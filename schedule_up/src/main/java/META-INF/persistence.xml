@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd"
+             version="2.2">
+
+    <persistence-unit name="persistenceUnit">
+        <class>ba.telegroup.schedule_up.model.Building</class>
+        <class>ba.telegroup.schedule_up.model.Company</class>
+        <class>ba.telegroup.schedule_up.model.Document</class>
+        <class>ba.telegroup.schedule_up.model.Gear</class>
+        <class>ba.telegroup.schedule_up.model.GearUnit</class>
+        <class>ba.telegroup.schedule_up.model.Holiday</class>
+        <class>ba.telegroup.schedule_up.model.Logger</class>
+        <class>ba.telegroup.schedule_up.model.Meeting</class>
+        <class>ba.telegroup.schedule_up.model.Note</class>
+        <class>ba.telegroup.schedule_up.model.Participant</class>
+        <class>ba.telegroup.schedule_up.model.Reminder</class>
+        <class>ba.telegroup.schedule_up.model.Role</class>
+        <class>ba.telegroup.schedule_up.model.Room</class>
+        <class>ba.telegroup.schedule_up.model.RoomHasGearUnit</class>
+        <class>ba.telegroup.schedule_up.model.Settings</class>
+        <class>ba.telegroup.schedule_up.model.UnavailablePeriod</class>
+        <class>ba.telegroup.schedule_up.model.User</class>
+        <class>ba.telegroup.schedule_up.model.UserGroup</class>
+        <class>ba.telegroup.schedule_up.model.UserGroupHasUser</class>
+        <properties>
+            <property name="hibernate.connection.url" value="jdbc:mysql://89.111.232.3:54602/shedule_up_db"/>
+            <property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver"/>
+        </properties>
+    </persistence-unit>
+</persistence>
