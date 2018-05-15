@@ -70,7 +70,7 @@ public class Logger {
     }
 
     @Basic
-    @Column(name = "created", nullable = false)
+    @Column(name = "created", nullable = false,insertable = false, updatable = false)
     public Timestamp getCreated() {
         return created;
     }
