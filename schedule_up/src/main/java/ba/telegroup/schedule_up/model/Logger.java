@@ -18,6 +18,19 @@ public class Logger {
     private Byte atomic;
     private Integer companyId;
 
+    public Logger(){
+
+    }
+
+    public Logger(Integer userId, String actionType, String actionDetails, String tableName, Byte atomic, Integer companyId) {
+        this.userId = userId;
+        this.actionType = actionType;
+        this.actionDetails = actionDetails;
+        this.tableName = tableName;
+        this.atomic = atomic;
+        this.companyId = companyId;
+    }
+
     @Id
     @Column(name = "id", nullable = false)
     public Integer getId() {
@@ -117,5 +130,23 @@ public class Logger {
     public int hashCode() {
 
         return Objects.hash(id, actionType, actionDetails, tableName, created, userId, atomic, companyId);
+    }
+
+    public enum ActionType {
+        CREATE("create"),
+        UPDATE("update"),
+        READ("read"),
+        DELETE("delete");
+
+        private final String text;
+
+        private ActionType(final String text) {
+            this.text = text;
+        }
+
+        @Override
+        public String toString() {
+            return text;
+        }
     }
 }
