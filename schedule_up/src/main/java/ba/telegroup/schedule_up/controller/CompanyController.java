@@ -5,15 +5,17 @@ import ba.telegroup.schedule_up.model.Company;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @RequestMapping("/company")
 @Controller
 @Scope("request")
 public class CompanyController extends GenericController<Company,Integer> {
-
-
     public CompanyController(JpaRepository<Company, Integer> repo) {
         super(repo);
     }
+
 }
