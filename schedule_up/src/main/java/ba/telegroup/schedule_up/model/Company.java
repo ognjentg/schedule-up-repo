@@ -1,9 +1,6 @@
 package ba.telegroup.schedule_up.model;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.sql.Time;
 import java.util.Objects;
 
@@ -14,8 +11,8 @@ public class Company {
     private Time timeFrom;
     private Time timeTo;
     private Byte deleted;
-
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     public Integer getId() {
         return id;

@@ -4,6 +4,7 @@ package ba.telegroup.schedule_up.session;
 import ba.telegroup.schedule_up.model.User;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.SessionScope;
 
