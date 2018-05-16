@@ -19,23 +19,17 @@ import javax.servlet.http.HttpSession;
  */
 public class GenericLogger<T> extends CommonController {
 
+    protected Cloner cloner;
     private Class<T> type;
-
     private HttpSession httpSession;
-
     @Autowired
     private LoggerRepository loggerRepository;
-
     @Value("${loggerConfig.createMessage}")
     private String createMessage;
-
     @Value("${loggerConfig.updateMessage}")
     private String updateMessage;
-
     @Value("${loggerConfig.deleteMessage}")
     private String deleteMessage;
-
-    protected Cloner cloner;
 
     public GenericLogger() {
         cloner = new Cloner();

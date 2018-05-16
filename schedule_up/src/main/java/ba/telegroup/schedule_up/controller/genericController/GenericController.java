@@ -24,10 +24,9 @@ import java.util.List;
  */
 public class GenericController<T, ID extends Serializable> extends GenericLogger<T> {
 
+    protected JpaRepository<T, ID> repo;
     @PersistenceContext
     private EntityManager entityManager;
-
-    protected JpaRepository<T, ID> repo;
 
     public GenericController(JpaRepository<T, ID> repo) {
         this.repo = repo;
@@ -43,7 +42,7 @@ public class GenericController<T, ID extends Serializable> extends GenericLogger
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public @ResponseBody
     T findById(@PathVariable("id") ID id) throws ForbiddenException {
-      //  return repo.findOne(id);
+        //  return repo.findOne(id);
         return repo.findById(id).orElse(null);
     }
 
@@ -63,7 +62,7 @@ public class GenericController<T, ID extends Serializable> extends GenericLogger
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public @ResponseBody
-    String update(@PathVariable ID id, @RequestBody T object) throws BadRequestException,ForbiddenException {
+    String update(@PathVariable ID id, @RequestBody T object) throws BadRequestException, ForbiddenException {
         T oldObject = cloner.deepClone(repo.findById(id).orElse(null));
         if (repo.saveAndFlush(object) != null) {
             logUpdateAction(object, oldObject);
@@ -74,10 +73,10 @@ public class GenericController<T, ID extends Serializable> extends GenericLogger
 
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.DELETE)
     public @ResponseBody
-    String delete(@PathVariable ID id) throws BadRequestException,ForbiddenException {
+    String delete(@PathVariable ID id) throws BadRequestException, ForbiddenException {
         try {
             T object = repo.findById(id).orElse(null);
-           // repo.delete(id);
+            // repo.delete(id);
             repo.deleteById(id);
             logDeleteAction(object);
             return "Success";

@@ -15,7 +15,7 @@ public class Logger {
     private Byte atomic;
     private Integer companyId;
 
-    public Logger(){
+    public Logger() {
 
     }
 
@@ -70,7 +70,7 @@ public class Logger {
     }
 
     @Basic
-    @Column(name = "created", nullable = false,insertable = false, updatable = false)
+    @Column(name = "created", nullable = false, insertable = false, updatable = false)
     public Timestamp getCreated() {
         return created;
     }

@@ -14,6 +14,7 @@ public class GearUnit {
     private Integer companyId;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     public Integer getId() {
         return id;

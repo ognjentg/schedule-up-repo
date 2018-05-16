@@ -5,12 +5,14 @@ import java.sql.Time;
 import java.util.Objects;
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 public class Company {
     private Integer id;
     private String name;
     private Time timeFrom;
     private Time timeTo;
     private Byte deleted;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
