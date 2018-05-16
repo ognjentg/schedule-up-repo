@@ -34,7 +34,7 @@ public class HubAccessFilter implements Filter {
     }
 
     @Override
-    public void init(FilterConfig config) throws ServletException {
+    public void init(FilterConfig config) {
         springContext = WebApplicationContextUtils.getWebApplicationContext(config.getServletContext());
     }
 

@@ -1,5 +1,7 @@
 package ba.telegroup.schedule_up.model;
 
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
 import java.sql.Time;
 import java.util.Objects;

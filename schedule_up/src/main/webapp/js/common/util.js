@@ -179,7 +179,7 @@ var util = {
         },
 
         checkPositiveNumber: function (value, errorMessageTarget, errorMessage) {
-            var valid = true
+            var valid = true;
             if (isNaN(value)) valid = false;
             else valid = (value > 0);
 
@@ -209,7 +209,6 @@ var util = {
                         return false;
                     } else return true;
                 }
-                    ;
                     break;
             }
 
@@ -435,7 +434,7 @@ var util = {
                     util.showErrorMessage("Greška prilikom aktiviranja iptv servisa.");
                 }, roomId);
             }
-        }
+        };
         webix.confirm(confirmBox);
     },
 
@@ -460,7 +459,7 @@ var util = {
                     util.showErrorMessage("Greška prilikom deaktiviranja iptv servisa.");
                 }, roomId);
             }
-        }
+        };
         webix.confirm(confirmBox);
     },
 
@@ -493,7 +492,7 @@ var util = {
                     util.showErrorMessage("Greška prilikom aktiviranja voice servisa.");
                 }, roomId);
             }
-        }
+        };
         webix.confirm(confirmBox);
     },
 
@@ -526,7 +525,7 @@ var util = {
                     util.showErrorMessage("Greška prilikom deaktiviranja voice servisa.");
                 }, roomId);
             }
-        }
+        };
         webix.confirm(confirmBox);
     },
 
@@ -559,7 +558,7 @@ var util = {
                     util.showErrorMessage("Greška prilikom aktiviranja voice premium saobraćaja.");
                 }, roomId);
             }
-        }
+        };
         webix.confirm(confirmBox);
     },
 
@@ -592,7 +591,7 @@ var util = {
                     util.showErrorMessage("Greška prilikom deaktiviranja voice premium saobraćaja.");
                 }, roomId);
             }
-        }
+        };
         webix.confirm(confirmBox);
     },
     onAfterFilter: function (count) {
@@ -635,4 +634,4 @@ var util = {
         }
         return true;
     }
-}
+};

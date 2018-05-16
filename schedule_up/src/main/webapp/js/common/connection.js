@@ -405,7 +405,7 @@ var connection = {
 
         return promise;
     }
-}
+};
 
 //webix connection methods
 webix.proxy.hub = {
@@ -427,4 +427,4 @@ webix.proxy.hub = {
         });
 
     }
-}
+};

@@ -77,7 +77,7 @@ var loadScripts = function () {
     }
 
     if (linearJsDownloadOrder.length > 0) loadScript(0);
-}
+};
 
 
 var loadCss = function () {
@@ -92,7 +92,7 @@ var loadCss = function () {
 
         console.log("Loaded css " + cssToLoad[i] + " (" + (i + 1) + "/" + cssToLoad.length + ")");
     }
-}
+};
 
 
 loadCss();

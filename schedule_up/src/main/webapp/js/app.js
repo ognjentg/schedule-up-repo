@@ -85,7 +85,7 @@ var menuEvents = {
     onItemClick: function (item) {
         menuActions(item);
     }
-}
+};
 
 var showApp = function () {
     var main = webix.copy(mainLayout);
@@ -122,11 +122,11 @@ var showApp = function () {
     $$("mainMenu").define("on", menuEvents);
 
     rightPanel = "emptyRightPanel";
-}
+};
 
 
 //main call
 window.onload = function () {
     init();
-}
+};
 

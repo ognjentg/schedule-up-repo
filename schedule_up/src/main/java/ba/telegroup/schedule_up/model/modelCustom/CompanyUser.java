@@ -7,6 +7,8 @@ import javax.persistence.ColumnResult;
 import javax.persistence.ConstructorResult;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.SqlResultSetMapping;
+import java.io.Serializable;
+import java.util.Date;
 import java.sql.Time;
 
 @SuppressWarnings("WeakerAccess")
@@ -17,21 +19,26 @@ import java.sql.Time;
                 columns = {
                         @ColumnResult(name = "id"),
                         @ColumnResult(name = "name"),
+                        @ColumnResult(name="time_from"),
+                        @ColumnResult(name="time_to"),
                         @ColumnResult(name = "email")
                 }
         )
 )
 @MappedSuperclass
-public class CompanyUser extends Company {
+public class CompanyUser extends Company implements Serializable {
 
     private String email;
 
     public CompanyUser() {
     }
 
-    public CompanyUser(Integer id, String name, String email) {
+    //Workaround to get time, DB returns java.util.Date
+    public CompanyUser(Integer id, String name, Date timeFrom,Date timeTo,String email) {
         setId(id);
         setName(name);
+        setTimeFrom(new Time(timeFrom.getTime()));
+        setTimeTo(new Time(timeTo.getTime()));
         this.email = email;
     }
 
@@ -49,15 +56,5 @@ public class CompanyUser extends Company {
         return super.getDeleted();
     }
 
-    @JsonIgnore
-    @Override
-    public Time getTimeFrom() {
-        return super.getTimeFrom();
-    }
 
-    @JsonIgnore
-    @Override
-    public Time getTimeTo() {
-        return super.getTimeTo();
-    }
 }

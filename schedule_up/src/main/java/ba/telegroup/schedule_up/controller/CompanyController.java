@@ -2,6 +2,7 @@ package ba.telegroup.schedule_up.controller;
 
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.model.Company;
+import ba.telegroup.schedule_up.model.modelCustom.CompanyUser;
 import ba.telegroup.schedule_up.repository.CompanyRepository;
 import ba.telegroup.schedule_up.repository.repositoryCustom.CompanyRepositoryCustom;
 import org.springframework.context.annotation.Scope;
@@ -31,7 +32,7 @@ public class CompanyController extends GenericController<Company, Integer> {
 
     @RequestMapping(value = "/getAllExtended", method = RequestMethod.GET)
     public @ResponseBody
-    List getAllExtended() {
+    List<CompanyUser> getAllExtended() {
         return ((CompanyRepositoryCustom) repo).getAllExtended();
     }
 

@@ -41,4 +41,4 @@ var commonViews = {
         }
     }
 
-}
+};

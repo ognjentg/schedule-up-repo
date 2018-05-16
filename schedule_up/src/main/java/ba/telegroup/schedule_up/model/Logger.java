@@ -138,7 +138,7 @@ public class Logger {
 
         private final String text;
 
-        private ActionType(final String text) {
+        ActionType(final String text) {
             this.text = text;
         }
 

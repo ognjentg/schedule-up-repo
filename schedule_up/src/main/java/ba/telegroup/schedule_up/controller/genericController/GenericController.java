@@ -35,13 +35,13 @@ public class GenericController<T, ID extends Serializable> extends GenericLogger
     @Transactional
     @RequestMapping(method = RequestMethod.GET)
     public @ResponseBody
-    List<T> getAll() throws ForbiddenException {
+    List<T> getAll() {
         return repo.findAll();
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public @ResponseBody
-    T findById(@PathVariable("id") ID id) throws ForbiddenException {
+    T findById(@PathVariable("id") ID id) {
         //  return repo.findOne(id);
         return repo.findById(id).orElse(null);
     }
@@ -50,7 +50,7 @@ public class GenericController<T, ID extends Serializable> extends GenericLogger
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public @ResponseBody
-    T insert(@RequestBody T object) throws BadRequestException, ForbiddenException {
+    T insert(@RequestBody T object) throws BadRequestException {
         T ret = null;
         if ((ret = repo.saveAndFlush(object)) != null) {
             entityManager.refresh(ret);
@@ -62,7 +62,7 @@ public class GenericController<T, ID extends Serializable> extends GenericLogger
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public @ResponseBody
-    String update(@PathVariable ID id, @RequestBody T object) throws BadRequestException, ForbiddenException {
+    String update(@PathVariable ID id, @RequestBody T object) throws BadRequestException {
         T oldObject = cloner.deepClone(repo.findById(id).orElse(null));
         if (repo.saveAndFlush(object) != null) {
             logUpdateAction(object, oldObject);
@@ -73,7 +73,7 @@ public class GenericController<T, ID extends Serializable> extends GenericLogger
 
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.DELETE)
     public @ResponseBody
-    String delete(@PathVariable ID id) throws BadRequestException, ForbiddenException {
+    String delete(@PathVariable ID id) throws BadRequestException {
         try {
             T object = repo.findById(id).orElse(null);
             // repo.delete(id);
