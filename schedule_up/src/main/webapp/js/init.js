@@ -15,6 +15,11 @@ var scriptsToLoad = [
         "files": ["connection", "util", "view_components", "pagination_setup"]
     },
     {
+        "section":"views",
+        "path":"js/views/",
+        "files":["company"]
+    },
+    {
         "section": "core",
         "path": "js/",
         "files": ["app"]

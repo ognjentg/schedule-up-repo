@@ -5,11 +5,20 @@ var MENU_STATES = {
 var menuState = MENU_STATES.COLLAPSED;
 
 var menuData = [
-
+    {
+        id:"company",
+        value:"Company",
+        icon:"briefcase"
+    }
 ];
 
 var menuActions = function (id) {
 
+    switch(id){
+        case "company":
+            companyView.selectPanel();
+            break;
+    }
 };
 
 var panel = {id: "empty"};
