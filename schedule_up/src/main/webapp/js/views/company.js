@@ -43,21 +43,36 @@ var companyView = {
                     }
                 ]
             }, {
-                id: "email",
+                id: "timeFrom",
                 fillspace: true,
                 editor: "text",
-                sort: "text",
-                header: [
-                    "E-mail", {
+                header: ["Time from",
+                    {
                         content: "textFilter"
-                    }
-                ]
-            }
+                    }]
+            },
+                {
+                    id: "timeTo",
+                    fillspace: true,
+                    editor: "text",
+                    header: ["Time to",{
+                        content: "textFilter"
+                    }],
+                }, {
+                    id: "email",
+                    fillspace: true,
+                    editor: "text",
+                    sort: "text",
+                    header: [
+                        "E-mail", {
+                            content: "textFilter"
+                        }
+                    ]
+                }
             ],
             select: "row",
             navigation: true,
             editable: "false",
-            editaction: "dblclick",
             url: "company/getAllExtended",
             on: {
 
@@ -75,7 +90,6 @@ var companyView = {
         var panelCopy = webix.copy(this.panel);
 
         $$("main").addView(webix.copy(panelCopy));
-
 
 
         webix.ui({
@@ -105,6 +119,7 @@ var companyView = {
                             var delBox = (webix.copy(commonViews.deleteConfirm("company")));
                             delBox.callback = function (result) {
                                 if (result == 1) {
+                                    connection.sendAjax("DELETE")
                                     $$("companyDT").remove(context.id.row);
                                     util.messages.showMessage("Company deleted successfully.");
                                 }
@@ -153,23 +168,60 @@ var companyView = {
                     invalidMessage: "Enter company name!",
                     required: true
                 }, {
-                    view: "text",
-                    id: "email",
-                    name: "email",
-                    label: "E-mail:",
-                    required: true
+                    id: "timeFrom",
+                    invalidMessage:"Enter time from!",
+                    name: "timeFrom",
+                    view: "datepicker",
+                    stringResult: true,
+                    label: "Time from",
+                    timepicker: true,
+                    type: "time",
+                    required: true,
+                    format: "%H:%i",
+                    suggest: {
+                        type: "calendar",
+                        body: {
+                            type: "time",
+                            calendarTime: "%H:%i"
+                        }
+                    }
                 }, {
-                    margin: 5,
-                    cols: [{}, {
-                        id: "saveCompany",
-                        view: "button",
-                        value: "Save",
-                        type: "form",
-                        click: "companyView.save",
-                        hotkey: "enter",
-                        width: 150
-                    }]
-                }],
+                    id: "timeTo",
+                    name: "timeTo",
+                    view: "datepicker",
+                    invalidMessage:"Enter time to!",
+                    stringResult: true,
+                    label: "Time to",
+                    timepicker: true,
+                    type: "time",
+                    required: true,
+                    format: "%H:%i",
+                    suggest: {
+                        type: "calendar",
+                        body: {
+                            type: "time",
+                            calendarTime: "%H:%i"
+                        }
+                    }
+                },
+                    {
+                        view: "text",
+                        id: "email",
+                        name: "email",
+                        label: "E-mail:",
+                        required: true
+                    }, {
+                        margin: 5,
+                        cols: [{}, {
+                            id: "saveCompany",
+                            view: "button",
+                            value: "Save",
+                            type: "form",
+                            click: "companyView.save",
+                            hotkey: "enter",
+                            width: 150
+                        }]
+                    }],
                 rules: {
                     "name": function (value) {
                         if (!value)
@@ -180,7 +232,7 @@ var companyView = {
                         }
                         return true;
                     },
-                    "email": function (value) {
+                    "email":function (value) {
                         if (!value) {
                             $$('addCompanyForm').elements.email.config.invalidMessage = 'Enter E-mail!';
                             return false;
@@ -189,6 +241,11 @@ var companyView = {
                             $$('addCompanyForm').elements.email.config.invalidMessage = 'Up to 100 characters allowed';
                             return false;
                         }
+                        if(!webix.rules.isEmail(value)) {
+                            $$('addCompanyForm').elements.email.config.invalidMessage = 'Email is not in valid format.';
+                            return false;
+                        }
+
                         return true;
                     }
                 }
@@ -204,19 +261,46 @@ var companyView = {
     save: function () {
         var form = $$("addCompanyForm");
         if (form.validate()) {
+            var newCompany = {
+                name: form.getValues().name,
+                timeFrom: form.getValues().timeFrom + ":00",
+                timeTo: form.getValues().timeTo + ":00",
+                deleted:0
+            };
+            var newUser = {
+                email: form.getValues().email,
+                deleted:0,
+                active:0,
+                roleId:1,
 
+            };
+            connection.sendAjax("POST", "company", function (text, data, xhr) {
+                var addedCompany = data.json();
+                newUser.companyId=addedCompany.id;
 
-            if ($$("addCompanyForm").validate()) {
-                var newItem = {
-                    name: form.getValues().name,
-                    email:form.getValues().email
-                };
-               // $$("companyDT").add(newItem);
+                connection.sendAjax("POST", "user", function (text, data, xhr) {
+                    addedCompany.email = data.json().email;
+                    $$("companyDT").add(addedCompany);
+                    util.messages.showMessage("Company added successfully.");
+                }, function () {
+                    connection.sendAjax("DELETE","company/"+addedCompany.id,function(text,data,xhr){
+                        util.messages.showErrorMessage("Company cannot be added!");
 
-                util.dismissDialog('addCompanyDialog');
-            }
+                    },function(){
+                        util.messages.showErrorMessage("If this happened,backend is to blame.");
+                    },{});
+
+                }, newUser);
+            }, function () {
+
+                util.messages.showErrorMessage("Company cannot be added!");
+            }, newCompany);
+
+            util.dismissDialog('addCompanyDialog');
         }
-    },
+    }
+
+    ,
 
     changeCompanyDialog: {
         view: "popup",
