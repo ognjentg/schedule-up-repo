@@ -12,7 +12,5 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Scope("request")
 public class UserController extends GenericController<User, Integer> {
 
-    public UserController(JpaRepository<User, Integer> repo) {
-        super(repo);
-    }
+    public UserController(JpaRepository<User, Integer> repo) { super(repo); }
 }
