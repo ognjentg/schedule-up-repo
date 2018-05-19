@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 public class Room {
     private Integer id;
     private String name;
