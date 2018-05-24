@@ -49,4 +49,69 @@ public class HolidayController extends GenericController<Holiday, Integer> {
         }
         throw new BadRequestException("Bad request");
     }
+
+    @RequestMapping(value = "/getAllByCompanyId/{id}", method = RequestMethod.GET)
+    public @ResponseBody
+    List getAllByCompanyId(@PathVariable Integer id) {
+        List<Holiday> holidays = ((HolidayRepository) repo).getAllByCompanyId(id);
+        List<Holiday> result = new ArrayList<>();
+        for (Holiday n : holidays) {
+            if(n.getDeleted()!=(byte)1){
+                result.add(n);
+            }
+        }
+        return result;
+    }
+
+    @RequestMapping(value = "/getAllByNameContains/{name}", method = RequestMethod.GET)
+    public @ResponseBody
+    List getAllByNameContains(@PathVariable String name) {
+        List<Holiday> holidays = ((HolidayRepository) repo).getAllByNameContains(name);
+        List<Holiday> result = new ArrayList<>();
+        for (Holiday n : holidays) {
+            if(n.getDeleted()!=(byte)1){
+                result.add(n);
+            }
+        }
+        return result;
+    }
+
+    @RequestMapping(value = "/getAllByDateAfter/{date}", method = RequestMethod.GET)
+    public @ResponseBody
+    List getAllByDateAfter(@PathVariable java.sql.Date date) {
+        List<Holiday> holidays = ((HolidayRepository) repo).getAllByDateAfter(date);
+        List<Holiday> result = new ArrayList<>();
+        for (Holiday n : holidays) {
+            if(n.getDeleted()!=(byte)1){
+                result.add(n);
+            }
+        }
+        return result;
+    }
+
+    @RequestMapping(value = "/getAllByDateBefore/{date}", method = RequestMethod.GET)
+    public @ResponseBody
+    List getAllByDateBefore(@PathVariable java.sql.Date date) {
+        List<Holiday> holidays = ((HolidayRepository) repo).getAllByDateBefore(date);
+        List<Holiday> result = new ArrayList<>();
+        for (Holiday n : holidays) {
+            if(n.getDeleted()!=(byte)1){
+                result.add(n);
+            }
+        }
+        return result;
+    }
+
+    @RequestMapping(value = "/getAllByDateBetween/{from}/{to}", method = RequestMethod.GET)
+    public @ResponseBody
+    List getAllByDateBetween(@PathVariable java.sql.Date from, @PathVariable java.sql.Date to) {
+        List<Holiday> holidays = ((HolidayRepository) repo).getAllByDateBetween(from, to);
+        List<Holiday> result = new ArrayList<>();
+        for (Holiday n : holidays) {
+            if(n.getDeleted()!=(byte)1){
+                result.add(n);
+            }
+        }
+        return result;
+    }
 }
