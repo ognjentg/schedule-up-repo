@@ -8,6 +8,5 @@ import java.util.List;
 
 public interface GearRepository extends JpaRepository<Gear, Integer> {
 
-    List<Gear> getAllByNameStartingWithIgnoreCase(String name);
-
+    List<Gear> getAllByNameContainsIgnoreCase(String name);
 }
