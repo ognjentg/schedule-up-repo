@@ -11,4 +11,6 @@ public interface CompanyRepository extends JpaRepository<Company, Integer>, Comp
     List<Company> getAllByIdIsAfter(Integer id);
 
     List<Company> getByNameContains(String name);
+
+
 }
