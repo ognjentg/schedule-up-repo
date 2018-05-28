@@ -5,6 +5,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "gear_unit", schema = "shedule_up_db", catalog = "")
+@Inheritance(strategy = InheritanceType.JOINED)
 public class GearUnit {
     private Integer id;
     private Byte available;

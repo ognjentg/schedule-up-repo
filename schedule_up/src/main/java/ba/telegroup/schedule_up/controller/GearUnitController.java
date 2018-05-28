@@ -31,6 +31,26 @@ public class GearUnitController extends GenericController<GearUnit, Integer> {
         return ((GearUnitRepositoryCustom) repo).getAllExtended().stream().filter(x -> x.getDeleted()==0).collect(Collectors.toList());
     }
 
+    @RequestMapping(value ="/getAllExtendedById/{id}", method = RequestMethod.GET)
+    public @ResponseBody
+    List<GearUnitGear> getAllExtendedById(@PathVariable Integer id) {
+        return ((GearUnitRepositoryCustom)repo).getAllExtendedById(id);
+    }
+
+    @Transactional
+    @RequestMapping(value ="/", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.CREATED)
+    public @ResponseBody
+    GearUnitGear insertExtended(@RequestBody GearUnitGear gearUnitGear) throws BadRequestException {
+        return  ((GearUnitRepositoryCustom)repo).insertExtended(gearUnitGear);
+    }
+
+    @Transactional
+    @RequestMapping(value ="/", method = RequestMethod.PUT)
+    public @ResponseBody
+    GearUnitGear updateExtended(@RequestBody GearUnitGear gearUnitGear) throws BadRequestException {
+        return  ((GearUnitRepositoryCustom)repo).updateExtended(gearUnitGear);
+    }
 
     @Override
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.DELETE)
