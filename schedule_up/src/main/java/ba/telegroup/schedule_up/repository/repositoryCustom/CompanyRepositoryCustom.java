@@ -15,7 +15,9 @@ public interface CompanyRepositoryCustom {
 
     CompanyUser getByIdAndEmail(Integer id, String email);
 
-    String updateExtended(Integer id, String email, CompanyUser companyUser);
+    CompanyUser updateExtended(Integer userId, CompanyUser companyUser);
 
     String deleteCompany(Company company);
+
+    CompanyUser insertExtended(CompanyUser companyUser);
 }

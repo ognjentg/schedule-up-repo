@@ -8,7 +8,9 @@ import ba.telegroup.schedule_up.repository.CompanyRepository;
 import ba.telegroup.schedule_up.repository.repositoryCustom.CompanyRepositoryCustom;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,7 +28,7 @@ public class CompanyController extends GenericController<Company, Integer> {
     /*
     Vraca sve custom CompanyUser objekte
      */
-    @RequestMapping(value = "/getAllExtended", method = RequestMethod.GET)
+    @RequestMapping(value = "/", method = RequestMethod.GET)
     public @ResponseBody
     List<CompanyUser> getAllExtended() {
         return ((CompanyRepositoryCustom) repo).getAllExtended();
@@ -59,23 +61,26 @@ public class CompanyController extends GenericController<Company, Integer> {
         return ((CompanyRepositoryCustom) repo).getByIdAndEmail(id, email);
     }
 
+    @Transactional
+    @RequestMapping(value ="/", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.CREATED)
+    public @ResponseBody
+    CompanyUser insertExtended(@RequestBody CompanyUser companyUser) throws BadRequestException {
+        return  ((CompanyRepositoryCustom)repo).insertExtended(companyUser);
+    }
 
     /*
     Metoda kojom se azurira objekat klase CompanyUser
     Ukoliko se izmijeni email adresa administratoru, setuje mu se flag active na 0
+    Path varijabla id se odnosi na id korisnika
     */
-  /*  @RequestMapping(value = "/{id}/{email}", method = RequestMethod.PUT)
+    @Transactional
+    @RequestMapping(value ="/custom/{id}", method = RequestMethod.PUT)
     public @ResponseBody
-    String updateExtended(@PathVariable Integer id, @PathVariable String email, @RequestBody CompanyUser companyUser) throws BadRequestException {
-        CompanyUser oldObject = cloner.deepClone(((CompanyRepositoryCustom)repo).getByIdAndEmail(id, email));
-        if ("Success".equals(((CompanyRepositoryCustom)repo).updateExtended(id, email, companyUser))) {
-            logUpdateAction(companyUser, oldObject);
-            return "Success";
-        } else {
-            throw new BadRequestException("Bad request");
-        }
+    CompanyUser updateExtended(@PathVariable Integer id, @RequestBody CompanyUser companyUser) throws BadRequestException {
+        System.out.println("Ulazi");
+        return  ((CompanyRepositoryCustom)repo).updateExtended(id, companyUser);
     }
-*/
 
 
     /*

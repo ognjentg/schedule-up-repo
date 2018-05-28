@@ -20,13 +20,6 @@ public class DocumentController extends GenericController<Document, Integer> {
         super(repo);
     }
 
-    @RequestMapping(value = "/getById/{id}", method = RequestMethod.GET)
-    public @ResponseBody
-    Document getById(@PathVariable Integer id) {
-        Document document = ((DocumentRepository) repo).getById(id);
-        return document;
-    }
-
 
     @RequestMapping(value = "/getAllByIdIsAfter/{id}", method = RequestMethod.GET)
     public @ResponseBody
