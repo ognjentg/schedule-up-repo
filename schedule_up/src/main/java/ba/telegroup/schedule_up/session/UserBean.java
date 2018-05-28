@@ -15,6 +15,7 @@ public class UserBean {
     // Must change this as soon as possible.
 
     public UserBean() {
+        System.out.println("CONSTRUCTOOOR");
         user = new User();
         loggedIn = true;
         user.setId(1);

@@ -4,6 +4,8 @@ import ba.telegroup.schedule_up.common.exceptions.BadRequestException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.model.Building;
 import ba.telegroup.schedule_up.repository.BuildingRepository;
+import ba.telegroup.schedule_up.session.UserBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Controller;
@@ -20,76 +22,41 @@ import java.util.List;
 @Controller
 @Scope("request")
 public class BuildingController extends GenericController<Building, Integer> {
-
     public BuildingController(JpaRepository<Building, Integer> repo) {
         super(repo);
     }
 
-    @RequestMapping(value = "/getAllByCompanyId/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/", method = RequestMethod.GET)
     public @ResponseBody
-    List getAllByCompanyId(@PathVariable Integer id) {
-        List<Building> buildings = ((BuildingRepository) repo).getAllByCompanyId(id);
-        List<Building> result=new ArrayList<>();
-        for (Building b:
-                buildings) {
-            if(b.getDeleted()!=(byte)1){
-                result.add(b);
-            }
-        }
-        return result;
+    List getAllByCompanyId() {
+        return ((BuildingRepository) repo).getAllByCompanyIdAndDeletedEquals(userBean.getUser().getCompanyId(),(byte)0);
+
     }
 
     @RequestMapping(value = "/getAllByNameContains/{name}", method = RequestMethod.GET)
     public @ResponseBody
     List getAllByNameContains(@PathVariable String name) {
-        List<Building> buildings = ((BuildingRepository) repo).getAllByNameContains(name);
-        List<Building> result=new ArrayList<>();
-        for (Building b:
-                buildings) {
-            if(b.getDeleted()!=(byte)1){
-                result.add(b);
-            }
-        }
-        return result;
+       return ((BuildingRepository) repo).getAllByCompanyIdAndNameContainsIgnoreCaseAndDeletedEquals(userBean.getUser().getCompanyId(),name,(byte)0);
+
     }
 
     @RequestMapping(value = "/getAllByLongitudeAndLatitude/{longitude}/{latitude}", method = RequestMethod.GET)
     public @ResponseBody
     List getAllByLongitudeAndLatitude(@PathVariable Double longitude, @PathVariable Double latitude) {
-        List<Building> buildings = ((BuildingRepository) repo).getAllByLongitudeAndLatitude(longitude, latitude);
-        List<Building> result=new ArrayList<>();
-        for (Building b:
-                buildings) {
-            if (b.getDeleted() != (byte) 1) {
-                result.add(b);
-            }
-        }
-        return result;
-    }
+        return  ((BuildingRepository) repo).getAllByCompanyIdAndLongitudeAndLatitudeAndDeletedEquals(userBean.getUser().getCompanyId(),longitude, latitude,(byte)0);
 
-    @RequestMapping(value = "/getAllByCompanyIdAndLongitudeAndLatitude/{id}/{longitude}/{latitude}", method = RequestMethod.GET)
-    public @ResponseBody
-    List getAllByCompanyIdAndLongitudeAndLatitude(@PathVariable Integer id, @PathVariable Double longitude, @PathVariable Double latitude) {
-        List<Building> buildings = ((BuildingRepository) repo).getAllByCompanyIdAndLongitudeAndLatitude(id, longitude, latitude);
-        List<Building> result=new ArrayList<>();
-        for (Building b:
-                buildings) {
-            if(b.getDeleted()!=(byte)1){
-                result.add(b);
-            }
-        }
-        return result;
     }
 
     @Override
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.DELETE)
     public @ResponseBody String delete(@PathVariable Integer id) throws BadRequestException {
         Building building=((BuildingRepository) repo).findById(id).orElse(null);
-        Building oldObject = cloner.deepClone(building);
-        building.setDeleted((byte)1);
-        if (((BuildingRepository) repo).saveAndFlush(building) != null) {
-            logUpdateAction(building, oldObject);
-            return "Success";
+        if(building!=null){
+            building.setDeleted((byte)1);
+            if (((BuildingRepository) repo).saveAndFlush(building) != null) {
+                logDeleteAction(building);
+                return "Success";
+            }
         }
         throw new BadRequestException("Bad request");
     }

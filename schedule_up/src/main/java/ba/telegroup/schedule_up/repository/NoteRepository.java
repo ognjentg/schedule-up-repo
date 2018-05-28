@@ -8,10 +8,9 @@ import java.util.List;
 
 public interface NoteRepository extends JpaRepository<Note, Integer> {
 
-    List<Note> getAllByCompanyId(Integer id);
-    List<Note> getAllByUserId(Integer id);
-    List<Note> getAllByCompanyIdAndUserId(Integer companyId, Integer userId);
-    List<Note> getAllByNameContains(String name);
+    List<Note> getAllByCompanyIdAndDeletedEquals(Integer id, Byte deleted);
+    List<Note> getAllByCompanyIdAndUserIdAndDeletedEquals(Integer companyId, Integer userId,Byte deleted);
+    List<Note> getAllByCompanyIdAndNameContainsIgnoreCaseAndDeletedEquals(Integer companyId,String name,Byte deleted);
 //    List<Note> getAllByPublishTimeAfter(Timestamp time);
 //    List<Note> getAllByPublishTimeBefore(Timestamp time);
 

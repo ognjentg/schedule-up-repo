@@ -6,6 +6,8 @@ import ba.telegroup.schedule_up.model.Building;
 import ba.telegroup.schedule_up.model.Note;
 import ba.telegroup.schedule_up.repository.BuildingRepository;
 import ba.telegroup.schedule_up.repository.NoteRepository;
+import ba.telegroup.schedule_up.session.UserBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Controller;
@@ -22,73 +24,46 @@ import java.util.List;
 @Controller
 @Scope("request")
 public class NoteController extends GenericController<Note, Integer> {
+
     public NoteController(JpaRepository<Note, Integer> repo) {
         super(repo);
     }
 
-    @RequestMapping(value = "/getAllByCompanyId/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/", method = RequestMethod.GET)
     public @ResponseBody
-    List getAllByCompanyId(@PathVariable Integer id) {
-        List<Note> notes = ((NoteRepository) repo).getAllByCompanyId(id);
-        List<Note> result = new ArrayList<>();
-        for (Note n : notes) {
-            if(n.getDeleted()!=(byte)1){
-                result.add(n);
-            }
-        }
-        return result;
+    List getAllByCompanyId() {
+        return ((NoteRepository) repo).getAllByCompanyIdAndDeletedEquals(userBean.getUser().getCompanyId(), (byte) 0);
+
     }
 
     @RequestMapping(value = "/getAllByUserId/{id}", method = RequestMethod.GET)
     public @ResponseBody
     List getAllByUserId(@PathVariable Integer id) {
-        List<Note> notes = ((NoteRepository) repo).getAllByUserId(id);
-        List<Note> result = new ArrayList<>();
-        for (Note n : notes) {
-            if(n.getDeleted()!=(byte)1){
-                result.add(n);
-            }
-        }
-        return result;
+        return ((NoteRepository) repo).getAllByCompanyIdAndUserIdAndDeletedEquals(userBean.getUser().getCompanyId(),id, (byte) 0);
+
     }
 
-    @RequestMapping(value = "/getAllByCompanyIdAndUserId/{companyId}/{userId}", method = RequestMethod.GET)
-    public @ResponseBody
-    List getAllByCompanyIdAndUserId(@PathVariable Integer companyId, @PathVariable Integer userId) {
-        List<Note> notes = ((NoteRepository) repo).getAllByCompanyIdAndUserId(companyId, userId);
-        List<Note> result = new ArrayList<>();
-        for (Note n : notes) {
-            if(n.getDeleted()!=(byte)1){
-                result.add(n);
-            }
-        }
-        return result;
-    }
 
     @RequestMapping(value = "/getAllByNameContains/{name}", method = RequestMethod.GET)
     public @ResponseBody
     List getAllByNameContains(@PathVariable String name) {
-        List<Note> notes = ((NoteRepository) repo).getAllByNameContains(name);
-        List<Note> result = new ArrayList<>();
-        for (Note n : notes) {
-            if(n.getDeleted()!=(byte)1){
-                result.add(n);
-            }
-        }
-        return result;
+        return ((NoteRepository) repo).getAllByCompanyIdAndNameContainsIgnoreCaseAndDeletedEquals(userBean.getUser().getCompanyId(),name, (byte) 0);
+
     }
 
     @Override
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.DELETE)
     public @ResponseBody String delete(@PathVariable Integer id) throws BadRequestException {
         Note note=((NoteRepository) repo).findById(id).orElse(null);
-        Note oldObject = cloner.deepClone(note);
-        note.setDeleted((byte)1);
-        if (((NoteRepository) repo).saveAndFlush(note) != null) {
-            logUpdateAction(note, oldObject);
-            return "Success";
-        }
-        throw new BadRequestException("Bad request");
+       if (note!=null) {
+           note.setDeleted((byte) 1);
+           if (((NoteRepository) repo).saveAndFlush(note) != null) {
+               logDeleteAction(note);
+               return "Success";
+           }
+       }
+           throw new BadRequestException("Bad request");
+
     }
 
 //    @RequestMapping(value = "/getAllByPublishTimeAfter/{time}", method = RequestMethod.GET)

@@ -4,6 +4,8 @@ package ba.telegroup.schedule_up.controller.genericController;
 import ba.telegroup.schedule_up.common.exceptions.BadRequestException;
 import ba.telegroup.schedule_up.common.exceptions.ForbiddenException;
 import ba.telegroup.schedule_up.controller.genericLogger.GenericLogger;
+import ba.telegroup.schedule_up.session.UserBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +30,8 @@ public class GenericController<T, ID extends Serializable> extends GenericLogger
     @PersistenceContext
     private EntityManager entityManager;
 
+    @Autowired
+    protected  UserBean userBean;
     public GenericController(JpaRepository<T, ID> repo) {
         this.repo = repo;
     }
@@ -35,13 +39,13 @@ public class GenericController<T, ID extends Serializable> extends GenericLogger
     @Transactional
     @RequestMapping(method = RequestMethod.GET)
     public @ResponseBody
-    List<T> getAll() {
+    List<T> getAll()throws BadRequestException,ForbiddenException {
         return repo.findAll();
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public @ResponseBody
-    T findById(@PathVariable("id") ID id) {
+    T findById(@PathVariable("id") ID id) throws BadRequestException,ForbiddenException {
         //  return repo.findOne(id);
         return repo.findById(id).orElse(null);
     }
@@ -50,7 +54,7 @@ public class GenericController<T, ID extends Serializable> extends GenericLogger
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public @ResponseBody
-    T insert(@RequestBody T object) throws BadRequestException {
+    T insert(@RequestBody T object) throws BadRequestException,ForbiddenException {
         T ret = null;
         if ((ret = repo.saveAndFlush(object)) != null) {
             entityManager.refresh(ret);
@@ -62,7 +66,7 @@ public class GenericController<T, ID extends Serializable> extends GenericLogger
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public @ResponseBody
-    String update(@PathVariable ID id, @RequestBody T object) throws BadRequestException {
+    String update(@PathVariable ID id, @RequestBody T object) throws BadRequestException,ForbiddenException {
         T oldObject = cloner.deepClone(repo.findById(id).orElse(null));
         if (repo.saveAndFlush(object) != null) {
             logUpdateAction(object, oldObject);
@@ -73,7 +77,7 @@ public class GenericController<T, ID extends Serializable> extends GenericLogger
 
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.DELETE)
     public @ResponseBody
-    String delete(@PathVariable ID id) throws BadRequestException {
+    String delete(@PathVariable ID id) throws BadRequestException,ForbiddenException {
         try {
             T object = repo.findById(id).orElse(null);
             // repo.delete(id);
