@@ -23,10 +23,12 @@ public class UserGroupController extends GenericController<UserGroup, Integer> {
         super(repo);
     }
 
-    @Override
-    public List<UserGroup> getAll() {
-        return super.getAll().stream().filter(x -> x.getDeleted()==0).collect(Collectors.toList());
+    @RequestMapping(value = {"/"}, method = RequestMethod.GET)
+    public @ResponseBody
+    List<UserGroup> getByCompanyId() {
+        return ((UserGroupRepository)repo).getAllByCompanyIdAndDeletedEquals(userBean.getUser().getCompanyId(), (byte) 0);
     }
+
 
     @Override
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.DELETE)

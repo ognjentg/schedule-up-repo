@@ -1,6 +1,7 @@
 package ba.telegroup.schedule_up.controller;
 
 import ba.telegroup.schedule_up.common.exceptions.BadRequestException;
+import ba.telegroup.schedule_up.common.exceptions.ForbiddenException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.model.Gear;
 import ba.telegroup.schedule_up.repository.GearRepository;
@@ -27,8 +28,8 @@ public class GearController extends GenericController<Gear, Integer> {
     }
 
     @Override
-    public List<Gear> getAll() {
-        return null;
+    public List<Gear> getAll() throws ForbiddenException {
+        throw new ForbiddenException("Forbidden");
     }
 
     @Override
@@ -37,17 +38,17 @@ public class GearController extends GenericController<Gear, Integer> {
     }
 
     @Override
-    public Gear insert(Gear object) throws BadRequestException {
-        throw new BadRequestException("Method Not Allowed");
+    public Gear insert(Gear object) throws ForbiddenException {
+        throw new ForbiddenException("Forbidden");
     }
 
     @Override
-    public String update(Integer integer, Gear object) throws BadRequestException {
-        throw new BadRequestException("Method Not Allowed");
+    public String update(Integer integer, Gear object) throws ForbiddenException {
+        throw new ForbiddenException("Forbidden");
     }
 
     @Override
-    public String delete(Integer integer) throws BadRequestException {
-        throw new BadRequestException("Method Not Allowed");
+    public String delete(Integer integer) throws ForbiddenException {
+        throw new ForbiddenException("Forbidden");
     }
 }

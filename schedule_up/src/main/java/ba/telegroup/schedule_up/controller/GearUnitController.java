@@ -28,7 +28,7 @@ public class GearUnitController extends GenericController<GearUnit, Integer> {
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public @ResponseBody
     List<GearUnitGear> getAllExtended() {
-        return ((GearUnitRepositoryCustom) repo).getAllExtended().stream().filter(x -> x.getDeleted()==0).collect(Collectors.toList());
+        return ((GearUnitRepositoryCustom) repo).getAllExtended().stream().filter(x-> x.getCompanyId()==userBean.getUser().getCompanyId()).collect(Collectors.toList());
     }
 
     @RequestMapping(value ="/getAllExtendedById/{id}", method = RequestMethod.GET)
