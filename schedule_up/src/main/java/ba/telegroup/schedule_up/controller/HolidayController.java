@@ -26,14 +26,7 @@ public class HolidayController extends GenericController<Holiday, Integer> {
     @RequestMapping(method = RequestMethod.GET)
     public @ResponseBody
     List<Holiday> getAll() {
-        List<Holiday> holidays = ((HolidayRepository) repo).findAll();
-        List<Holiday> retVal = new ArrayList<>();
-        for (Holiday holiday : holidays) {
-            if (holiday.getDeleted() != (byte) 1) {
-                retVal.add(holiday);
-            }
-        }
-        return retVal;
+        return ((HolidayRepository) repo).getAllByDeletedEqualsAndCompanyId((byte)0, userBean.getUser().getCompanyId());
     }
 
     @Override
@@ -41,8 +34,14 @@ public class HolidayController extends GenericController<Holiday, Integer> {
     public @ResponseBody
     String delete(@PathVariable Integer id) throws BadRequestException {
         Holiday holiday = ((HolidayRepository) repo).findById(id).orElse(null);
-        Holiday oldObject = cloner.deepClone(holiday);
-        holiday.setDeleted((byte) 1);
+        Holiday oldObject = null;
+        //Holiday holiday = ((HolidayRepository) repo).findOneByIdAndCompanyId(id, userBean.getUser().getCompanyId());
+        if(!userBean.getUser().getCompanyId().equals(holiday.getCompanyId()))holiday=null;
+        else {
+            oldObject = cloner.deepClone(holiday);
+            holiday.setDeleted((byte) 1);
+        }
+
         if (((HolidayRepository) repo).saveAndFlush(holiday) != null) {
             logUpdateAction(holiday, oldObject);
             return "Success";
@@ -53,65 +52,30 @@ public class HolidayController extends GenericController<Holiday, Integer> {
     @RequestMapping(value = "/getAllByCompanyId/{id}", method = RequestMethod.GET)
     public @ResponseBody
     List getAllByCompanyId(@PathVariable Integer id) {
-        List<Holiday> holidays = ((HolidayRepository) repo).getAllByCompanyId(id);
-        List<Holiday> result = new ArrayList<>();
-        for (Holiday n : holidays) {
-            if(n.getDeleted()!=(byte)1){
-                result.add(n);
-            }
-        }
-        return result;
+        return ((HolidayRepository) repo).getAllByCompanyIdAndDeletedEqualsAndCompanyId(userBean.getUser().getCompanyId(), (byte) 0, userBean.getUser().getCompanyId());
     }
 
     @RequestMapping(value = "/getAllByNameContains/{name}", method = RequestMethod.GET)
     public @ResponseBody
     List getAllByNameContains(@PathVariable String name) {
-        List<Holiday> holidays = ((HolidayRepository) repo).getAllByNameContains(name);
-        List<Holiday> result = new ArrayList<>();
-        for (Holiday n : holidays) {
-            if(n.getDeleted()!=(byte)1){
-                result.add(n);
-            }
-        }
-        return result;
+        return ((HolidayRepository) repo).getAllByNameContainsIgnoreCaseAndDeletedEqualsAndCompanyId(name, (byte)0, userBean.getUser().getCompanyId());
     }
 
     @RequestMapping(value = "/getAllByDateAfter/{date}", method = RequestMethod.GET)
     public @ResponseBody
     List getAllByDateAfter(@PathVariable java.sql.Date date) {
-        List<Holiday> holidays = ((HolidayRepository) repo).getAllByDateAfter(date);
-        List<Holiday> result = new ArrayList<>();
-        for (Holiday n : holidays) {
-            if(n.getDeleted()!=(byte)1){
-                result.add(n);
-            }
-        }
-        return result;
+        return ((HolidayRepository) repo).getAllByDateAfterAndDeletedEqualsAndCompanyId(date, (byte)0, userBean.getUser().getCompanyId());
     }
 
     @RequestMapping(value = "/getAllByDateBefore/{date}", method = RequestMethod.GET)
     public @ResponseBody
     List getAllByDateBefore(@PathVariable java.sql.Date date) {
-        List<Holiday> holidays = ((HolidayRepository) repo).getAllByDateBefore(date);
-        List<Holiday> result = new ArrayList<>();
-        for (Holiday n : holidays) {
-            if(n.getDeleted()!=(byte)1){
-                result.add(n);
-            }
-        }
-        return result;
+        return ((HolidayRepository) repo).getAllByDateBeforeAndDeletedEqualsAndCompanyId(date, (byte)0, userBean.getUser().getCompanyId());
     }
 
     @RequestMapping(value = "/getAllByDateBetween/{from}/{to}", method = RequestMethod.GET)
     public @ResponseBody
     List getAllByDateBetween(@PathVariable java.sql.Date from, @PathVariable java.sql.Date to) {
-        List<Holiday> holidays = ((HolidayRepository) repo).getAllByDateBetween(from, to);
-        List<Holiday> result = new ArrayList<>();
-        for (Holiday n : holidays) {
-            if(n.getDeleted()!=(byte)1){
-                result.add(n);
-            }
-        }
-        return result;
+        return ((HolidayRepository) repo).getAllByDateBetweenAndDeletedEqualsAndCompanyId(from, to, (byte)0, userBean.getUser().getCompanyId());
     }
 }

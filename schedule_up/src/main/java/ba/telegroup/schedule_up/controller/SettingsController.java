@@ -32,37 +32,38 @@ public class SettingsController extends GenericController<Settings, Integer>{
     @RequestMapping(value = "/getAllByReminderTimeAfter/{time}", method = RequestMethod.GET)
     public @ResponseBody
     List getAllByRemainderTimeAfter(@PathVariable java.sql.Time time) {
-        return ((SettingsRepository) repo).getAllByReminderTimeAfter(time);
+        return ((SettingsRepository) repo).getAllByReminderTimeAfterAndCompanyId(time, userBean.getUser().getCompanyId());
     }
 
     @RequestMapping(value = "/getAllByReminderTimeBefore/{time}", method = RequestMethod.GET)
     public @ResponseBody
     List getAllByRemainderTimeBefore(@PathVariable java.sql.Time time) {
-        return ((SettingsRepository) repo).getAllByReminderTimeBefore(time);
+        return ((SettingsRepository) repo).getAllByReminderTimeBeforeAndCompanyId(time, userBean.getUser().getCompanyId());
     }
 
     @RequestMapping(value = "/getAllByReminderTimeBetween/{from}/{to}", method = RequestMethod.GET)
     public @ResponseBody
     List getAllByRemainderTimeBetween(@PathVariable java.sql.Time from, @PathVariable java.sql.Time to) {
-        return ((SettingsRepository) repo).getAllByReminderTimeBetween(from, to);
+        return ((SettingsRepository) repo).getAllByReminderTimeBetweenAndCompanyId(from, to, userBean.getUser().getCompanyId());
     }
 
     @RequestMapping(value = "/getAllByCancelTimeAfter/{time}", method = RequestMethod.GET)
     public @ResponseBody
     List getAllByCancelTimeAfter(@PathVariable java.sql.Time time) {
-        return ((SettingsRepository) repo).getAllByCancelTimeAfter(time);
+        return ((SettingsRepository) repo).getAllByCancelTimeAfterAndCompanyId(time, userBean.getUser().getCompanyId());
     }
 
     @RequestMapping(value = "/getAllByCancelTimeBefore/{time}", method = RequestMethod.GET)
     public @ResponseBody
     List getAllByCancelTimeBefore(@PathVariable java.sql.Time time) {
-        return ((SettingsRepository) repo).getAllByCancelTimeBefore(time);
+        return ((SettingsRepository) repo).getAllByCancelTimeBeforeAndCompanyId(time, userBean.getUser().getCompanyId());
     }
 
     @RequestMapping(value = "/getAllByCancelTimeBetween/{from}/{to}", method = RequestMethod.GET)
     public @ResponseBody
     List getAllByCancelTimeBetween(@PathVariable java.sql.Time from, @PathVariable java.sql.Time to) {
-        return ((SettingsRepository) repo).getAllByCancelTimeBetween(from, to);
+        return ((SettingsRepository) repo).getAllByCancelTimeBetweenAndCompanyId(from, to, userBean.getUser().getCompanyId());
     }
 
 }
+
