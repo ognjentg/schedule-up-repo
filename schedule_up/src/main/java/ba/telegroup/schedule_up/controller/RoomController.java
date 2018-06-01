@@ -3,10 +3,14 @@ package ba.telegroup.schedule_up.controller;
 import ba.telegroup.schedule_up.common.exceptions.BadRequestException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.model.Building;
+import ba.telegroup.schedule_up.model.Note;
 import ba.telegroup.schedule_up.model.Room;
+import ba.telegroup.schedule_up.model.modelCustom.LoggerUser;
 import ba.telegroup.schedule_up.model.modelCustom.RoomBuilding;
 import ba.telegroup.schedule_up.repository.BuildingRepository;
+import ba.telegroup.schedule_up.repository.NoteRepository;
 import ba.telegroup.schedule_up.repository.RoomRepository;
+import ba.telegroup.schedule_up.repository.repositoryCustom.LoggerRepositoryCustom;
 import ba.telegroup.schedule_up.repository.repositoryCustom.RoomRepositoryCustom;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,22 +30,22 @@ public class RoomController extends GenericController<Room, Integer> {
         super(repo);
     }
 
-    @RequestMapping(value = "/getAllExtended", method = RequestMethod.GET)
-    public @ResponseBody
-    List<RoomBuilding> getAllExtended(){
-      return ((RoomRepositoryCustom)repo).getAllExtended();
-    }
-
     @Override
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.DELETE)
     public @ResponseBody String delete(@PathVariable Integer id) throws BadRequestException {
-        Room currentRoom=((RoomRepository) repo).findById(id).orElse(null);
-        Room clonedRoom = cloner.deepClone(currentRoom);
-        currentRoom.setDeleted((byte)1);
-        if (((RoomRepository) repo).saveAndFlush(currentRoom) != null) {
-            logUpdateAction(currentRoom, clonedRoom);
-            return "Success";
+        Room room=((RoomRepository) repo).findById(id).orElse(null);
+        if (room!=null) {
+            room.setDeleted((byte) 1);
+            if (((RoomRepository) repo).saveAndFlush(room) != null) {
+                logDeleteAction(room);
+                return "Success";
+            }
         }
         throw new BadRequestException("Bad request");
+    }
+
+    @RequestMapping(value = "/", method = RequestMethod.GET)
+    public @ResponseBody
+    List<RoomBuilding> getAllExtendedByCompanyId() { return ((RoomRepositoryCustom) repo).getAllExtendedByCompanyId(userBean.getUser().getCompanyId());
     }
 }

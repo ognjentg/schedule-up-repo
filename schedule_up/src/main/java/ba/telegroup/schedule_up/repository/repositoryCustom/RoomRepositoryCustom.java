@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface RoomRepositoryCustom {
 
-    List<RoomBuilding> getAllExtended();
+    List<RoomBuilding> getAllExtendedByCompanyId(Integer id);
 }

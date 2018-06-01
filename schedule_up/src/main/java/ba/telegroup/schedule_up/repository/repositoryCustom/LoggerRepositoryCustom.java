@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface LoggerRepositoryCustom {
 
-    List<LoggerUser> getAllExtended();
+    List<LoggerUser> getAllExtendedByCompanyId(Integer id);
 }

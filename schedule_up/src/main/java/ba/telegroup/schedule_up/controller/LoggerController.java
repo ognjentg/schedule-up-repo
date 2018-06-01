@@ -25,8 +25,9 @@ public class LoggerController extends GenericController<Logger, Integer> {
         super(repo);
     }
 
-    @RequestMapping(value = "/getAllExtended", method = RequestMethod.GET)
+    @RequestMapping(value = "/", method = RequestMethod.GET)
     public @ResponseBody
-    List<LoggerUser> getAllExtended() { return ((LoggerRepositoryCustom) repo).getAllExtended();
+    List<LoggerUser> getAllExtendedByCompanyId() { return ((LoggerRepositoryCustom) repo).getAllExtendedByCompanyId(userBean.getUser().getCompanyId());
     }
+
 }
