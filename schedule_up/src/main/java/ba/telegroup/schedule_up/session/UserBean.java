@@ -18,8 +18,9 @@ public class UserBean {
         System.out.println("CONSTRUCTOOOR");
         user = new User();
         loggedIn = true;
-        user.setId(1);
+        user.setId(29);
         user.setCompanyId(1);
+        user.setRoleId(2);
     }
 
     public User getUser() {

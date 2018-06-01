@@ -1,0 +1,10 @@
+package ba.telegroup.schedule_up.repository;
+
+import ba.telegroup.schedule_up.model.Participant;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface ParticipantRepository extends JpaRepository<Participant,Integer> {
+     List<Participant> getAllByMeetingIdAndDeletedIs(Integer meetingId,byte deleted);
+}
