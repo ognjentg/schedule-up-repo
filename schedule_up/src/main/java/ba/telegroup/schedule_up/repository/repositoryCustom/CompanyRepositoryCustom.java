@@ -9,11 +9,9 @@ public interface CompanyRepositoryCustom {
 
     List<CompanyUser> getAllExtended();
 
-    List getAllExtendedById(Integer id);
+    CompanyUser getAllExtendedById(Integer userId);
 
     List getAllExtendedByNameContains(String name);
-
-    CompanyUser getByIdAndEmail(Integer id, String email);
 
     CompanyUser updateExtended(Integer userId, CompanyUser companyUser);
 

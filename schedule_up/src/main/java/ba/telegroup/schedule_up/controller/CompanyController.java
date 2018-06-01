@@ -35,30 +35,21 @@ public class CompanyController extends GenericController<Company, Integer> {
     }
 
     /*
-    Vraca sve custom ComanyUser objekte na osnovnu id-a kompanije(id Company i company_id User-a moraju biti isti)
+    Vraca sve custom ComanyUser objekte gdje id predstavlja id User-a
      */
-    @RequestMapping(value = "/getAllExtendedById/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public @ResponseBody
-    List getAllExtendedById(@PathVariable Integer id) {
+    CompanyUser findById(@PathVariable Integer id) {
         return ((CompanyRepositoryCustom) repo).getAllExtendedById(id);
     }
 
     /*
-    Vraca sve custom ComanyUser objekte ciji naziv kompanije sadrzi naziv teksta kojeg smo unijeli
+    Vraca sve custom ComanyUser objekte ciji naziv kompanije sadrzi naziv teksta kojeg smo proslijedili
      */
-    @RequestMapping(value = "/getAllExtendedByNameContains/{name}", method = RequestMethod.GET)
+    @RequestMapping(value = "/custom/{name}", method = RequestMethod.GET)
     public @ResponseBody
     List getAllExtendedByNameContains(@PathVariable String name) {
         return ((CompanyRepositoryCustom) repo).getAllExtendedByNameContains(name);
-    }
-
-    /*
-    Vraca sve custom ComanyUser objekte na osnovu id kompanije i emaila user-a
-     */
-    @RequestMapping(value = "/getByIdAndEmail/{id}/{email}", method = RequestMethod.GET)
-    public @ResponseBody
-    CompanyUser getByIdAndEmail(@PathVariable Integer id, @PathVariable String email) {
-        return ((CompanyRepositoryCustom) repo).getByIdAndEmail(id, email);
     }
 
     @Transactional
@@ -78,16 +69,15 @@ public class CompanyController extends GenericController<Company, Integer> {
     @RequestMapping(value ="/custom/{id}", method = RequestMethod.PUT)
     public @ResponseBody
     CompanyUser updateExtended(@PathVariable Integer id, @RequestBody CompanyUser companyUser) throws BadRequestException {
-        System.out.println("Ulazi");
         return  ((CompanyRepositoryCustom)repo).updateExtended(id, companyUser);
     }
 
 
     /*
     Metoda za brisanje kompanije(setuje se flag deleted na 1)
-    Nakon sto se izbrise kompanija, svakom administratoru koji je vezan za tu
+    Nakon sto se izbrise kompanija, svakom korisniku koji je vezan za tu
     kompaniju se setuje flag active na 0
-    (ne smije se desiti da bude aktivan administrator ukoliko je kompanija izbrisana)
+    (ne smije se desiti da bude aktivan korisnik ukoliko je kompanija obrisana)
      */
     @Override
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.DELETE)
@@ -95,8 +85,8 @@ public class CompanyController extends GenericController<Company, Integer> {
         Company company=((CompanyRepository) repo).findById(id).orElse(null);
         Company oldObject = cloner.deepClone(company);
         company.setDeleted((byte)1);
-        if ("Success".equals(((CompanyRepositoryCustom) repo).deleteCompany(company))) {
-            logUpdateAction(company, oldObject);
+        if (((CompanyRepositoryCustom) repo).deleteCompany(company) != null) {
+            logDeleteAction(company);
             return "Success";
         }
         throw new BadRequestException("Bad request");
