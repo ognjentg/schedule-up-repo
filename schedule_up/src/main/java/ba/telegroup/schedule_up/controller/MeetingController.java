@@ -23,8 +23,6 @@ public class MeetingController extends GenericController<Meeting,Integer>{
     /**
      * Ova metoda vraca sve rezervacije na osnovu privilegija ukoliko je u pitanju admin on moze da vidi sve kreirane rezervacije
      * dok se u slucaju da je u pitanju napredni korisnik ili obicni korisnik prikazuju rezervacije u kojima je on ucesnik
-     * @return
-     * @throws ForbiddenException
      */
     @Override
     @RequestMapping(value = "/",method = RequestMethod.GET)
@@ -40,10 +38,6 @@ public class MeetingController extends GenericController<Meeting,Integer>{
 
     /**
      * Ova metoda sluzi za zatvaranje sastanka
-     * @param id
-     * @return
-     * @throws BadRequestException
-     * @throws ForbiddenException
      */
     @RequestMapping(value = "/finish/{id}",method = RequestMethod.PUT)
     public @ResponseBody
@@ -53,10 +47,6 @@ public class MeetingController extends GenericController<Meeting,Integer>{
 
     /**
      * Ova metoda sluzi za otkazivanje sastanka - ostaje sporno da se vidi koji je onaj predefinisani period
-     * @param id
-     * @return
-     * @throws BadRequestException
-     * @throws ForbiddenException
      */
     @RequestMapping(value = "/cancel/{id}",method = RequestMethod.PUT)
     public @ResponseBody
@@ -66,11 +56,6 @@ public class MeetingController extends GenericController<Meeting,Integer>{
 
     /**
      * metoda za azuriranje odnosno izmjenu rezervacije moguca je samo u slucaju da je radi onaj koju je i kreirao
-     * @param id
-     * @param object
-     * @return
-     * @throws BadRequestException
-     * @throws ForbiddenException
      */
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
@@ -95,24 +80,16 @@ public class MeetingController extends GenericController<Meeting,Integer>{
 
     /**
      * brisanje je nemoguce
-     * @param id
-     * @return
-     * @throws BadRequestException
-     * @throws ForbiddenException
      */
     @Override
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.DELETE)
     public @ResponseBody
-    String delete(@PathVariable Integer id) throws BadRequestException, ForbiddenException {
+    String delete(@PathVariable Integer id) throws ForbiddenException {
         throw new ForbiddenException("Forbidden action");
     }
 
     /**
      * kreiranje rezervacije u slucaju da smo ili admin ili napredni korisnik u suprotnom ide forbidden exception
-     * @param object
-     * @return
-     * @throws BadRequestException
-     * @throws ForbiddenException
      */
     @Override
     @Transactional
@@ -130,10 +107,7 @@ public class MeetingController extends GenericController<Meeting,Integer>{
     }
 
     /**
-     * metoda za provjeru sastanka
-     * @param meeting
-     * @param insert
-     * @return
+     * pomocna metoda za provjeru sastanka
      */
     private Boolean check(Meeting meeting, Boolean insert){
         if(meeting!=null
@@ -162,11 +136,6 @@ public class MeetingController extends GenericController<Meeting,Integer>{
 
     /**
      * pomocna metoda za azuranje statusa napravaljena zbog dupliciranja koda
-     * @param id
-     * @param status
-     * @return
-     * @throws BadRequestException
-     * @throws ForbiddenException
      */
     private String updateStatus(Integer id,byte status) throws BadRequestException, ForbiddenException {
         if(status>2){

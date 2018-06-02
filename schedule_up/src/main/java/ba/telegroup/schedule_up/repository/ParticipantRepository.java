@@ -7,4 +7,7 @@ import java.util.List;
 
 public interface ParticipantRepository extends JpaRepository<Participant,Integer> {
      List<Participant> getAllByMeetingIdAndDeletedIs(Integer meetingId,byte deleted);
+     List<Participant> getAllByUserGroupIdAndDeletedIs(Integer userId,byte deleted);
+     List<Participant> getAllByUserIdAndDeletedIs(Integer userId,byte deleted);
+     List<Participant> getAllByEmailAndDeletedIs(String email,byte deleted);
 }
