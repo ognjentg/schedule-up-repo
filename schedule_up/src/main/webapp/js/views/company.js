@@ -9,12 +9,12 @@ var companyView = {
             cols: [{
                 view: "label",
                 width: 400,
-                template: "<span class='fa-briefcase'></span> Companies"
+                template: "<span class='fa fa-briefcase'></span> Kompanije"
             }, {}, {
                 id: "addCompanyBtn",
                 view: "button",
                 type: "iconButton",
-                label: "Add company",
+                label: "Dodajte kompaniju",
                 icon: "plus-circle",
                 click: 'companyView.showAddDialog',
                 autowidth: true
@@ -38,7 +38,7 @@ var companyView = {
                 editor: "text",
                 sort: "string",
                 header: [
-                    "Name", {
+                    "Naziv", {
                         content: "textFilter"
                     }
                 ]
@@ -46,7 +46,7 @@ var companyView = {
                 id: "timeFrom",
                 fillspace: true,
                 editor: "text",
-                header: ["Time from",
+                header: ["Radno vrijeme od",
                     {
                         content: "textFilter"
                     }]
@@ -55,7 +55,7 @@ var companyView = {
                     id: "timeTo",
                     fillspace: true,
                     editor: "text",
-                    header: ["Time to",{
+                    header: ["Radno vrijeme do",{
                         content: "textFilter"
                     }],
                 }, {
@@ -73,7 +73,7 @@ var companyView = {
             select: "row",
             navigation: true,
             editable: "false",
-            url: "company/getAllExtended",
+            url: "company/",
             on: {
 
                 onAfterContextMenu: function (item) {

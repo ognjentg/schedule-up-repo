@@ -6,9 +6,14 @@ var menuState = MENU_STATES.COLLAPSED;
 
 var menuData = [
     {
-        id:"company",
-        value:"Company",
-        icon:"briefcase"
+        id: "company",
+        value: "Kompanije",
+        icon: "briefcase"
+    },
+    {
+        id:"building",
+        value:"Zgrade",
+        icon:"building"
     }
 ];
 
@@ -17,6 +22,9 @@ var menuActions = function (id) {
     switch(id){
         case "company":
             companyView.selectPanel();
+            break;
+        case "building":
+            buildingView.selectPanel();
             break;
     }
 };
