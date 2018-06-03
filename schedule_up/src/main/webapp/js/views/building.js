@@ -209,7 +209,9 @@ var buildingView = {
                 id: $$("changeBuildingForm").getValues().id,
                 name: $$("changeBuildingForm").getValues().name,
                 description: $$("changeBuildingForm").getValues().description,
-                companyId: 1
+                companyId: 1,
+                deleted:0,
+                latitude:0
             };
             console.log("aj");
                 console.log("building id:"+newItem.id);
