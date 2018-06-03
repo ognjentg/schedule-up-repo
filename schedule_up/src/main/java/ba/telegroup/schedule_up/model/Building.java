@@ -12,6 +12,7 @@ public class Building {
     private Byte deleted;
     private String description;
     private Integer companyId;
+    private String address;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,7 +36,7 @@ public class Building {
     }
 
     @Basic
-    @Column(name = "longitude", nullable = false, precision = 6)
+    @Column(name = "longitude", precision = 6)
     public Double getLongitude() {
         return longitude;
     }
@@ -45,7 +46,7 @@ public class Building {
     }
 
     @Basic
-    @Column(name = "latitude", nullable = false, precision = 6)
+    @Column(name = "latitude", precision = 6)
     public Double getLatitude() {
         return latitude;
     }
@@ -54,6 +55,10 @@ public class Building {
         this.latitude = latitude;
     }
 
+    @Basic
+    @Column(name="address",nullable = false)
+    public String getAddress(){ return address;}
+    public void setAddress(String address){ this.address=address;}
     @Basic
     @Column(name = "deleted", nullable = false,insertable = false)
     public Byte getDeleted() {

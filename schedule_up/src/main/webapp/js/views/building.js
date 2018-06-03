@@ -54,6 +54,17 @@ var buildingView = {
                             content: "textFilter"
                         }
                     ]
+                },
+                {
+                    id: "address",
+                    fillspace: true,
+                    editor: "text",
+                    sort: "text",
+                    header: [
+                        "Adresa", {
+                            content: "textFilter"
+                        }
+                    ]
                 }
             ],
             select: "row",

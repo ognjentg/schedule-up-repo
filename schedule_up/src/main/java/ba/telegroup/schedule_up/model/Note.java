@@ -1,10 +1,13 @@
 package ba.telegroup.schedule_up.model;
 
+import org.hibernate.annotations.DynamicUpdate;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity
+@DynamicUpdate
 @Table(name = "note", schema = "shedule_up_db", catalog = "")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Note {
@@ -48,7 +51,7 @@ public class Note {
     }
 
     @Basic
-    @Column(name = "publish_time", nullable = false,insertable = false)
+    @Column(name = "publish_time", nullable = false,insertable = false,updatable = false)
     public Timestamp getPublishTime() {
         return publishTime;
     }
