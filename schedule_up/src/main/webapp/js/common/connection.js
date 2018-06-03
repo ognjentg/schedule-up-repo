@@ -169,7 +169,7 @@ var connection = {
 
             if (newValue == oldValue) return;
 
-            var editLink = link;
+            var editLink = link+"/"+"id";
 
             var data = $$(dtId).getItem(id);
             data[column] = newValue;

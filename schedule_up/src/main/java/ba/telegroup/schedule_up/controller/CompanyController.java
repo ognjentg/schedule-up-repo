@@ -1,6 +1,7 @@
 package ba.telegroup.schedule_up.controller;
 
 import ba.telegroup.schedule_up.common.exceptions.BadRequestException;
+import ba.telegroup.schedule_up.common.exceptions.ForbiddenException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.model.Company;
 import ba.telegroup.schedule_up.model.modelCustom.CompanyUser;
@@ -28,11 +29,12 @@ public class CompanyController extends GenericController<Company, Integer> {
     /*
     Vraca sve custom CompanyUser objekte
      */
-    @RequestMapping(value = "/", method = RequestMethod.GET)
-    public @ResponseBody
-    List<CompanyUser> getAllExtended() {
+
+    @Override
+    public List getAll() throws BadRequestException, ForbiddenException {
         return ((CompanyRepositoryCustom) repo).getAllExtended();
     }
+
 
     /*
     Vraca sve custom ComanyUser objekte gdje id predstavlja id User-a
@@ -65,6 +67,9 @@ public class CompanyController extends GenericController<Company, Integer> {
     Ukoliko se izmijeni email adresa administratoru, setuje mu se flag active na 0
     Path varijabla id se odnosi na id korisnika
     */
+
+
+
     @Transactional
     @RequestMapping(value ="/custom/{id}", method = RequestMethod.PUT)
     public @ResponseBody

@@ -73,7 +73,7 @@ var companyView = {
             select: "row",
             navigation: true,
             editable: "false",
-            url: "company/",
+            url: "company",
             on: {
 
                 onAfterContextMenu: function (item) {
@@ -90,7 +90,7 @@ var companyView = {
         var panelCopy = webix.copy(this.panel);
 
         $$("main").addView(webix.copy(panelCopy));
-        connection.attachAjaxEvents("companyDT", "company/");
+        connection.attachAjaxEvents("companyDT", "company");
 
 
         webix.ui({
