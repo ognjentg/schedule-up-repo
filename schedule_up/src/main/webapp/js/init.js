@@ -40,7 +40,7 @@ function loadScript(index) {
 
     var script = document.createElement("script");
     script.type = "text/javascript";
-
+    script.charset="utf-8";
     if (script.readyState) {  //IE
         script.onreadystatechange = function () {
             if (script.readyState == "loaded" ||

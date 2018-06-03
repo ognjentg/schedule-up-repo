@@ -90,6 +90,7 @@ var companyView = {
         var panelCopy = webix.copy(this.panel);
 
         $$("main").addView(webix.copy(panelCopy));
+        connection.attachAjaxEvents("companyDT", "company/");
 
 
         webix.ui({
@@ -143,7 +144,7 @@ var companyView = {
                 view: "toolbar",
                 cols: [{
                     view: "label",
-                    label: "<span class='webix_icon fa-briefcase'></span> Add company",
+                    label: "<span class='webix_icon fa-briefcase'></span> Dodavanje kompanije",
                     width: 400
                 }, {}, {
                     hotkey: 'esc',
@@ -155,25 +156,25 @@ var companyView = {
             }, {
                 view: "form",
                 id: "addCompanyForm",
-                width: 500,
+                width: 600,
                 elementsConfig: {
-                    labelWidth: 140,
+                    labelWidth: 200,
                     bottomPadding: 18
                 },
                 elements: [{
                     view: "text",
                     id: "name",
                     name: "name",
-                    label: "Name:",
-                    invalidMessage: "Enter company name!",
+                    label: "Naziv:",
+                    invalidMessage: "Unesite naziv kompanije!",
                     required: true
                 }, {
                     id: "timeFrom",
-                    invalidMessage:"Enter time from!",
+                    invalidMessage:"Unesite početak radnog vremena!",
                     name: "timeFrom",
                     view: "datepicker",
                     stringResult: true,
-                    label: "Time from",
+                    label: "Početak radnog vremena",
                     timepicker: true,
                     type: "time",
                     required: true,
@@ -189,9 +190,9 @@ var companyView = {
                     id: "timeTo",
                     name: "timeTo",
                     view: "datepicker",
-                    invalidMessage:"Enter time to!",
+                    invalidMessage:"Unesite kraj radnog vremena!",
                     stringResult: true,
-                    label: "Time to",
+                    label: "Kraj radnog vremena",
                     timepicker: true,
                     type: "time",
                     required: true,
@@ -215,7 +216,7 @@ var companyView = {
                         cols: [{}, {
                             id: "saveCompany",
                             view: "button",
-                            value: "Save",
+                            value: "Dodajte kompaniju",
                             type: "form",
                             click: "companyView.save",
                             hotkey: "enter",
@@ -227,22 +228,22 @@ var companyView = {
                         if (!value)
                             return false;
                         if (value.length > 100) {
-                            $$('addCompanyForm').elements.name.config.invalidMessage = 'Up to 100 characters allowed';
+                            $$('addCompanyForm').elements.name.config.invalidMessage = 'Maksimalan broj karaktera je 100!';
                             return false;
                         }
                         return true;
                     },
                     "email":function (value) {
                         if (!value) {
-                            $$('addCompanyForm').elements.email.config.invalidMessage = 'Enter E-mail!';
+                            $$('addCompanyForm').elements.email.config.invalidMessage = 'Unesite E-mail!';
                             return false;
                         }
                         if (value.length > 100) {
-                            $$('addCompanyForm').elements.email.config.invalidMessage = 'Up to 100 characters allowed';
+                            $$('addCompanyForm').elements.email.config.invalidMessage = 'Maksimalan broj karaktera je 100';
                             return false;
                         }
                         if(!webix.rules.isEmail(value)) {
-                            $$('addCompanyForm').elements.email.config.invalidMessage = 'Email is not in valid format.';
+                            $$('addCompanyForm').elements.email.config.invalidMessage = 'E-mail nije u validnom formatu.';
                             return false;
                         }
 
@@ -265,37 +266,9 @@ var companyView = {
                 name: form.getValues().name,
                 timeFrom: form.getValues().timeFrom + ":00",
                 timeTo: form.getValues().timeTo + ":00",
-                deleted:0
+                email:form.getValues().email
             };
-            var newUser = {
-                email: form.getValues().email,
-                deleted:0,
-                active:0,
-                roleId:1,
-
-            };
-            connection.sendAjax("POST", "company", function (text, data, xhr) {
-                var addedCompany = data.json();
-                newUser.companyId=addedCompany.id;
-
-                connection.sendAjax("POST", "user", function (text, data, xhr) {
-                    addedCompany.email = data.json().email;
-                    $$("companyDT").add(addedCompany);
-                    util.messages.showMessage("Company added successfully.");
-                }, function () {
-                    connection.sendAjax("DELETE","company/"+addedCompany.id,function(text,data,xhr){
-                        util.messages.showErrorMessage("Company cannot be added!");
-
-                    },function(){
-                        util.messages.showErrorMessage("If this happened,backend is to blame.");
-                    },{});
-
-                }, newUser);
-            }, function () {
-
-                util.messages.showErrorMessage("Company cannot be added!");
-            }, newCompany);
-
+            $$("companyDT").add(newCompany);
             util.dismissDialog('addCompanyDialog');
         }
     }

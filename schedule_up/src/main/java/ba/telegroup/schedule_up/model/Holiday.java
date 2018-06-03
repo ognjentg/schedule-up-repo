@@ -34,7 +34,7 @@ public class Holiday {
     }
 
     @Basic
-    @Column(name = "deleted", nullable = false)
+    @Column(name = "deleted", nullable = false,insertable = false)
     public Byte getDeleted() {
         return deleted;
     }

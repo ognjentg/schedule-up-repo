@@ -48,7 +48,7 @@ public class Note {
     }
 
     @Basic
-    @Column(name = "publish_time", nullable = false)
+    @Column(name = "publish_time", nullable = false,insertable = false)
     public Timestamp getPublishTime() {
         return publishTime;
     }
@@ -58,7 +58,7 @@ public class Note {
     }
 
     @Basic
-    @Column(name = "deleted", nullable = false)
+    @Column(name = "deleted", nullable = false,insertable = false)
     public Byte getDeleted() {
         return deleted;
     }
