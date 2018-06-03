@@ -34,6 +34,7 @@ var buildingView = {
 
             }, {
                 id: "name",
+                editable: false,
                 fillspace: true,
                 editor: "text",
                 sort: "string",
@@ -47,6 +48,7 @@ var buildingView = {
                     fillspace: true,
                     editor: "text",
                     sort: "text",
+                    editable:false,
                     header: [
                         "Opis", {
                             content: "textFilter"
@@ -56,7 +58,7 @@ var buildingView = {
             ],
             select: "row",
             navigation: true,
-            editable: "false",
+            editable: false,
             url: "building/",
             on: {
 
@@ -211,7 +213,8 @@ var buildingView = {
                 description: $$("changeBuildingForm").getValues().description,
                 companyId: 1,
                 deleted:0,
-                latitude:0
+                latitude:0,
+                longitude:0
             };
             console.log("aj");
                 console.log("building id:"+newItem.id);

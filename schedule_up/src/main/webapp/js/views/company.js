@@ -34,6 +34,7 @@ var companyView = {
 
             }, {
                 id: "name",
+                editable:false,
                 fillspace: true,
                 editor: "text",
                 sort: "string",
@@ -45,6 +46,7 @@ var companyView = {
             }, {
                 id: "timeFrom",
                 fillspace: true,
+                editable:false,
                 editor: "text",
                 header: ["Radno vrijeme od",
                     {
@@ -54,6 +56,7 @@ var companyView = {
                 {
                     id: "timeTo",
                     fillspace: true,
+                    editable:false,
                     editor: "text",
                     header: ["Radno vrijeme do",{
                         content: "textFilter"
@@ -61,6 +64,7 @@ var companyView = {
                 }, {
                     id: "email",
                     fillspace: true,
+                    editable:false,
                     editor: "text",
                     sort: "text",
                     header: [
@@ -72,7 +76,7 @@ var companyView = {
             ],
             select: "row",
             navigation: true,
-            editable: "false",
+            editable: false,
             url: "company",
             on: {
 
