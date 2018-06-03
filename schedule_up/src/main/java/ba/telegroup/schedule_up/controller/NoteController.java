@@ -4,8 +4,10 @@ import ba.telegroup.schedule_up.common.exceptions.BadRequestException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.model.Building;
 import ba.telegroup.schedule_up.model.Note;
+import ba.telegroup.schedule_up.model.modelCustom.NoteUser;
 import ba.telegroup.schedule_up.repository.BuildingRepository;
 import ba.telegroup.schedule_up.repository.NoteRepository;
+import ba.telegroup.schedule_up.repository.repositoryCustom.NoteRepositoryCustom;
 import ba.telegroup.schedule_up.session.UserBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -29,25 +31,37 @@ public class NoteController extends GenericController<Note, Integer> {
         super(repo);
     }
 
+    /*
+    Vraca sve custom NoteUser objekte
+     */
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public @ResponseBody
-    List getAllByCompanyId() {
-        return ((NoteRepository) repo).getAllByCompanyIdAndDeletedEquals(userBean.getUser().getCompanyId(), (byte) 0);
-
+    List<NoteUser> getAllExtended() {
+        return ((NoteRepositoryCustom) repo).getAllExtended(userBean.getUser().getCompanyId());
     }
 
+    /*
+    Vraca custom NoteUser objekat sa id-em
+     */
+    @RequestMapping(value = {"/{id}"}, method = RequestMethod.GET)
+    public @ResponseBody NoteUser findById(@PathVariable Integer id) {
+        return ((NoteRepositoryCustom) repo).getAllExtendedById(userBean.getUser().getCompanyId(), id);
+    }
+
+    /*
+    Vraca sve custom NoteUser objekte gdje id predstavlja id User-a
+     */
     @RequestMapping(value = "/getAllByUserId/{id}", method = RequestMethod.GET)
     public @ResponseBody
-    List getAllByUserId(@PathVariable Integer id) {
-        return ((NoteRepository) repo).getAllByCompanyIdAndUserIdAndDeletedEquals(userBean.getUser().getCompanyId(),id, (byte) 0);
+    List<NoteUser> getAllByUserId(@PathVariable Integer id) {
+        return ((NoteRepositoryCustom) repo).getAllExtendedByUserId(userBean.getUser().getCompanyId(),id);
 
     }
-
 
     @RequestMapping(value = "/getAllByNameContains/{name}", method = RequestMethod.GET)
     public @ResponseBody
     List getAllByNameContains(@PathVariable String name) {
-        return ((NoteRepository) repo).getAllByCompanyIdAndNameContainsIgnoreCaseAndDeletedEquals(userBean.getUser().getCompanyId(),name, (byte) 0);
+        return ((NoteRepositoryCustom) repo).getAllExtendedByNameContains(userBean.getUser().getCompanyId(),name);
 
     }
 

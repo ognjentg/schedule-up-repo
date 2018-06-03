@@ -1,12 +1,13 @@
 package ba.telegroup.schedule_up.repository;
 
 import ba.telegroup.schedule_up.model.Note;
+import ba.telegroup.schedule_up.repository.repositoryCustom.NoteRepositoryCustom;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.sql.Timestamp;
 import java.util.List;
 
-public interface NoteRepository extends JpaRepository<Note, Integer> {
+public interface NoteRepository extends JpaRepository<Note, Integer>, NoteRepositoryCustom {
 
     List<Note> getAllByCompanyIdAndDeletedEquals(Integer id, Byte deleted);
     List<Note> getAllByCompanyIdAndUserIdAndDeletedEquals(Integer companyId, Integer userId,Byte deleted);

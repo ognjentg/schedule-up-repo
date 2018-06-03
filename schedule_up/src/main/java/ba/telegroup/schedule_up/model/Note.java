@@ -5,6 +5,8 @@ import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity
+@Table(name = "note", schema = "shedule_up_db", catalog = "")
+@Inheritance(strategy = InheritanceType.JOINED)
 public class Note {
     private Integer id;
     private String name;
