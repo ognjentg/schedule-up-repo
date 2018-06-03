@@ -14,7 +14,7 @@ import java.util.List;
 
 public class GearUnitRepositoryImpl implements GearUnitRepositoryCustom {
 
-    private static final String SQL_GET_ALL_EXTENDED = "SELECT gu.id, gu.available, gu.deleted, gu.description, gu.company_id, gu.gear_id, g.name FROM gear_unit gu JOIN gear g ON g.id=gu.gear_id AND gu.deleted=0";
+    private static final String SQL_GET_ALL_EXTENDED = "SELECT gu.id, gu.available, gu.deleted, gu.description, gu.company_id, gu.gear_id, g.name FROM gear_unit gu JOIN gear g ON g.id=gu.gear_id AND gu.deleted=0 AND gu.company_id=?";
     private static final String SQL_GET_ALL_EXTENDED_BY_ID = "SELECT gu.id, gu.available, gu.deleted, gu.description, gu.company_id, gu.gear_id, g.name FROM gear_unit gu JOIN gear g ON g.id=gu.gear_id WHERE gu.id=? AND gu.deleted=0";
     
     @PersistenceContext
@@ -24,8 +24,8 @@ public class GearUnitRepositoryImpl implements GearUnitRepositoryCustom {
     private EntityManagerFactory emf;
 
     @Override
-    public List<GearUnitGear> getAllExtended() {
-        return entityManager.createNativeQuery(SQL_GET_ALL_EXTENDED, "GearUnitGearMapping").getResultList();
+    public List<GearUnitGear> getAllExtendedByCompanyId(Integer id) {
+        return entityManager.createNativeQuery(SQL_GET_ALL_EXTENDED, "GearUnitGearMapping").setParameter(1,id).getResultList();
     }
 
     @Override

@@ -21,7 +21,7 @@ public class GearController extends GenericController<Gear, Integer> {
         super(repo);
     }
 
-    @RequestMapping(value = "/getAllByNameContainsIgnoreCase/{name}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{name}", method = RequestMethod.GET)
     @ResponseBody
     public List<Gear> getAllByNameContainsIgnoreCase(@PathVariable String name) {
         return ((GearRepository) repo).getAllByNameContainsIgnoreCase(name);
@@ -33,6 +33,7 @@ public class GearController extends GenericController<Gear, Integer> {
     }
 
     @Override
+    @DeleteMapping
     public Gear findById(Integer integer) {
         return null;
     }

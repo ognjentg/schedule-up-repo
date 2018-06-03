@@ -5,7 +5,7 @@ import java.util.List;
 
 public interface GearUnitRepositoryCustom {
 
-    List<GearUnitGear> getAllExtended();
+    List<GearUnitGear> getAllExtendedByCompanyId(Integer id);
     List<GearUnitGear> getAllExtendedById(Integer id);
     GearUnitGear insertExtended(GearUnitGear gearUnitGear);
     GearUnitGear updateExtended(GearUnitGear gearUnitGear);
