@@ -1,6 +1,7 @@
 package ba.telegroup.schedule_up.model.modelCustom;
 
 import ba.telegroup.schedule_up.model.GearUnit;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 
@@ -12,7 +13,7 @@ import javax.persistence.*;
                 columns = {
                         @ColumnResult(name = "id"),
                         @ColumnResult(name = "available"),
-                        @ColumnResult(name = "deleted"),
+                      //  @ColumnResult(name = "deleted"),
                         @ColumnResult(name = "description"),
                         @ColumnResult(name = "gear_id"),
                         @ColumnResult(name = "company_id"),
@@ -29,11 +30,11 @@ public class GearUnitGear extends GearUnit {
     }
 
     @SuppressWarnings("WeakerAccess")
-    public GearUnitGear(Integer id, Byte available, Byte deleted, String description, Integer gear_id, Integer company_id,
-                    String name) {
+    public GearUnitGear(Integer id, Byte available, String description, Integer gear_id, Integer company_id,
+                        String name) {
         setId(id);
         setAvailable(available);
-        setDeleted(deleted);
+
         setDescription(description);
         setGearId(gear_id);
         setCompanyId(company_id);
@@ -44,6 +45,8 @@ public class GearUnitGear extends GearUnit {
 
     public void setName(String name) { this.name = name; }
 
-
+    @Override
+    @JsonIgnore
+    public Byte getDeleted() { return super.getDeleted(); }
 
 }

@@ -14,7 +14,7 @@ import java.util.List;
 
 public class GearUnitRepositoryImpl implements GearUnitRepositoryCustom {
 
-    private static final String SQL_GET_ALL_EXTENDED = "SELECT gu.id, gu.available, gu.deleted, gu.description, gu.company_id, gu.gear_id, g.name FROM gear_unit gu JOIN gear g ON g.id=gu.gear_id AND gu.deleted=0 AND gu.company_id=?";
+    private static final String SQL_GET_ALL_EXTENDED = "SELECT gu.id, gu.available, gu.deleted, gu.description, gu.company_id, gu.gear_id, g.name FROM gear_unit gu JOIN gear g ON g.id=gu.gear_id WHERE gu.deleted=0 AND gu.company_id=?";
     private static final String SQL_GET_ALL_EXTENDED_BY_ID = "SELECT gu.id, gu.available, gu.deleted, gu.description, gu.company_id, gu.gear_id, g.name FROM gear_unit gu JOIN gear g ON g.id=gu.gear_id WHERE gu.id=? AND gu.deleted=0";
     
     @PersistenceContext
@@ -48,7 +48,7 @@ public class GearUnitRepositoryImpl implements GearUnitRepositoryCustom {
             }
             GearUnit gearUnit = new GearUnit();
             gearUnit.setGearId(gearUnitGear.getGearId());
-            gearUnit.setDeleted(gearUnitGear.getDeleted());
+            gearUnit.setDeleted((byte)0);
             gearUnit.setAvailable(gearUnitGear.getAvailable());
             gearUnit.setCompanyId(gearUnitGear.getCompanyId());
             gearUnit.setDescription(gearUnitGear.getDescription());
@@ -79,8 +79,8 @@ public class GearUnitRepositoryImpl implements GearUnitRepositoryCustom {
         GearUnit gearUnit=new GearUnit();
         gearUnit.setId(gearUnitGear.getId());
         gearUnit = entityManager1.find(GearUnit.class, gearUnit.getId());
+
         gearUnit.setGearId(gearUnitGear.getGearId());
-        gearUnit.setDeleted(gearUnitGear.getDeleted());
         gearUnit.setAvailable(gearUnitGear.getAvailable());
         gearUnit.setCompanyId(gearUnitGear.getCompanyId());
         gearUnit.setDescription(gearUnitGear.getDescription());
