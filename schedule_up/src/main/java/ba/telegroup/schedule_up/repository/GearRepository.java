@@ -9,4 +9,6 @@ import java.util.List;
 public interface GearRepository extends JpaRepository<Gear, Integer> {
 
     List<Gear> getAllByNameContainsIgnoreCase(String name);
+    @Query("SELECT g.name FROM Gear g")
+    List<String> getAllNames();
 }
