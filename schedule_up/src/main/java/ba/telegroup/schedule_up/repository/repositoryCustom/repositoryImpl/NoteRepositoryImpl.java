@@ -1,9 +1,15 @@
 package ba.telegroup.schedule_up.repository.repositoryCustom.repositoryImpl;
 
+import ba.telegroup.schedule_up.model.Note;
+import ba.telegroup.schedule_up.model.User;
 import ba.telegroup.schedule_up.model.modelCustom.NoteUser;
 import ba.telegroup.schedule_up.repository.repositoryCustom.NoteRepositoryCustom;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 

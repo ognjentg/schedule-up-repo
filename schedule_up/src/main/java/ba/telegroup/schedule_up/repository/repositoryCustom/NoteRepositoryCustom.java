@@ -1,5 +1,6 @@
 package ba.telegroup.schedule_up.repository.repositoryCustom;
 
+import ba.telegroup.schedule_up.model.Note;
 import ba.telegroup.schedule_up.model.modelCustom.NoteUser;
 
 import java.util.List;

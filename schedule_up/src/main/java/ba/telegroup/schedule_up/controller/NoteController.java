@@ -12,12 +12,13 @@ import ba.telegroup.schedule_up.session.UserBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,11 @@ import java.util.List;
 @Controller
 @Scope("request")
 public class NoteController extends GenericController<Note, Integer> {
+
+    private static final String SQL_GET_USERNAME_BY_USER_ID = "SELECT username FROM user WHERE id=?";
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public NoteController(JpaRepository<Note, Integer> repo) {
         super(repo);
@@ -65,6 +71,29 @@ public class NoteController extends GenericController<Note, Integer> {
 
     }
 
+    @Transactional
+    @RequestMapping(value = "/", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.CREATED)
+    public @ResponseBody NoteUser insert(@RequestBody Note note) throws BadRequestException {
+        if (repo.saveAndFlush(note) != null) {
+            logCreateAction(note);
+
+            String username = (String) entityManager.createNativeQuery(SQL_GET_USERNAME_BY_USER_ID).setParameter(1, note.getUserId()).getSingleResult();
+
+            NoteUser noteUser = new NoteUser();
+            noteUser.setId(note.getId());
+            noteUser.setName(note.getName());
+            noteUser.setDescription(note.getDescription());
+            noteUser.setPublishTime(note.getPublishTime());
+            noteUser.setDeleted(note.getDeleted());
+            noteUser.setUserId(note.getUserId());
+            noteUser.setCompanyId(note.getCompanyId());
+            noteUser.setUsername(username);
+            return noteUser;
+        }
+        throw new BadRequestException("Bad request");
+    }
+
     @Override
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.DELETE)
     public @ResponseBody String delete(@PathVariable Integer id) throws BadRequestException {
@@ -77,7 +106,6 @@ public class NoteController extends GenericController<Note, Integer> {
            }
        }
            throw new BadRequestException("Bad request");
-
     }
 
 //    @RequestMapping(value = "/getAllByPublishTimeAfter/{time}", method = RequestMethod.GET)
