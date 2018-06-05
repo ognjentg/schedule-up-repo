@@ -9,7 +9,7 @@ var noteView = {
             cols: [{
                 view: "label",
                 width: 400,
-                template: "<span class='fa fa-note'></span> Oglasi"
+                template: "<span class='fa fa-sticky-note'></span> Oglasi"
             },{}, {
                 id: "addNoteBtn",
                 view: "button",

@@ -24,6 +24,10 @@ var menuData = [
         id:"gear",
         value:"Oprema",
         icon:"archive"
+    },{
+        id:"settings",
+        value:"Podešavanja",
+        icon:"cog"
     }
 ];
 
@@ -41,6 +45,8 @@ var menuActions = function (id) {
             break;
         case "gear":
             gearView.selectPanel();
+        case "settings":
+            companySettingsView.selectPanel();
     }
 };
 
@@ -76,7 +82,15 @@ var mainLayout = {
                         css: "appNameLabel",
                         label: "Schedule Up",
                         width: 400
-                    },{}
+                    },{},{
+                        id: "addNoteBtn",
+                        view: "button",
+                        type: "iconButton",
+                        template:"<span class='webix_icon fa-cog' style='font-size:35px; align='right'; '>",
+                        click: "companySettingsView.customizeDialog",
+                        autowidth:true,
+                        height:400
+                    }
                 ]
             }]
 
