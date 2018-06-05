@@ -14,6 +14,11 @@ var menuData = [
         id:"building",
         value:"Zgrade",
         icon:"building"
+    },
+    {
+        id:"note",
+        value:"Oglasi",
+        icon:"sticky-note"
     }
 ];
 
@@ -25,6 +30,9 @@ var menuActions = function (id) {
             break;
         case "building":
             buildingView.selectPanel();
+            break;
+        case "note":
+            noteView.selectPanel();
             break;
     }
 };
