@@ -86,11 +86,11 @@ var noteView = {
     },
     changeNoteDialog: {
         view: "popup",
-        id: "showNoteDialog",
+        id: "changeNoteDialog",
         modal: true,
         position: "center",
         body: {
-            id: "showNoteInside",
+            id: "changeNoteInside",
             rows: [{
                 view: "toolbar",
                 cols: [{
@@ -101,11 +101,11 @@ var noteView = {
                     view: "icon",
                     icon: "close",
                     align: "right",
-                    click: "util.dismissDialog('showNoteDialog');"
+                    click: "util.dismissDialog('changeNoteDialog');"
                 }]
             }, {
                 view: "form",
-                id: "showNoteForm",
+                id: "changeNoteForm",
                 width: 500,
                 elementsConfig: {
                     labelWidth: 140,
@@ -132,7 +132,7 @@ var noteView = {
             }]
         }
     },
-    showNoteDialog: function (note) {
+    showChangeNoteDialog: function (note) {
         webix.ui(webix.copy(buildingView.changeNoteDialog));
         var form = $$("changeNoteForm");
         form.elements.id.setValue(note.id);
