@@ -48,6 +48,9 @@ var companyView = {
                 fillspace: true,
                 editable:false,
                 editor: "text",
+                format:function (value) {
+                    return value.substring(0,value.length-3);
+                },
                 header: ["Radno vrijeme od",
                     {
                         content: "textFilter"
@@ -58,6 +61,9 @@ var companyView = {
                     fillspace: true,
                     editable:false,
                     editor: "text",
+                    format:function (value) {
+                        return value.substring(0,value.length-3);
+                    },
                     header: ["Radno vrijeme do",{
                         content: "textFilter"
                     }],

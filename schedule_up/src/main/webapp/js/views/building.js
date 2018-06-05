@@ -273,6 +273,12 @@ var buildingView = {
 
     },
     showMapDetailsDialog: function(building){
+        tablecentar[0]=building.latitude;
+        tablecentar[1]=building.longitude;
+        var mapaObjekat={
+            id:1,lat:tablecentar[0],  lng:tablecentar[1]
+        };
+        tabledata[0]=mapaObjekat;
         webix.ui(webix.copy(buildingView.showMapDialog));
         $$("mapLabel").data.label="<span class='webix_icon fa fa-map-marker '></span> Lokacija zgrade";
         $$("saveMap").data.hidden=true;
