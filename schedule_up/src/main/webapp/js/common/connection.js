@@ -112,7 +112,7 @@ var connection = {
     },
 
     //attach triggers to datatables
-    attachAjaxEvents: function (dtId, link, preserveId, editValidationRules) {
+    attachAjaxEvents: function (dtId, link,customInsert, preserveId, editValidationRules) {
         $$(dtId).attachEvent("onBeforeAdd", function (index, obj) {
             if (obj.isNew) {
                 return true;
@@ -120,10 +120,15 @@ var connection = {
             if (typeof preserveId === 'undefined' || preserveId !== true) {
                 delete obj["id"];
             }
+            var addLink=link;
+            if (typeof customInsert !== 'undefined' && customInsert === true) {
+                addLink=addLink+"/custom/";
+            }
             util.preloader.inc();
+
             webix.ajax().headers({
                 "Content-type": "application/json"
-            }).post(link, JSON.stringify(obj), {
+            }).post(addLink, JSON.stringify(obj), {
                 error: function (text, data, xhr) {
                     if (xhr.status == 401) {
                         if (connection.showSEM) {
@@ -168,9 +173,15 @@ var connection = {
             var oldValue = state.old;
 
             if (newValue == oldValue) return;
-
-            var editLink = link+"/"+"id";
-
+            if (typeof preserveId === 'undefined' || preserveId !== true) {
+                delete obj["id"];
+            }
+            var editLink="";
+            if (typeof customInsert !== 'undefined' && customInsert === true) {
+                editLink=link+"/custom/"+id;
+            }else {
+                editLink = link + "/" + id;
+            }
             var data = $$(dtId).getItem(id);
             data[column] = newValue;
 
