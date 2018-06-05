@@ -54,8 +54,9 @@ public class CompanyController extends GenericController<Company, Integer> {
         return ((CompanyRepositoryCustom) repo).getAllExtendedByNameContains(name);
     }
 
+    //Ovo je metoda za insert CompanyUser
     @Transactional
-    @RequestMapping(value ="/", method = RequestMethod.POST)
+    @RequestMapping(value ="/insert", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public @ResponseBody
     CompanyUser insertExtended(@RequestBody CompanyUser companyUser) throws BadRequestException {
