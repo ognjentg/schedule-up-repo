@@ -26,12 +26,7 @@ public class GearController extends GenericController<Gear, Integer> {
     public List<Gear> getAllByNameContainsIgnoreCase(@PathVariable String name) {
         return ((GearRepository) repo).getAllByNameContainsIgnoreCase(name);
     }
-
-    @Override
-    public List<Gear> getAll() throws ForbiddenException {
-        throw new ForbiddenException("Forbidden");
-    }
-
+        
     @Override
     @DeleteMapping
     public Gear findById(Integer integer) {
