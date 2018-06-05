@@ -196,6 +196,12 @@ var buildingView = {
             id: "buildingContextMenu",
             width: 200,
             data: [{
+                id: "3",
+                value: "Prikažite na mapi",
+                icon: "map-marker"
+            },
+
+                {
                 id: "1",
                 value: "Izmijenite",
                 icon: "pencil-square-o"
@@ -224,6 +230,12 @@ var buildingView = {
                                 }
                             };
                             webix.confirm(delBox);
+                            break;
+                        case "3":
+                           webix.ui(webix.copy(buildingView.showMapDialog));
+                            $$("mapLabel").data.label="<span class='webix_icon fa fa-map-marker '></span> Lokacija zgrade";
+                            $$("saveMap").data.hidden=true;
+                            $$("showMapDialog").show();
                             break;
                     }
                 }
@@ -387,6 +399,7 @@ var buildingView = {
             rows: [{
                 view: "toolbar",
                 cols: [{
+                    id:"mapLabel",
                     view: "label",
                     label: "<span class='webix_icon fa fa-map-marker '></span> Odaberite lokaciju",
                     width: 600,

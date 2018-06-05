@@ -169,7 +169,7 @@ var companyView = {
                     view: "text",
                     id: "name",
                     name: "name",
-                    label: "Naziv:",
+                    label: "Naziv",
                     invalidMessage: "Unesite naziv kompanije!",
                     required: true
                 }, {
@@ -213,7 +213,7 @@ var companyView = {
                         view: "text",
                         id: "email",
                         name: "email",
-                        label: "E-mail:",
+                        label: "E-mail",
                         required: true
                     }, {
                         margin: 5,
