@@ -27,7 +27,8 @@ var noteView = {
             resizeColumn: true,
             resizeRow: true,
             onContext: {},
-            columns: [{
+            columns: [
+                {
                 id: "id",
                 hidden: true,
                 fillspace: true,
@@ -36,14 +37,31 @@ var noteView = {
                 id: "publishTime",
                 editable: false,
                 fillspace: false,
-                width:250,
+                width:150,
                 editor: "date",
                 header: "Datum objave",
+                    format:function(value){
+                        date = new Date(value);
+                        var hours = date.getHours();
+                        var minutes = date.getMinutes();
+
+                        minutes = minutes < 10 ? '0'+minutes : minutes;
+                        var strTime = hours + ':' + minutes;
+                        return date.getDate() + "/" + (date.getMonth()+1) + "/" + date.getFullYear() + "  " + strTime;
+                         }
 
             }, {
+                    id: "username",
+                    fillspace: false,
+                    editor: "text",
+                    width:200,
+                    editable:false,
+                    header: "Korisnik"
+
+                }, {
                 id: "name",
                 editable: false,
-                fillspace: true,
+                fillspace: false, width:400,
                 editor: "text",
                 header: "Naziv"
 
@@ -60,17 +78,7 @@ var noteView = {
             select: "row",
             navigation: true,
             editable: false,
-            url: "note/",
-            on: {
-
-                onAfterContextMenu: function (item) {
-                    this.select(item.row);
-                },
-                onItemClick: function (item) {
-                    console.log("prozor");
-                            noteView.showNoteDialog($$("noteDT").getItem(item.row));
-                    }
-            }
+            url: "note/"
         }]
     },
     selectPanel: function(){
@@ -80,168 +88,9 @@ var noteView = {
         var panelCopy = webix.copy(this.panel);
 
         $$("main").addView(webix.copy(panelCopy));
-        var my_format = webix.Date.strToDate("%d-%m-%Y ");
-        connection.attachAjaxEvents("noteDT", "note");
 
-    },
-    changeNoteDialog: {
-        view: "popup",
-        id: "changeNoteDialog",
-        modal: true,
-        position: "center",
-        body: {
-            id: "changeNoteInside",
-            rows: [{
-                view: "toolbar",
-                cols: [{
-                    view: "label",
-                    label: "<span class='webix_icon fa-book'></span> Oglas",
-                    width: 400
-                }, {}, {
-                    view: "icon",
-                    icon: "close",
-                    align: "right",
-                    click: "util.dismissDialog('changeNoteDialog');"
-                }]
-            }, {
-                view: "form",
-                id: "changeNoteForm",
-                width: 500,
-                elementsConfig: {
-                    labelWidth: 140,
-                    bottomPadding: 18
-                },
-                elements: [{
-                    view: "text",
-                    name: "id",
-                    hidden: true
-                }, {
-                    view: "text",
-                    id: "name",
-                    name: "name",
-                    label: "Name:",
-                }, {
-                    view: "text",
-                    id: "description",
-                    name: "description",
-                    label: "Tekst:",
-                }, {
-                    margin: 5,
-                }]
-
-            }]
-        }
-    },
-    showChangeNoteDialog: function (note) {
-        webix.ui(webix.copy(buildingView.changeNoteDialog));
-        var form = $$("changeNoteForm");
-        form.elements.id.setValue(note.id);
-        form.elements.name.setValue(note.name);
-        form.elements.description.setValue(note.description);
-
-        setTimeout(function () {
-            $$("changeNoteDialog").show();
-            webix.UIManager.setFocus("name");
-        }, 0);
-    },
-    addDialog: {
-        view: "popup",
-        id: "addNoteDialog",
-        modal: true,
-        position: "center",
-        body: {
-            id: "addNoteInside",
-            rows: [{
-                view: "toolbar",
-                cols: [{
-                    view: "label",
-                    label: "<span class='webix_icon fa-sticky-note'></span> Dodavanje oglasa",
-                    width: 400
-                }, {}, {
-                    hotkey: 'esc',
-                    view: "icon",
-                    icon: "close",
-                    align: "right",
-                    click: "util.dismissDialog('addNoteDialog');"
-                }]
-            }, {
-                view: "form",
-                id: "addNoteForm",
-                width: 500,
-                elementsConfig: {
-                    labelWidth: 140,
-                    bottomPadding: 18
-                },
-                elements: [{
-                    view: "text",
-                    id: "name",
-                    name: "name",
-                    label: "Naslov",
-                    invalidMessage: "Unesite naslov oglasa!",
-                    required: true
-                }, {
-                    view: "textarea",
-                    id: "description",
-                    name: "description",
-                    label: "Tekst",
-                    height:200,
-                    invalidMessage: "Unesite tekst oglasa!",
-                    required: true
-                }, {
-                        margin: 5,
-                        cols: [{}, {
-                            id: "saveNote",
-                            view: "button",
-                            value: "Dodajte oglas",
-                            type: "form",
-                            click: "noteView.save",
-                            hotkey: "enter",
-                            width: 150
-                        }]
-                    }],
-                rules: {
-                    "name": function (value) {
-                        if (!value)
-                            return false;
-                        if (value.length > 100) {
-                            $$('addNoteForm').elements.name.config.invalidMessage = 'Maksimalan broj karaktera je 100!';
-                            return false;
-                        }
-                        return true;
-                    },
-                    "description": function (value) {
-                        if (!value)
-                            return false;
-                        if (value.length > 500) {
-                            $$('addNoteForm').elements.name.config.invalidMessage = 'Maksimalan broj karaktera je 500!';
-                            return false;
-                        }
-                        return true;
-                    }
-                }
-            }]
-        }
-    },
-
-    showAddDialog: function () {
-        webix.ui(webix.copy(noteView.addDialog)).show();
-        webix.UIManager.setFocus("name");
-    },
-
-    save: function () {
-        var form = $$("addNoteForm");
-        if (form.validate()) {
-            var newNote = {
-                name: form.getValues().name,
-                description: form.getValues().description,
-                userId:1, // we need to change this when userBean is made
-                companyId:1 // also needs change
-            };
-            $$("noteDT").add(newNote);
-            util.dismissDialog('addNoteDialog');
-        }
     }
 
-    
+
 
 };
