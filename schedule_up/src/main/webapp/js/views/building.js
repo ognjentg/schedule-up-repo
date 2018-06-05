@@ -264,10 +264,7 @@ var buildingView = {
                             webix.confirm(delBox);
                             break;
                         case "3":
-                           webix.ui(webix.copy(buildingView.showMapDialog));
-                            $$("mapLabel").data.label="<span class='webix_icon fa fa-map-marker '></span> Lokacija zgrade";
-                            $$("saveMap").data.hidden=true;
-                            $$("showMapDialog").show();
+                            buildingView.showMapDetailsDialog($$("buildingDT").getItem(context.id.row));
                             break;
                     }
                 }
@@ -275,6 +272,12 @@ var buildingView = {
         });
 
     },
+    showMapDetailsDialog: function(building){
+        webix.ui(webix.copy(buildingView.showMapDialog));
+        $$("mapLabel").data.label="<span class='webix_icon fa fa-map-marker '></span> Lokacija zgrade";
+        $$("saveMap").data.hidden=true;
+        $$("showMapDialog").show();
+        },
     showChangeBuildingDialog: function (building) {
         webix.ui(webix.copy(buildingView.changeBuildingDialog));
         var form = $$("changeBuildingForm");
