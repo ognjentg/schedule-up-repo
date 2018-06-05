@@ -1,5 +1,3 @@
 var gearView = {
-    selectPanel: function() {
 
-    }
 };

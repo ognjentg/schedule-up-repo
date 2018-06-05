@@ -19,11 +19,6 @@ var menuData = [
         id:"note",
         value:"Oglasi",
         icon:"sticky-note"
-    },
-    {
-        id:"gear",
-        value: "Oprema",
-        icon:"archive"
     }
 ];
 
@@ -39,8 +34,6 @@ var menuActions = function (id) {
         case "note":
             noteView.selectPanel();
             break;
-        case "gear":
-            gearView.selectPanel();
     }
 };
 
