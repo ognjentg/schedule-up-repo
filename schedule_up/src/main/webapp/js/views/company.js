@@ -100,7 +100,7 @@ var companyView = {
         var panelCopy = webix.copy(this.panel);
 
         $$("main").addView(webix.copy(panelCopy));
-        connection.attachAjaxEvents("companyDT", "company");
+        connection.attachAjaxEvents("companyDT", "company",true);
 
 
         webix.ui({
@@ -384,7 +384,7 @@ var companyView = {
                 ects: $$("changeCompanyForm").getValues().ects
             };
 
-            connection.sendAjax("PUT", "company",
+            connection.sendAjax("PUT", "company/custom/"+newItem.id,
                 function (text, data, xhr) {
                     if (text) {
                         util.messages.showMessage("Data successfully changed.");

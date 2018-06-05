@@ -38,7 +38,7 @@ public class GearUnitController extends GenericController<GearUnit, Integer> {
     }
 
     @Transactional
-    @RequestMapping(value ="/", method = RequestMethod.POST)
+    @RequestMapping(value ="/custom/", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public @ResponseBody
     GearUnitGear insertExtended(@RequestBody GearUnitGear gearUnitGear) throws BadRequestException {
@@ -46,7 +46,7 @@ public class GearUnitController extends GenericController<GearUnit, Integer> {
     }
 
     @Transactional
-    @RequestMapping(value ="/", method = RequestMethod.PUT)
+    @RequestMapping(value ="/custom/", method = RequestMethod.PUT)
     public @ResponseBody
     GearUnitGear updateExtended(@RequestBody GearUnitGear gearUnitGear) throws BadRequestException {
         return  ((GearUnitRepositoryCustom)repo).updateExtended(gearUnitGear);

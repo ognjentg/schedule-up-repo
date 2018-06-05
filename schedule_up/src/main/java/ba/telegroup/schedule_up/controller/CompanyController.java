@@ -56,7 +56,7 @@ public class CompanyController extends GenericController<Company, Integer> {
 
     //Ovo je metoda za insert CompanyUser
     @Transactional
-    @RequestMapping(value ="/insert", method = RequestMethod.POST)
+    @RequestMapping(value ="/custom/", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public @ResponseBody
     CompanyUser insertExtended(@RequestBody CompanyUser companyUser) throws BadRequestException {
