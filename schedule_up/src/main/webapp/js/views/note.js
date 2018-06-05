@@ -16,6 +16,7 @@ var noteView = {
                 type: "iconButton",
                 label: "Dodajte oglas",
                 icon: "plus-circle",
+                click: "noteView.showAddDialog",
                 autowidth: true
             }]
         }, {
@@ -80,6 +81,7 @@ var noteView = {
 
         $$("main").addView(webix.copy(panelCopy));
         var my_format = webix.Date.strToDate("%d-%m-%Y ");
+        connection.attachAjaxEvents("noteDT", "note");
 
     },
     changeNoteDialog: {
@@ -142,5 +144,104 @@ var noteView = {
             webix.UIManager.setFocus("name");
         }, 0);
     },
+    addDialog: {
+        view: "popup",
+        id: "addNoteDialog",
+        modal: true,
+        position: "center",
+        body: {
+            id: "addNoteInside",
+            rows: [{
+                view: "toolbar",
+                cols: [{
+                    view: "label",
+                    label: "<span class='webix_icon fa-sticky-note'></span> Dodavanje oglasa",
+                    width: 400
+                }, {}, {
+                    hotkey: 'esc',
+                    view: "icon",
+                    icon: "close",
+                    align: "right",
+                    click: "util.dismissDialog('addNoteDialog');"
+                }]
+            }, {
+                view: "form",
+                id: "addNoteForm",
+                width: 500,
+                elementsConfig: {
+                    labelWidth: 140,
+                    bottomPadding: 18
+                },
+                elements: [{
+                    view: "text",
+                    id: "name",
+                    name: "name",
+                    label: "Naslov",
+                    invalidMessage: "Unesite naslov oglasa!",
+                    required: true
+                }, {
+                    view: "textarea",
+                    id: "description",
+                    name: "description",
+                    label: "Tekst",
+                    height:200,
+                    invalidMessage: "Unesite tekst oglasa!",
+                    required: true
+                }, {
+                        margin: 5,
+                        cols: [{}, {
+                            id: "saveNote",
+                            view: "button",
+                            value: "Dodajte oglas",
+                            type: "form",
+                            click: "noteView.save",
+                            hotkey: "enter",
+                            width: 150
+                        }]
+                    }],
+                rules: {
+                    "name": function (value) {
+                        if (!value)
+                            return false;
+                        if (value.length > 100) {
+                            $$('addNoteForm').elements.name.config.invalidMessage = 'Maksimalan broj karaktera je 100!';
+                            return false;
+                        }
+                        return true;
+                    },
+                    "description": function (value) {
+                        if (!value)
+                            return false;
+                        if (value.length > 500) {
+                            $$('addNoteForm').elements.name.config.invalidMessage = 'Maksimalan broj karaktera je 500!';
+                            return false;
+                        }
+                        return true;
+                    }
+                }
+            }]
+        }
+    },
+
+    showAddDialog: function () {
+        webix.ui(webix.copy(noteView.addDialog)).show();
+        webix.UIManager.setFocus("name");
+    },
+
+    save: function () {
+        var form = $$("addNoteForm");
+        if (form.validate()) {
+            var newNote = {
+                name: form.getValues().name,
+                description: form.getValues().description,
+                userId:1, // we need to change this when userBean is made
+                companyId:1 // also needs change
+            };
+            $$("noteDT").add(newNote);
+            util.dismissDialog('addNoteDialog');
+        }
+    }
+
+    
 
 };

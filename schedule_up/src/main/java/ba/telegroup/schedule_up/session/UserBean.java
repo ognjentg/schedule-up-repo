@@ -15,12 +15,11 @@ public class UserBean {
     // Must change this as soon as possible.
 
     public UserBean() {
-        System.out.println("CONSTRUCTOOOR");
         user = new User();
         loggedIn = true;
-        user.setId(29);
+        user.setId(1);
         user.setCompanyId(1);
-        user.setRoleId(2);
+        user.setRoleId(1);
     }
 
     public User getUser() {
