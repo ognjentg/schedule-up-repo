@@ -82,7 +82,6 @@ public class GearUnitRepositoryImpl implements GearUnitRepositoryCustom {
 
         gearUnit.setGearId(gearUnitGear.getGearId());
         gearUnit.setAvailable(gearUnitGear.getAvailable());
-        gearUnit.setCompanyId(gearUnitGear.getCompanyId());
         gearUnit.setDescription(gearUnitGear.getDescription());
 
         transaction.commit();

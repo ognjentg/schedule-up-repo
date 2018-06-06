@@ -186,7 +186,7 @@ var gearView = {
 
         setTimeout(function () {
             $$("changeGearDialog").show();
-            webix.UIManager.setFocus("name");
+            webix.UIManager.setFocus("description");
         }, 0);
     },
 
@@ -197,9 +197,7 @@ var gearView = {
                 name: $$("changeGearForm").getValues().name,
                 description: $$("changeGearForm").getValues().description,
                 //gearID: id se dobija na osnovu name, ali jos nema metode za to
-                companyId: 1,
                 available: 1,
-                deleted: 0,
                 gearId: 1,
                 id: 50
             };
