@@ -29,6 +29,11 @@ var menuData = [
         id:"room",
         value:"Sale",
         icon:"cube"
+    },
+    {
+        id:"gear",
+        value: "Oprema",
+        icon: "wrench"
     }
 ];
 
@@ -49,6 +54,9 @@ var menuActions = function (id) {
             break;
         case "room":
             roomView.selectPanel();
+            break;
+        case "gear":
+            gearView.selectPanel();
             break;
     }
 };
