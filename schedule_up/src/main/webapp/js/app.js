@@ -24,10 +24,16 @@ var menuData = [
         id:"gear",
         value:"Oprema",
         icon:"archive"
-    },{
+    },
+    {
         id:"settings",
         value:"Podešavanja",
         icon:"cog"
+    },
+    {
+        id:"room",
+        value:"Sale",
+        icon:"cube"
     }
 ];
 
@@ -45,8 +51,13 @@ var menuActions = function (id) {
             break;
         case "gear":
             gearView.selectPanel();
+            break;
         case "settings":
             companySettingsView.selectPanel();
+            break;
+        case "room":
+            roomView.selectPanel();
+            break;
     }
 };
 

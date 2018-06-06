@@ -1,3 +1,6 @@
 var roomView = {
 
+    selectPanel: function() {
+
+    }
 };
