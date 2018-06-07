@@ -80,29 +80,6 @@ var gearView = {
                 onAfterContextMenu: function (item) {
                     this.select(item.row);
                 }
-                /*onAfterLoad: function () {
-                    this.eachRow(
-                        function (row) {
-                            var item = this.getItem(row);
-                            if(item.available == 1){
-                                item.available = "Da";
-                            }else item.available = "Ne";
-                            this.refresh();
-                        }
-                    );
-                    //this.adjustRowHeight();
-                },
-                onAfterAdd: function () {
-                    this.eachRow(
-                        function (row) {
-                            var item = this.getItem(row);
-                            if(item.available == 1){
-                                item.available = "Da";
-                            }else item.available = "Ne";
-                            this.refresh();
-                        }
-                    )
-                }*/
             }
         }]
     },
