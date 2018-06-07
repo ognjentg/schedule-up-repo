@@ -34,6 +34,10 @@ var menuData = [
         id:"gear",
         value: "Oprema",
         icon: "wrench"
+    },{
+        id:"logger",
+        value: "Logovi",
+        icon: "history"
     }
 ];
 
@@ -58,6 +62,9 @@ var menuActions = function (id) {
         case "gear":
             gearView.selectPanel();
             break;
+        case "logger":
+        loggerView.selectPanel();
+        break;
     }
 };
 
