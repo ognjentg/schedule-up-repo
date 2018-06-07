@@ -9,15 +9,7 @@ var loggerView = {
             cols: [{
                 view: "label",
                 width: 400,
-                template: "<span class='fa fa-history'></span> "
-            }, {}, {
-                id: "addCompanyBtn",
-                view: "button",
-                type: "iconButton",
-                label: "Dodajte kompaniju",
-                icon: "plus-circle",
-                click: 'companyView.showAddDialog',
-                autowidth: true
+                template: "<span class='fa fa-history'></span> Logovi "
             }]
         }, {
             view: "datatable",
@@ -71,7 +63,7 @@ var loggerView = {
                     fillspace: true,
                     editable: false,
                     editor: "text",
-                    header: ["Izvrseno nad", {
+                    header: ["Izvršeno nad", {
                         content: "textFilter"
                     }],
                 }, {
@@ -87,11 +79,10 @@ var loggerView = {
 
                         minutes = minutes < 10 ? '0'+minutes : minutes;
                         var strTime = hours + ':' + minutes;
-                        return date.getDate() + "/" + (date.getMonth()+1) + "/" + date.getFullYear() + "  " + strTime;
+                        return date.getDate() + "." + (date.getMonth()+1) + "." + date.getFullYear() + ".  " + strTime;
                     },
                     header: ["Datum", {
-                        //content: "textFilter"
-                        text: ""
+                        content: "textFilter"
                     }],
                 }
             ],

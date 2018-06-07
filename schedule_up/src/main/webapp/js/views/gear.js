@@ -61,8 +61,8 @@ var gearView = {
                 sort: "text",
                 editable:false,
                 format: function(value){
-                  if(value == 1) value="Da";
-                  else value="Ne";
+                  if(value == 1) return "Da";
+                  else return "Ne";
                 },
                 header: [
                     "Slobodno", {

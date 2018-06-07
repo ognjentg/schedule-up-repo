@@ -39,7 +39,9 @@ var noteView = {
                 fillspace: false,
                 width:150,
                 editor: "date",
-                header: "Datum objave",
+                header: ["Datum objave", {
+                    content: "textFilter"
+                }],
                     format:function(value){
                         date = new Date(value);
                         var hours = date.getHours();
@@ -56,14 +58,18 @@ var noteView = {
                     editor: "text",
                     width:200,
                     editable:false,
-                    header: "Korisnik"
+                    header: ["Korisnik", {
+                    content: "textFilter"
+                }],
 
                 }, {
                 id: "name",
                 editable: false,
                 fillspace: false, width:400,
                 editor: "text",
-                header: "Naziv"
+                header: ["Naziv", {
+                    content: "textFilter"
+                }],
 
             },
                 {
@@ -71,7 +77,9 @@ var noteView = {
                 fillspace: true,
                 editor: "text",
                 editable:false,
-                header: "Opis"
+                header: ["Opis", {
+                    content: "textFilter"
+                }],
 
             }
             ],

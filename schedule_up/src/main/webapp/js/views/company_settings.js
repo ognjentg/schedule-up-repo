@@ -14,9 +14,7 @@ var companySettingsView = {
                 view: "label",
                 template: "<span class='fa fa-cog'></span> Podešavanja"
             }]
-        }, {type:"space", cols:[
-            ]
-        },{view: "form",
+        }, {view: "form",
             id: "customizeForm",
             elementsConfig: {
                 labelWidth: 290,
@@ -72,7 +70,9 @@ var companySettingsView = {
                     width:400,
             options:["15 minuta","30 minuta", "1 sat","12 sati","1 dan","1 sedmica"]
                 }]
-        }]
+        },{type:"space", css:'white', cols:[
+            ]
+        },]
     },
     formatDate:function format(obj){
     if (obj.value){

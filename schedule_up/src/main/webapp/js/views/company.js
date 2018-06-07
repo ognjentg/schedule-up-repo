@@ -147,7 +147,7 @@ var companyView = {
                             break;
                 }
             }
-        });
+        }})
     },
 
     addDialog: {
