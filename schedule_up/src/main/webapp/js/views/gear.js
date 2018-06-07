@@ -110,6 +110,8 @@ var gearView = {
         var panelCopy = webix.copy(this.panel);
 
         $$("main").addView(webix.copy(panelCopy));
+        connection.attachAjaxEvents("gearDT", "gear-unit",true);
+        $$("gearDT").detachEvent("onBeforeDelete");
 
         webix.ui({
             view: "contextmenu",
@@ -135,13 +137,21 @@ var gearView = {
                             gearView.showChangeGearDialog($$("gearDT").getItem(context.id.row));
                             break;
                         case "2":
-                            var delBox = (webix.copy(commonViews.deleteConfirm("gear")));
+                            var delBox = (webix.copy(commonViews.brisanjePotvrda("opreme", "opremu")));
+                            var newItem=$$("gearDT").getItem(context.id.row);
                             delBox.callback = function (result) {
                                 if (result == 1) {
-                                    connection.sendAjax("DELETE")
-                                    $$("gearDT").remove(context.id.row);
-                                    util.messages.showMessage("Oprema je uspješno obrisana.");
-                                }
+                                    connection.sendAjax("DELETE", "gear-unit/"+newItem.id,
+                                        function (text, data, xhr) {
+                                            alert(text);
+                                            if (text) {
+                                                util.messages.showMessage("Oprema uspješno uklonjena.");
+                                                $$("gearDT").remove(context.id.row);
+                                            } else
+                                                util.messages.showErrorMessage("Neuspješno uklanjanje.");
+                                        }, function () {
+                                            util.messages.showErrorMessage("Neuspješno uklanjanje.");
+                                        }, null);}
                             };
                             webix.confirm(delBox);
                             break;
