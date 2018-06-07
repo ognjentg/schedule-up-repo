@@ -2,7 +2,6 @@
 var roomView = {
 
     selectPanel: function () {
-
     },
 
     addDialog: {
@@ -81,10 +80,12 @@ var roomView = {
                     invalidMessage: "Unesite PIN!",
                     required: true
                 }, {
-                    view: "text",
+                    view: "textarea",
                     id: "description",
                     name: "description",
-                    label: "Opis"
+                    label: "Opis",
+                    height: 90
+
                 }, {
                     margin: 5,
                     cols: [{}, {
@@ -117,7 +118,7 @@ var roomView = {
                         return true;
                     },
                     "floor": function (value) {
-                        if (isNaN(value)) {
+                        if (isNaN(value) || value !== parseInt(value, 10)) {
                             $$('addRoomForm').elements.floor.config.invalidMessage = 'Broj spratova mora biti cijeli broj!';
                             return false;
                         }
@@ -128,7 +129,7 @@ var roomView = {
                         return true;
                     },
                     "capacity": function (value) {
-                        if (isNaN(value)) {
+                        if (isNaN(value) || value !== parseInt(value, 10)) {
                             $$('addRoomForm').elements.capacity.config.invalidMessage = 'Kapacitet sale mora biti cijeli broj!';
                             $$('addRoomForm').elements.capacity.setValue(1);
                             return false;
@@ -142,7 +143,7 @@ var roomView = {
                     "pin": function (value) {
                         if (!value)
                             return false;
-                        if (isNaN(value)) {
+                        if (isNaN(value) || value != parseInt(value, 10)) {
                             $$('addRoomForm').elements.pin.config.invalidMessage = 'PIN može da sadrži samo cifre!';
                             return false;
                         }
@@ -266,10 +267,11 @@ var roomView = {
                     invalidMessage: "Unesite PIN!",
                     required: true
                 }, {
-                    view: "text",
+                    view: "textarea",
                     id: "description",
                     name: "description",
-                    label: "Opis"
+                    label: "Opis",
+                    height: 90
                 }, {
                     margin: 5,
                     cols: [{}, {
@@ -302,7 +304,7 @@ var roomView = {
                         return true;
                     },
                     "floor": function (value) {
-                        if (isNaN(value)) {
+                        if (isNaN(value) || value !== parseInt(value, 10)) {
                             $$('changeRoomForm').elements.floor.config.invalidMessage = 'Broj spratova mora biti cijeli broj!';
                             return false;
                         }
@@ -313,7 +315,7 @@ var roomView = {
                         return true;
                     },
                     "capacity": function (value) {
-                        if (isNaN(value)) {
+                        if (isNaN(value) || value !== parseInt(value, 10)) {
                             $$('changeRoomForm').elements.capacity.config.invalidMessage = 'Kapacitet sale mora biti cijeli broj!';
                             $$('changeRoomForm').elements.capacity.setValue(1);
                             return false;
@@ -327,7 +329,7 @@ var roomView = {
                     "pin": function (value) {
                         if (!value)
                             return false;
-                        if (isNaN(value)) {
+                        if (isNaN(value) || value !== parseInt(value, 10)) {
                             $$('changeRoomForm').elements.pin.config.invalidMessage = 'PIN može da sadrži samo cifre!';
                             return false;
                         }

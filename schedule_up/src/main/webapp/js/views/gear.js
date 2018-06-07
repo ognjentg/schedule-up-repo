@@ -143,7 +143,6 @@ var gearView = {
                                 if (result == 1) {
                                     connection.sendAjax("DELETE", "gear-unit/"+newItem.id,
                                         function (text, data, xhr) {
-                                            alert(text);
                                             if (text) {
                                                 util.messages.showMessage("Oprema uspješno uklonjena.");
                                                 $$("gearDT").remove(context.id.row);
