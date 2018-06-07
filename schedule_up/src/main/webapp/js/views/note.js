@@ -101,13 +101,13 @@ var noteView = {
             width: 200,
             data: [{
                 id: "1",
-                value: "Izmjena oglasa",
+                value: "Izmijenite",
                 icon: "pencil-square-o"
             }, {
                 $template: "Separator"
             }, {
                 id: "2",
-                value: "Brisanje oglasa",
+                value: "Obrišite",
                 icon: "trash"
             }],
             master: $$("noteDT"),
@@ -126,7 +126,6 @@ var noteView = {
 
                                     connection.sendAjax("DELETE", "note/"+newItem.id,
                                         function (text, data, xhr) {
-                                            alert(text);
                                             if (text) {
                                                 util.messages.showMessage("Oglas uspješno uklonjen.");
                                                 $$("noteDT").remove(context.id.row);

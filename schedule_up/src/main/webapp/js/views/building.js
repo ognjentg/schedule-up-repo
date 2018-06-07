@@ -584,6 +584,8 @@ var buildingView = {
             var mapaObjekat={
                 id:1, draggable:true,lat:json['results'][0]['geometry']['location']['lat'],  lng:json['results'][0]['geometry']['location']['lng'],   label:"A", draggable:true
             }
+            lat=json['results'][0]['geometry']['location']['lat'];
+            lng=json['results'][0]['geometry']['location']['lng'];
             tabledata[0]=mapaObjekat;
             webix.ui(webix.copy(buildingView.showMapDialog)).show();
             $$("map").attachEvent("onAfterDrop", function(id, item){
