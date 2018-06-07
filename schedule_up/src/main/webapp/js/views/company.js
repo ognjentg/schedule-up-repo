@@ -130,14 +130,21 @@ var companyView = {
                             var delBox = (webix.copy(commonViews.deleteConfirm("company")));
                             delBox.callback = function (result) {
                                 if (result == 1) {
-                                    connection.sendAjax("DELETE")
-                                    $$("companyDT").remove(context.id.row);
-                                    util.messages.showMessage("Company deleted successfully.");
+                                    var item = $$("companyDT").getItem(context.id.row);
+                                    $$("companyDT").detachEvent("onBeforeDelete");
+                                    connection.sendAjax("DELETE","/company/"+item.id,function (text,data,xhr) {
+                                        if (text)
+                                        {
+                                            $$("companyDT").remove(context.id.row);
+                                            util.messages.showMessage("Uspjesno uklanjanje");
+                                        }
+                                    },function (text,data,xhr) {
+                                        util.messages.showErrorMessage("Neuspjesno uklanjanje");
+                                    },item);
                                 }
                             };
                             webix.confirm(delBox);
                             break;
-                    }
                 }
             }
         });
