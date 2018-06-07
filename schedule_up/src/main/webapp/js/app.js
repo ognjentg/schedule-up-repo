@@ -91,16 +91,7 @@ var mainLayout = {
                         id: "appNameLabel",
                         view: "label",
                         css: "appNameLabel",
-                        label: "Schedule Up",
-                        width: 400
-                    },{},{
-                        id: "addNoteBtn",
-                        view: "button",
-                        type: "iconButton",
-                        template:"<span class='webix_icon fa-cog' style='font-size:35px; align='right'; '>",
-                        click: "companySettingsView.customizeDialog",
-                        autowidth:true,
-                        height:400
+                        label: "Schedule Up"
                     }
                 ]
             }]

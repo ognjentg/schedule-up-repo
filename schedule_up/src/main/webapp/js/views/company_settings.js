@@ -3,8 +3,8 @@ var companySettingsView = {
 
 
     panel: {
-        id: "notePanel",
-        adjust: true,
+        id: "settingsPanel",
+
         width:1500,
         rows: [{
             view: "toolbar",
@@ -14,35 +14,63 @@ var companySettingsView = {
                 view: "label",
                 template: "<span class='fa fa-cog'></span> Podešavanja"
             }]
-        }, {view: "form",
+        }, {type:"space", cols:[
+            ]
+        },{view: "form",
             id: "customizeForm",
-            adjust:true,
+            elementsConfig: {
+                labelWidth: 290,
+                bottomPadding: 18
+            },
+
             elements: [{
                 id: "timeFrom",
-                editable:false,
-                editor: "text",
-                header: ["Radno vrijeme od",
-                    {
-                        content: "textFilter"
-                    }]
+                name: "timeFrom",
+                view: "datepicker",
+                stringResult: true,
+                width:400,
+                label: "Početak radnog vremena:",
+                timepicker: true,
+                type: "time",
+                format: "%H:%i",
+                suggest: {
+                    type: "calendar",
+                    body: {
+                        type: "time",
+                        calendarTime: "%H:%i"
+                    }
+                }
             },
                 {
                     id: "timeTo",
-                    fillspace: true,
-                    editable:false,
-                    editor: "text",
-                    header: ["Radno vrijeme do",{
-                        content: "textFilter"
-                    }]
-                },
-                {}, {
-                    id: "saveSettings",
-                    view: "button",
-                    value: "Sačuvajte",
-                    type: "form",
-                    click: "companySettingsView.save",
-                    hotkey: "enter",
-                    width: 150
+                    width:400,
+                    name: "timeTo",
+                    view: "datepicker",
+                    stringResult: true,
+                    label: "Kraj radnog vremena:",
+                    timepicker: true,
+                    type: "time",
+                    format: "%H:%i",
+                    suggest: {
+                        type: "calendar",
+                        body: {
+                            type: "time",
+                            calendarTime: "%H:%i"
+                        }
+                    }
+                }, {
+            id:"reminder",
+                    view:"combo",
+                    width:400,
+                    value:"One",
+                    options:["0 minuta", "5 minuta", "15 minuta","30 minuta", "1 sat","12 sati","1 dan","1 sedmica"],
+                    label:"Podsjetnik:"
+                },{
+            view:"combo",
+            id:"cancellation",
+            label:"Minimalno vrijeme za otkazivanje sastanka:",
+                    width:400,
+            options:["15 minuta","30 minuta", "1 sat","12 sati","1 dan","1 sedmica"]
                 }]
         }]
     },
@@ -67,100 +95,6 @@ var companySettingsView = {
 
         $$("main").addView(webix.copy(panelCopy));
 
-    },
-    showDialogForm: {
-        view: "popup",
-        id: "customizeDialog",
-        modal: true,
-        position: "center",
-        body: {
-            id: "customizeInside",
-            rows: [{
-                view: "toolbar",
-                cols: [{
-                    view: "label",
-                    label: "<span class='webix_icon fa fa-building'></span> Podešavanja kompanije",
-                    width: 400
-                }, {}, {
-                    hotkey: 'esc',
-                    autowidth: true,
-                    view: "icon",
-                    icon: "close",
-                    align: "right",
-                    click: "util.dismissDialog('customizeDialog');"
-                }]
-            }, {
-                view: "form",
-                id: "customizeForm",
-                width: 600,
-                elementsConfig: {
-                    labelWidth: 200,
-                    bottomPadding: 18
-                },
-                elements: [{
-                    id: "timeFrom",
-                    invalidMessage:"Unesite početak radnog vremena!",
-                    name: "timeFrom",
-                    view: "datepicker",
-                    stringResult: true,
-                    label: "Početak radnog vremena",
-                    timepicker: true,
-                    type: "time",
-                    required: true,
-                    format: "%H:%i",
-                    suggest: {
-                        type: "calendar",
-                        body: {
-                            type: "time",
-                            calendarTime: "%H:%i"
-                        }
-                    }
-                },
-                    {
-                        id: "timeTo",
-                        fillspace: true,
-                        editable:false,
-                        editor: "text"
-                    }, {
-                        id: "timeTo",
-                        invalidMessage:"Unesite kraj radnog vremena!",
-                        name: "timeTo",
-                        view: "datepicker",
-                        stringResult: true,
-                        label: "Kraj radnog vremena",
-                        timepicker: true,
-                        type: "time",
-                        required: true,
-                        format: "%H:%i",
-                        suggest: {
-                            type: "calendar",
-                            body: {
-                                type: "time",
-                                calendarTime: "%H:%i"
-                            }
-                        }
-                    },{
-
-                            id:"c3",
-                            date:new Date(2018,1,16),
-                            view:"calendar",
-                            multiselect:"touch"
-
-                    },{
-                            id: "saveSettings",
-                            view: "button",
-                            value: "Sačuvajte",
-                            type: "form",
-                            click: "companySettingsView.save",
-                            hotkey: "enter",
-                            width: 150
-                        }]
-                    }]
-
-
-                }
-            },
-
+    }
 
         };
-
