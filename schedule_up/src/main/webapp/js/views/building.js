@@ -253,13 +253,20 @@ var buildingView = {
                             buildingView.showChangeBuildingDialog($$("buildingDT").getItem(context.id.row));
                             break;
                         case "2":
-                            var delBox = (webix.copy(commonViews.deleteConfirm("building")));
+                            var delBox = (webix.copy(commonViews.brisanjePotvrda("zgrade", "zgradu")));
+                            var newItem=$$("buildingDT").getItem(context.id.row);
                             delBox.callback = function (result) {
                                 if (result == 1) {
-                                    connection.sendAjax("DELETE")
-                                    $$("buildingDT").remove(context.id.row);
-                                    util.messages.showMessage("Zgrada je uspješno obrisana.");
-                                }
+                                    connection.sendAjax("DELETE", "building/"+newItem.id,
+                                        function (text, data, xhr) {
+                                            if (text) {
+                                                util.messages.showMessage("Zgrada uspješno uklonjena.");
+                                                $$("buildingDT").remove(context.id.row);
+                                            } else
+                                                util.messages.showErrorMessage("Neuspješno uklanjanje zgrade.");
+                                        }, function () {
+                                            util.messages.showErrorMessage("Neuspješno uklanjanje zgrade.");
+                                        }, null);}
                             };
                             webix.confirm(delBox);
                             break;

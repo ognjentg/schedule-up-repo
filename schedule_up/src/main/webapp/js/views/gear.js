@@ -60,6 +60,10 @@ var gearView = {
                 editor: "text",
                 sort: "text",
                 editable:false,
+                format: function(value){
+                  if(value == 1) value="Da";
+                  else value="Ne";
+                },
                 header: [
                     "Slobodno", {
                         content: "textFilter"
@@ -75,8 +79,8 @@ var gearView = {
 
                 onAfterContextMenu: function (item) {
                     this.select(item.row);
-                },
-                onAfterLoad: function () {
+                }
+                /*onAfterLoad: function () {
                     this.eachRow(
                         function (row) {
                             var item = this.getItem(row);
@@ -98,7 +102,7 @@ var gearView = {
                             this.refresh();
                         }
                     )
-                }
+                }*/
             }
         }]
     },
@@ -279,8 +283,6 @@ var gearView = {
 
             if(!gearExists) newItem.gearId = null;
 
-            console.log("gear id:"+oldItem.id);
-            console.log(oldItem.available);
             connection.sendAjax("PUT", "gear-unit/custom/",
                 function (text, data, xhr) {
                     if (text) {
