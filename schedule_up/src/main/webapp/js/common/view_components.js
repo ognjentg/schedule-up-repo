@@ -14,6 +14,18 @@ var commonViews = {
             text: "Are you sure you want to delete " + text + "?"
         };
     },
+    // confirm dijalog na sprskom
+    brisanjePotvrda: function (titleEntity, textEntity) {
+        var text = titleEntity;
+        if (textEntity) text = textEntity;
+        return {
+            title: "Brisanje " + titleEntity,
+            ok: "Da",
+            cancel: "Ne",
+            width: 500,
+            text: "Jeste li sigurni da želite da obrišete " + text + "?"
+        };
+    },
 
 
     confirm: function (titleEntity, textEntity) {

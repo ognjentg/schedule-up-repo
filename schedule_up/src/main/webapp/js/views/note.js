@@ -78,7 +78,13 @@ var noteView = {
             select: "row",
             navigation: true,
             editable: false,
-            url: "note/"
+            url: "note/",
+            on: {
+
+                onAfterContextMenu: function (item) {
+                    this.select(item.row);
+                }
+            }
         }]
     },
     selectPanel: function(){
@@ -86,7 +92,58 @@ var noteView = {
         rightPanel = "notePanel";
         var panelCopy = webix.copy(this.panel);
         $$("main").addView(webix.copy(panelCopy));
-        connection.attachAjaxEvents("noteDT", "note");
+        connection.attachAjaxEvents("noteDT", "note",true);
+       $$("noteDT").detachEvent("onBeforeDelete");
+
+        webix.ui({
+            view: "contextmenu",
+            id: "noteContextMenu",
+            width: 200,
+            data: [{
+                id: "1",
+                value: "Izmjena oglasa",
+                icon: "pencil-square-o"
+            }, {
+                $template: "Separator"
+            }, {
+                id: "2",
+                value: "Brisanje oglasa",
+                icon: "trash"
+            }],
+            master: $$("noteDT"),
+            on: {
+                onItemClick: function (id) {
+                    var context = this.getContext();
+                    switch (id) {
+                        case "1":
+                            // noteView.showChangeCompanyDialog($$("companyDT").getItem(context.id.row));
+                            break;
+                        case "2":
+                            var delBox = (webix.copy(commonViews.brisanjePotvrda("oglasa","oglas")));
+                            var newItem=$$("noteDT").getItem(context.id.row);
+                            delBox.callback = function (result) {
+                                if (result == 1) {
+
+                                    connection.sendAjax("DELETE", "note/"+newItem.id,
+                                        function (text, data, xhr) {
+                                            alert(text);
+                                            if (text) {
+                                                util.messages.showMessage("Oglas uspješno uklonjen.");
+                                                $$("noteDT").remove(context.id.row);
+                                            } else
+                                                util.messages.showErrorMessage("Neuspješno uklanjanje.");
+                                        }, function () {
+                                            util.messages.showErrorMessage("Neuspješno uklanjanje.");
+                                        }, null);
+
+                                }
+                            };
+                            webix.confirm(delBox);
+                            break;
+                    }
+                }
+            }
+        });
     }
     ,
     addDialog: {
