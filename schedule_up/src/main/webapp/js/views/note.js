@@ -116,7 +116,7 @@ var noteView = {
                     var context = this.getContext();
                     switch (id) {
                         case "1":
-                            // noteView.showChangeCompanyDialog($$("companyDT").getItem(context.id.row));
+                             noteView.showChangeNoteDialog($$("noteDT").getItem(context.id.row));
                             break;
                         case "2":
                             var delBox = (webix.copy(commonViews.brisanjePotvrda("oglasa","oglas")));
@@ -242,7 +242,113 @@ var noteView = {
             util.dismissDialog('addNoteDialog');
         }
 
-    }
+    },
 
+    changeNoteDialog: {
+        view: "popup",
+        id: "changeNoteDialog",
+        modal: true,
+        position: "center",
+        body: {
+            id: "changeNoteInside",
+            rows: [{
+                view: "toolbar",
+                cols: [{
+                    view: "label",
+                    label: "<span class='webix_icon fa-sticky-note'></span> Izmjena oglasa",
+                    width: 400
+                }, {}, {
+                    view: "icon",
+                    icon: "close",
+                    align: "right",
+                    click: "util.dismissDialog('changeNoteDialog');"
+                }]
+            }, {
+                view: "form",
+                id: "changeNoteForm",
+                width: 600,
+                elementsConfig: {
+                    labelWidth: 200,
+                    bottomPadding: 18
+                },
+                elements: [{
+                    view: "text",
+                    name: "id",
+                    hidden: true
+                }, {
+                    view: "text",
+                    id: "name",
+                    name: "name",
+                    label: "Naslov: ",
+                    invalidMessage: "Unesite naslov oglasa !",
+                    required: true
+                }, {
+                    view: "textarea",
+                    id: "description",
+                    name: "description",
+                    label: "Opis",
+                    height:200,
+                    invalidMessage: "Unesite tekst oglasa!",
+                    required: true
+                }, {
+                    margin: 5,
+                    cols: [{}, {
+                        id: "saveChangedNote",
+                        view: "button",
+                        value: "Sačuvajte",
+                        type: "form",
+                        click: "noteView.saveChangedNote",
+                        hotkey: "enter",
+                        width: 150
+                    }]
+                }],
+                rules: {
+                    "noteName": function (value) {
+                        if (!value)
+                            return false;
+                        if (value.length > 15) {
+                            $$('changeNoteForm').elements.noteName.config.invalidMessage = 'Maksimalan broj karaktera je 15!';
+                            return false;
+                        }
+                        return true;
+                    }
+                }
+            }]
+        }
+    },
+
+    showChangeNoteDialog: function (note) {
+        webix.ui(webix.copy(noteView.changeNoteDialog));
+        var form = $$("changeNoteForm");
+        form.elements.id.setValue(note.id);
+        setTimeout(function () {
+            $$("changeNoteDialog").show();
+            webix.UIManager.setFocus("name");
+        }, 0);
+    },
+
+    saveChangedNote: function () {
+        if ($$("changeNoteForm").validate()) {
+            //changeItem is a copy of add new item, same atributes
+            var newItem = {
+                name: form.getValues().name,
+                description: form.getValues().description,
+                userId: 1, // we need to change this when userBean is made
+                companyId: 1, // also needs change
+            };
+            // connection.sendAjax("PUT", "note/"+newItem.id,
+            //     function (text, data, xhr) {
+            //         if (text) {
+            //             util.messages.showMessage("Oglas uspješno izmjenjen.");
+            //             $$("companyDT").updateItem(newItem.id, newItem);
+            //         } else
+            //             util.messages.showErrorMessage("Neuspješna izmjena.");
+            //     }, function () {
+            //         util.messages.showErrorMessage("Neuspješna izmjena.");
+            //     }, newItem);
+
+            util.dismissDialog('changeNoteDialog');
+        }
+    }
 
     };
