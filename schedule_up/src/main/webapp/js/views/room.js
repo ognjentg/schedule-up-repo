@@ -122,10 +122,6 @@ var roomView = {
                             $$('addRoomForm').elements.floor.config.invalidMessage = 'Broj spratova mora biti cijeli broj!';
                             return false;
                         }
-                        if (value < 0) {
-                            $$('addRoomForm').elements.floor.config.invalidMessage = 'Broj spratova ne smije biti manji od 0!';
-                            return false;
-                        }
                         return true;
                     },
                     "capacity": function (value) {
@@ -306,10 +302,6 @@ var roomView = {
                     "floor": function (value) {
                         if (isNaN(value) || value !== parseInt(value, 10)) {
                             $$('changeRoomForm').elements.floor.config.invalidMessage = 'Broj spratova mora biti cijeli broj!';
-                            return false;
-                        }
-                        if (value < 0) {
-                            $$('changeRoomForm').elements.floor.config.invalidMessage = 'Broj spratova ne smije biti manji od 0!';
                             return false;
                         }
                         return true;
