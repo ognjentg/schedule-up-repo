@@ -29,7 +29,7 @@ import java.util.List;
 public class NoteController extends GenericController<Note, Integer> {
 
     private static final String SQL_GET_USERNAME_BY_USER_ID = "SELECT username FROM user WHERE id=?";
-
+    private static final String SQL_GET_PUB_TIME="select publish_time from note where id=?";
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -72,8 +72,9 @@ public class NoteController extends GenericController<Note, Integer> {
     }
 
     @Transactional
-    @RequestMapping(value = "/", method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
+    @Override
     public @ResponseBody NoteUser insert(@RequestBody Note note) throws BadRequestException {
         if (repo.saveAndFlush(note) != null) {
             logCreateAction(note);
@@ -84,7 +85,7 @@ public class NoteController extends GenericController<Note, Integer> {
             noteUser.setId(note.getId());
             noteUser.setName(note.getName());
             noteUser.setDescription(note.getDescription());
-            noteUser.setPublishTime(note.getPublishTime());
+            noteUser.setPublishTime((Timestamp)entityManager.createNativeQuery(SQL_GET_PUB_TIME).setParameter(1, note.getId()).getSingleResult());
             noteUser.setDeleted(note.getDeleted());
             noteUser.setUserId(note.getUserId());
             noteUser.setCompanyId(note.getCompanyId());

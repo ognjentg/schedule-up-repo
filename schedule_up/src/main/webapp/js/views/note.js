@@ -100,7 +100,7 @@ var noteView = {
         rightPanel = "notePanel";
         var panelCopy = webix.copy(this.panel);
         $$("main").addView(webix.copy(panelCopy));
-        connection.attachAjaxEvents("noteDT", "note",true);
+        connection.attachAjaxEvents("noteDT", "note");
        $$("noteDT").detachEvent("onBeforeDelete");
 
         webix.ui({
