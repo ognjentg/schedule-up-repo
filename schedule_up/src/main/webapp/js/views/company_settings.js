@@ -4,8 +4,9 @@ var companySettingsView = {
 
     panel: {
         id: "settingsPanel",
-
+        adjust:true,
         width:1500,
+        height:1500,
         rows: [{
             view: "toolbar",
             padding: 8,
@@ -16,12 +17,12 @@ var companySettingsView = {
             }]
         }, {view: "form",
             id: "customizeForm",
+            adjust:true,
             elementsConfig: {
                 labelWidth: 290,
                 bottomPadding: 18,
                     width:400
             },
-
             elements: [{ margin:5, cols:[
 
                     {margin:5,rows:[ {
@@ -72,7 +73,7 @@ var companySettingsView = {
                             width:400,
                             options:["15 minuta","30 minuta", "1 sat","12 sati","1 dan","1 sedmica"]
                         }
-                ]},{view:"calendar", id:"calendar"},{rows:[{id:"aa",view:"label",label:"Neradni dani:"},{
+                ]},{view:"calendar", id:"calendar",multiselect:true},{rows:[{id:"aa",view:"label",label:"Neradni dani:"},{
                         id:"t3",template:function format(obj){
                             if (obj.value){
                                 if (webix.isArray(obj.value))
@@ -97,6 +98,6 @@ var companySettingsView = {
         var panelCopy = webix.copy(this.panel);
 
         $$("main").addView(webix.copy(panelCopy));
-
+        $$("t3").bind($$("calendar"), "value");
     }
         };
