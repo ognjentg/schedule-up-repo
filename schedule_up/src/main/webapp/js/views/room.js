@@ -1,7 +1,168 @@
 
 var roomView = {
 
+    panel: {
+        id: "roomPanel",
+        adjust: true,
+        rows: [{
+            view: "toolbar",
+            padding: 8,
+            css: "panelToolbar",
+            cols: [{
+                view: "label",
+                width: 400,
+                template: "<span class='fa fa-cube'></span> Sale"
+            }, {}, {
+                id: "addRoomBtn",
+                view: "button",
+                type: "iconButton",
+                label: "Dodajte salu",
+                icon: "plus-circle",
+                click: 'roomView.showAddDialog',
+                autowidth: true
+            }]
+        }, {
+            view: "datatable",
+            css: "webixDatatable",
+            multiselect: false,
+            id: "roomDT",
+            resizeColumn: true,
+            resizeRow: true,
+            onContext: {},
+            columns: [{
+                id: "id",
+                hidden: true,
+                fillspace: true,
+
+            }, {
+                id: "name",
+                editable:false,
+                fillspace: true,
+                editor: "text",
+                sort: "string",
+                header: [
+                    "Naziv sale", {
+                        content: "textFilter"
+                    }
+                ]
+            }, {
+                id: "floor",
+                fillspace: true,
+                editable:false,
+                editor: "text",
+                sort: "int",
+                header: ["Sprat",
+                    {
+                        content: "numberFilter"
+                    }]
+            },
+                {
+                    id: "capacity",
+                    fillspace: true,
+                    editable:false,
+                    editor: "text",
+                    sort: "int",
+                    header: ["Kapacitet",{
+                        content: "numberFilter"
+                    }],
+                },
+                {
+                    id: "buildingName",
+                    fillspace: true,
+                    editable:false,
+                    editor: "text",
+                    sort: "string",
+                    header: [
+                        "Naziv zgrade", {
+                            content: "textFilter"
+                        }
+                    ]
+                },
+                {
+                    id: "description",
+                    editable:false,
+                    fillspace: true,
+                    editor: "text",
+                    sort: "string",
+                    header: [
+                        "Opis", {
+                            content: "textFilter"
+                        }
+                    ]
+
+                }
+            ],
+            select: "row",
+            navigation: true,
+            editable: false,
+            url: "room/",
+            on: {
+
+                onAfterContextMenu: function (item) {
+                    this.select(item.row);
+                }
+            }
+        }]
+    },
+
     selectPanel: function () {
+        $$("main").removeView(rightPanel);
+        rightPanel = "roomPanel";
+
+        var panelCopy = webix.copy(this.panel);
+
+        $$("main").addView(webix.copy(panelCopy));
+        connection.attachAjaxEvents("roomDT", "room",true);
+        $$("roomDT").detachEvent("onBeforeDelete");
+
+        webix.ui({
+            view: "contextmenu",
+            id: "roomContextMenu",
+            width: 200,
+            data: [{
+                id: "1",
+                value: "Izmjenite",
+                icon: "pencil-square-o"
+            }, {
+                $template: "Separator"
+            }, {
+                id: "2",
+                value: "Obrišite",
+                icon: "trash"
+            }],
+            master: $$("roomDT"),
+            on: {
+                onItemClick: function (id) {
+                    var context = this.getContext();
+                    switch (id) {
+                        case "1":
+
+                            break;
+                        case "2":
+                            var delBox = (webix.copy(commonViews.brisanjePotvrda("sale","salu")));
+                            var newItem=$$("roomDT").getItem(context.id.row);
+                            delBox.callback = function (result) {
+                                if (result == 1) {
+
+                                    connection.sendAjax("DELETE", "room/"+newItem.id,
+                                        function (text, data, xhr) {
+                                            if (text) {
+                                                util.messages.showMessage("Sala uspješno obrisana.");
+                                                $$("roomDT").remove(context.id.row);
+                                            } else
+                                                util.messages.showErrorMessage("Neuspješno brisanje.");
+                                        }, function () {
+                                            util.messages.showErrorMessage("Neuspješno brisanje.");
+                                        }, null);
+
+                                }
+                            };
+                            webix.confirm(delBox);
+                            break;
+                    }
+                }
+            }
+        });
     },
 
     addDialog: {

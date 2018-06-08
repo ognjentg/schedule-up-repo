@@ -16,6 +16,7 @@ var gearView = {
                 type: "iconButton",
                 label: "Dodajte opremu",
                 icon: "plus-circle",
+                click: 'gearView.showAddDialog',
                 autowidth: true
             }]
         },{
@@ -275,6 +276,165 @@ var gearView = {
                 }, newItem);
 
             util.dismissDialog('changeGearDialog');
+        }
+    },
+
+    /////////////////
+
+    addDialog: {
+        view: "popup",
+        id: "addGearDialog",
+        modal: true,
+        position: "center",
+        body: {
+            id: "addGearInside",
+            rows: [{
+                view: "toolbar",
+                cols: [{
+                    view: "label",
+                    label: "<span class='fa fa-wrench'></span> Dodavanje opreme",
+                    width: 400
+                }, {}, {
+                    hotkey: 'esc',
+                    view: "icon",
+                    icon: "close",
+                    align: "right",
+                    click: "util.dismissDialog('addGearDialog');"
+                }]
+            }, {
+                view: "form",
+                id: "addGearForm",
+                width: 600,
+                elementsConfig: {
+                    labelWidth: 200,
+                    bottomPadding: 18
+                },
+                elements: [ {
+                    view: "text",
+                    id: "name",
+                    name: "name",
+                    label: "Naziv opreme",
+                    invalidMessage: "Unesite validan naziv opreme!",
+                    required: true,
+                    suggest: {
+                        id: "gearSuggest",
+                        url: "gear/getAllNames"
+                    }
+
+                },
+                    {
+                        id: "description",
+                        name: "description",
+                        view: "text",
+                        label: "Opis",
+                        required: false
+                    }, {
+                        margin: 5,
+                        cols: [{}, {
+                            id: "saveGear",
+                            view: "button",
+                            value: "Dodajte opremu",
+                            type: "form",
+                            click: "gearView.save",
+                            hotkey: "enter",
+                            width: 150
+                        }]
+                    }],
+                rules: {
+                    "name": function (value) {
+                        if (!value)
+                            return false;
+                        if (value.length > 100) {
+                            $$('addGearForm').elements.name.config.invalidMessage = 'Maksimalan broj karaktera je 100!';
+                            return false;
+                        }
+                        return true;
+                    },
+                    "description":function (value) {
+                        if (value.length > 500) {
+                            $$('addGearForm').elements.email.config.invalidMessage = 'Maksimalan broj karaktera je 500';
+                            return false;
+                        }
+                        return true;
+                    }
+                }
+            }]
+        }
+    },
+
+    showAddDialog: function () {
+        webix.ui(webix.copy(gearView.addDialog)).show();
+        webix.UIManager.setFocus("name");
+    },
+
+    save: function () {
+        var form = $$("addGearForm");
+        if (form.validate()) {
+            var newItem = {
+                name: $$("addGearForm").getValues().name,
+                description: $$("addGearForm").getValues().description,
+                available:1,
+                companyId:1,
+                gearId:null
+            };
+
+
+            //provjera da li oprema  vec postoji
+            var gearExists = false;
+            var allGearNames = $$("gearSuggest").getList().data;
+            allGearNames.each(
+                function (obj) {
+                    if(obj.value == newItem.name) gearExists = true;
+                }
+            );
+            //alert("vrijednost:"+gearExists);
+
+            if(gearExists){
+                connection.sendAjax("GET", "gear/"+newItem.name,
+                    function (text, data, xhr) {
+                        if (text) {
+                            newItem.gearId=JSON.parse(text)[0].id;
+                            //alert(newItem.gearId);
+                            //alert("proslo");
+                            $$("gearDT").add(newItem);
+                            // util.dismissDialog('addGearDialog');
+                            util.messages.showMessage("Oprema je uspješno kreirana.");
+                            /*connection.sendAjax("POST", "gear-unit/custom/",
+                                 function (text, data, xhr) {
+                                     if (text) {
+                                         util.messages.showMessage("Oprema je uspješno kreirana.");
+                                     } else
+                                         util.messages.showErrorMessage("Oprema nije kreirana.");
+                                 }, function () {
+                                     util.messages.showErrorMessage("Oprema nije kreirana.");
+                                 }, newItem);*/
+                        } else
+                            util.messages.showErrorMessage("Oprema nije kreirana.");
+                    }, function () {
+                        util.messages.showErrorMessage("Oprema nije kreirana.");
+                    }, newItem);
+
+                util.dismissDialog('addGearDialog');
+
+            }else {
+                $$("gearDT").add(newItem);
+                //util.dismissDialog('addGearDialog');
+                util.messages.showMessage("Oprema je uspješno kreirana.");
+                //alert("id opreme:"+newItem.gearId);
+                /*
+
+                                connection.sendAjax("POST", "gear-unit/custom/",
+                                    function (text, data, xhr) {
+                                        if (text) {
+                                            util.messages.showMessage("Oprema je uspješno kreirana.");
+                                        } else
+                                            util.messages.showErrorMessage("Oprema nije kreirana.");
+                                    }, function () {
+                                        util.messages.showErrorMessage("Oprema nije kreirana.");
+                                    }, newItem);
+                */
+                util.dismissDialog('addGearDialog');
+            }
         }
     }
 };
