@@ -73,7 +73,7 @@ var companySettingsView = {
                             width:400,
                             options:["15 minuta","30 minuta", "1 sat","12 sati","1 dan","1 sedmica"]
                         }
-                ]},{view:"calendar", id:"calendar",multiselect:true},{rows:[{id:"aa",view:"label",label:"Neradni dani:"},{
+                ]},{view:"calendar", id:"calendar",multiselect:true,select:true},{rows:[{id:"aa",view:"label",label:"Neradni dani:"},{
                         id:"t3",template:function format(obj){
                             if (obj.value){
                                 if (webix.isArray(obj.value))
