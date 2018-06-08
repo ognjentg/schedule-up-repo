@@ -311,11 +311,20 @@ var noteView = {
                     }]
                 }],
                 rules: {
-                    "noteName": function (value) {
+                    "name": function (value) {
                         if (!value)
                             return false;
-                        if (value.length > 15) {
-                            $$('changeNoteForm').elements.noteName.config.invalidMessage = 'Maksimalan broj karaktera je 15!';
+                        if (value.length > 100) {
+                            $$('addNoteForm').elements.name.config.invalidMessage = 'Maksimalan broj karaktera je 100!';
+                            return false;
+                        }
+                        return true;
+                    },
+                    "description": function (value) {
+                        if (!value)
+                            return false;
+                        if (value.length > 500) {
+                            $$('addNoteForm').elements.name.config.invalidMessage = 'Maksimalan broj karaktera je 500!';
                             return false;
                         }
                         return true;
@@ -329,6 +338,10 @@ var noteView = {
         webix.ui(webix.copy(noteView.changeNoteDialog));
         var form = $$("changeNoteForm");
         form.elements.id.setValue(note.id);
+        form.elements.name.setValue(note.name);
+        form.elements.description.setValue(note.description);
+       // form.elements.publishedTime.setValue(note.publishedTime);
+        //datum?!?
         setTimeout(function () {
             $$("changeNoteDialog").show();
             webix.UIManager.setFocus("name");
@@ -339,21 +352,25 @@ var noteView = {
         if ($$("changeNoteForm").validate()) {
             //changeItem is a copy of add new item, same atributes
             var newItem = {
-                name: form.getValues().name,
-                description: form.getValues().description,
+               id: $$("changeNoteForm").getValues().id,
+                name: $$("changeNoteForm").getValues().name,
+                description: $$("changeNoteForm").getValues().description,
+                publishedTime: new Date(),
+                deleted: 0,
                 userId: 1, // we need to change this when userBean is made
                 companyId: 1, // also needs change
             };
-            // connection.sendAjax("PUT", "note/"+newItem.id,
-            //     function (text, data, xhr) {
-            //         if (text) {
-            //             util.messages.showMessage("Oglas uspješno izmjenjen.");
-            //             $$("companyDT").updateItem(newItem.id, newItem);
-            //         } else
-            //             util.messages.showErrorMessage("Neuspješna izmjena.");
-            //     }, function () {
-            //         util.messages.showErrorMessage("Neuspješna izmjena.");
-            //     }, newItem);
+            connection.sendAjax("PUT", "note/"+newItem.id,
+                function (text, data, xhr) {
+                    if (text) {
+                        util.messages.showMessage("Oglas uspješno izmjenjen.");
+                        //$$("companyDT").detachEvent();
+                        $$("noteDT").updateItem(newItem.id, newItem);
+                    } else
+                        util.messages.showErrorMessage("Neuspješna izmjena.");
+                }, function () {
+                    util.messages.showErrorMessage("Neuspješna izmjena.");
+                }, newItem);
 
             util.dismissDialog('changeNoteDialog');
         }
