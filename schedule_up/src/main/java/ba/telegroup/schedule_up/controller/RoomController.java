@@ -44,8 +44,8 @@ public class RoomController extends GenericController<Room, Integer> {
         throw new BadRequestException("Bad request");
     }
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     public @ResponseBody
-    List<RoomBuilding> getAllExtendedByCompanyId() { return ((RoomRepositoryCustom) repo).getAllExtendedByCompanyId(userBean.getUser().getCompanyId());
+    List getAll() { return ((RoomRepositoryCustom) repo).getAllExtendedByCompanyId(userBean.getUser().getCompanyId());
     }
 }

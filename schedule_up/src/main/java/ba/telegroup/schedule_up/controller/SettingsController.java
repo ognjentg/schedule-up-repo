@@ -23,10 +23,10 @@ public class SettingsController extends GenericController<Settings, Integer>{
         super(repo);
     }
 
-    @RequestMapping(value = "/getAllByCompanyId/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/getByCompanyId/{id}", method = RequestMethod.GET)
     public @ResponseBody
-    List getAllByCompanyId(@PathVariable Integer id) {
-        return ((SettingsRepository) repo).getAllByCompanyId(id);
+    Settings getByCompanyId(@PathVariable Integer id) {
+        return ((SettingsRepository) repo).getByCompanyId(id);
     }
 
     @RequestMapping(value = "/getAllByReminderTimeAfter/{time}", method = RequestMethod.GET)

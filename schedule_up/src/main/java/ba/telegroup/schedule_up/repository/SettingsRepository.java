@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface SettingsRepository extends JpaRepository<Settings,Integer>  {
-    List<Settings> getAllByCompanyId(Integer companyId);
+    Settings getByCompanyId(Integer companyId);
     List<Settings> getAllByReminderTimeAfterAndCompanyId(java.sql.Time time, Integer companyId);
     List<Settings> getAllByReminderTimeBeforeAndCompanyId(java.sql.Time time, Integer companyId);
     List<Settings> getAllByReminderTimeBetweenAndCompanyId(java.sql.Time from, java.sql.Time to, Integer companyId);
