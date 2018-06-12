@@ -78,14 +78,14 @@ public class NoteController extends GenericController<Note, Integer> {
     public @ResponseBody NoteUser insert(@RequestBody Note note) throws BadRequestException {
         if (repo.saveAndFlush(note) != null) {
             logCreateAction(note);
-
+            entityManager.refresh(note);
             String username = (String) entityManager.createNativeQuery(SQL_GET_USERNAME_BY_USER_ID).setParameter(1, note.getUserId()).getSingleResult();
 
             NoteUser noteUser = new NoteUser();
             noteUser.setId(note.getId());
             noteUser.setName(note.getName());
             noteUser.setDescription(note.getDescription());
-            noteUser.setPublishTime((Timestamp)entityManager.createNativeQuery(SQL_GET_PUB_TIME).setParameter(1, note.getId()).getSingleResult());
+            noteUser.setPublishTime(note.getPublishTime()/*(Timestamp)entityManager.createNativeQuery(SQL_GET_PUB_TIME).setParameter(1, note.getId()).getSingleResult()*/);
             noteUser.setDeleted(note.getDeleted());
             noteUser.setUserId(note.getUserId());
             noteUser.setCompanyId(note.getCompanyId());
