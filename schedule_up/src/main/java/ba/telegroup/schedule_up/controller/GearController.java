@@ -7,7 +7,9 @@ import ba.telegroup.schedule_up.model.Gear;
 import ba.telegroup.schedule_up.repository.GearRepository;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -40,17 +42,52 @@ public class GearController extends GenericController<Gear, Integer> {
     }
 
     @Override
-    public Gear insert(Gear object) throws ForbiddenException {
-        throw new ForbiddenException("Forbidden");
+    @Transactional
+    @RequestMapping(method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.CREATED)
+    public @ResponseBody
+    Gear insert(@RequestBody Gear object) throws ForbiddenException, BadRequestException {
+        List<Gear> gears = ((GearRepository) repo).getAllByNameContainsIgnoreCase(object.getName());
+        if (gears == null || gears.size() == 0) {
+            if (Integer.valueOf(2).equals(userBean.getUser().getRoleId()) || Integer.valueOf(3).equals(userBean.getUser().getRoleId())) {
+                if (object.getName() != null) {
+                    return super.insert(object);
+                }
+                throw new BadRequestException("Bad request");
+            }
+            throw new ForbiddenException("Forbidden action");
+        } else {
+            if (gears.size() > 1)
+                throw new BadRequestException("Bad request");
+            update(object.getId(), object);
+        }
+        throw new BadRequestException("Bad request");
+    }
+
+    @RequestMapping(value = "/", method = RequestMethod.PUT)
+    public @ResponseBody
+    String update(@RequestBody Gear object) throws BadRequestException, ForbiddenException {
+        return update(null, object);
     }
 
     @Override
-    public String update(Integer integer, Gear object) throws ForbiddenException {
-        throw new ForbiddenException("Forbidden");
+    public String update(Integer integer, Gear object) throws ForbiddenException, BadRequestException {
+        List<Gear> gears = ((GearRepository) repo).getAllByNameContainsIgnoreCase(object.getName());
+        if(gears == null || gears.size() != 1)
+            throw new BadRequestException("Bad request");
+        Gear oldObj = gears.get(0);
+        if (Integer.valueOf(2).equals(userBean.getUser().getRoleId()) || Integer.valueOf(3).equals(userBean.getUser().getRoleId())) {
+            if (object.getName() != null) {
+                return super.update(oldObj.getId(), object);
+            }
+            throw new BadRequestException("Bad request");
+        }
+        throw new ForbiddenException("Forbidden action");
     }
 
     @Override
     public String delete(Integer integer) throws ForbiddenException {
         throw new ForbiddenException("Forbidden");
     }
+
 }
