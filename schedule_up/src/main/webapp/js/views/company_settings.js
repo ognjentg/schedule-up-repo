@@ -35,6 +35,11 @@ var companySettingsView = {
                         timepicker: true,
                         type: "time",
                         format: "%H:%i",
+                            on:{
+                            onChange:function( item){
+                                    webix.message("Value changed from:  to: "+oldv)}
+                            }
+                                ,
                         suggest: {
                             type: "calendar",
                             body: {
