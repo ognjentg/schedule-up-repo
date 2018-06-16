@@ -4,6 +4,7 @@ import ba.telegroup.schedule_up.common.exceptions.BadRequestException;
 import ba.telegroup.schedule_up.common.exceptions.ForbiddenException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.model.User;
+import ba.telegroup.schedule_up.util.LoginInformation;
 import ba.telegroup.schedule_up.util.Util;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.context.annotation.Scope;
@@ -29,15 +30,15 @@ public class UserController extends GenericController<User, Integer> {
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public @ResponseBody
-    User login(@RequestParam("username") String username, @RequestParam("password") String password, @RequestParam("company_name") String companyName) {
+    User login(@RequestBody LoginInformation loginInformation) {
 
-        List<Integer> userId = (List<Integer>) entityManager.createNativeQuery(SQL_LOGIN).setParameter(1, username.trim()).setParameter(2, companyName.trim()).getResultList();
+        List<Integer> userId = (List<Integer>) entityManager.createNativeQuery(SQL_LOGIN).setParameter(1, loginInformation.getUsername().trim()).setParameter(2, loginInformation.getCompanyName().trim()).getResultList();
         User user = null;
         if(userId != null && !userId.isEmpty()){
             user = entityManager.find(User.class, userId.get(0));
         }
 
-        if(user != null && Util.checkPassword(password.trim(), new String(user.getPassword()))){
+        if(user != null && Util.checkPassword(loginInformation.getPassword().trim(), new String(user.getPassword()))){
             user.setPassword(null);
             userBean.setUser(user);
             userBean.setLoggedIn(true);
