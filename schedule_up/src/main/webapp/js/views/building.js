@@ -1,6 +1,6 @@
-var countries=[];
-var tabledata=[];
-var tablecentar=[];
+var countries = [];
+var tabledata = [];
+var tablecentar = [];
 var lat;
 var lng;
 var buildingView = {
@@ -16,12 +16,12 @@ var buildingView = {
                 view: "label",
                 width: 400,
                 template: "<span class='fa fa-building'></span> Zgrade"
-            },{}, {
+            }, {}, {
                 id: "addBuildingBtn",
                 view: "button",
                 type: "iconButton",
                 label: "Dodajte zgradu",
-                click:"buildingView.showAddDialog",
+                click: "buildingView.showAddDialog",
                 icon: "plus-circle",
                 autowidth: true
             }]
@@ -49,12 +49,12 @@ var buildingView = {
                         content: "textFilter"
                     }
                 ]
-            },  {
+            }, {
                 id: "description",
                 fillspace: true,
                 editor: "text",
                 sort: "text",
-                editable:false,
+                editable: false,
                 header: [
                     "Opis", {
                         content: "textFilter"
@@ -71,7 +71,7 @@ var buildingView = {
                             content: "textFilter"
                         }
                     ]
-                },{
+                }, {
                     id: "latitude",
                     hidden: true,
                     fillspace: true,
@@ -128,7 +128,8 @@ var buildingView = {
                     align: "right",
                     click: "util.dismissDialog('changeBuildingDialog');"
                 }]
-            }, { view: "form",
+            }, {
+                view: "form",
                 id: "changeBuildingForm",
                 width: 600,
                 elementsConfig: {
@@ -137,38 +138,42 @@ var buildingView = {
                 },
                 elements: [{
                     name: "id",
-                    view:"text",
+                    view: "text",
                     hidden: true
 
-                },{
+                }, {
                     view: "text",
                     id: "name",
                     name: "name",
                     label: "Naziv:",
                     invalidMessage: "Unesite naziv zgrade!",
                     required: true
-                },{
+                }, {
                     view: "text",
                     id: "description",
                     name: "description",
                     label: "Opis:",
                     required: false
                 },
-                    {view:"label",
+                    {
+                        view: "label",
                         label: "Unesite lokaciju zgrade: ",
-                        inputWidth:100,
+                        inputWidth: 100,
                     },
-                    { view:"select", options:countries, label:"Drzava:",value:countries[0],id:"combo"
+                    {
+                        view: "select", options: countries, label: "Drzava:", value: countries[0], id: "combo"
 
                     },
-                    {view: "text",
+                    {
+                        view: "text",
                         id: "grad",
                         name: "grad",
                         label: "Grad:",
                         invalidMessage: "Unesite naziv grada!",
                         required: true
                     },
-                    {view: "text",
+                    {
+                        view: "text",
                         id: "adresa",
                         name: "adresa",
                         label: "Adresa:",
@@ -177,12 +182,13 @@ var buildingView = {
                     },
                     {
                         margin: 5,
-                        cols: [{ id: "showMap",
+                        cols: [{
+                            id: "showMap",
                             view: "button",
                             value: "Detaljna lokacija",
                             click: "buildingView.showMap",
                             width: 150
-                        },{}, {
+                        }, {}, {
                             id: "saveBuilding",
                             view: "button",
                             value: "Dodajte zgradu",
@@ -202,7 +208,7 @@ var buildingView = {
                         }
                         return true;
                     },
-                    "description":function (value) {
+                    "description": function (value) {
                         if (value.length > 500) {
                             $$('addBuildingForm').elements.description.config.invalidMessage = 'Maksimalan broj karaktera je 500!';
                             return false;
@@ -211,10 +217,11 @@ var buildingView = {
                         return true;
                     }
 
-                }}]
+                }
+            }]
         }
     },
-    selectPanel: function(){
+    selectPanel: function () {
         $$("main").removeView(rightPanel);
         rightPanel = "buildingPanel";
 
@@ -234,16 +241,16 @@ var buildingView = {
             },
 
                 {
-                id: "1",
-                value: "Izmijenite",
-                icon: "pencil-square-o"
-            }, {
-                $template: "Separator"
-            }, {
-                id: "2",
-                value: "Obrišite",
-                icon: "trash"
-            }],
+                    id: "1",
+                    value: "Izmijenite",
+                    icon: "pencil-square-o"
+                }, {
+                    $template: "Separator"
+                }, {
+                    id: "2",
+                    value: "Obrišite",
+                    icon: "trash"
+                }],
             master: $$("buildingDT"),
             on: {
                 onItemClick: function (id) {
@@ -254,10 +261,10 @@ var buildingView = {
                             break;
                         case "2":
                             var delBox = (webix.copy(commonViews.brisanjePotvrda("zgrade", "zgradu")));
-                            var newItem=$$("buildingDT").getItem(context.id.row);
+                            var newItem = $$("buildingDT").getItem(context.id.row);
                             delBox.callback = function (result) {
                                 if (result == 1) {
-                                    connection.sendAjax("DELETE", "building/"+newItem.id,
+                                    connection.sendAjax("DELETE", "building/" + newItem.id,
                                         function (text, data, xhr) {
                                             if (text) {
                                                 util.messages.showMessage("Zgrada uspješno uklonjena.");
@@ -266,7 +273,8 @@ var buildingView = {
                                                 util.messages.showErrorMessage("Neuspješno uklanjanje zgrade.");
                                         }, function () {
                                             util.messages.showErrorMessage("Neuspješno uklanjanje zgrade.");
-                                        }, null);}
+                                        }, null);
+                                }
                             };
                             webix.confirm(delBox);
                             break;
@@ -279,35 +287,35 @@ var buildingView = {
         });
 
     },
-    showMapDetailsDialog: function(building){
-        tablecentar[0]=building.latitude;
-        tablecentar[1]=building.longitude;
-        var mapaObjekat={
-            id:1,lat:tablecentar[0],  lng:tablecentar[1]
+    showMapDetailsDialog: function (building) {
+        tablecentar[0] = building.latitude;
+        tablecentar[1] = building.longitude;
+        var mapaObjekat = {
+            id: 1, lat: tablecentar[0], lng: tablecentar[1]
         };
-        tabledata[0]=mapaObjekat;
+        tabledata[0] = mapaObjekat;
         webix.ui(webix.copy(buildingView.showMapDialog));
-        $$("mapLabel").data.label="<span class='webix_icon fa fa-map-marker '></span> Lokacija zgrade";
-        $$("saveMap").data.hidden=true;
+        $$("mapLabel").data.label = "<span class='webix_icon fa fa-map-marker '></span> Lokacija zgrade";
+        $$("saveMap").data.hidden = true;
         $$("showMapDialog").show();
-        },
+    },
     showChangeBuildingDialog: function (building) {
         webix.ui(webix.copy(buildingView.changeBuildingDialog));
         var form = $$("changeBuildingForm");
-        console.log("Buidling id:"+building.id);
+        console.log("Buidling id:" + building.id);
         console.log(form.elements.id);
         form.elements.id.setValue(building.id);
         form.elements.name.setValue(building.name);
         form.elements.description.setValue(building.description);
         form.elements.adresa.setValue(building.address);
-        var url="https://restcountries.eu/rest/v2/all";
-        fetch(url).then(function(result) {
+        var url = "https://restcountries.eu/rest/v2/all";
+        fetch(url).then(function (result) {
             return result.json();
-        }).then(function(json) {
-            for(var i=0;i<json.length;i++){
-                var countryName=json[i].name;
-                var countryCode=json[i].alpha2Code;
-                countries[i]=(countryName+" : "+countryCode);
+        }).then(function (json) {
+            for (var i = 0; i < json.length; i++) {
+                var countryName = json[i].name;
+                var countryCode = json[i].alpha2Code;
+                countries[i] = (countryName + " : " + countryCode);
             }
             setTimeout(function () {
                 $$("changeBuildingDialog").show();
@@ -321,26 +329,26 @@ var buildingView = {
         if ($$("changeBuildingForm").validate()) {
 
             if (form.validate()) {
-                if(lat==null && lng==null){
-                    var adresa=$$("adresa").getValue();
+                if (lat == null && lng == null) {
+                    var adresa = $$("adresa").getValue();
                     var res = adresa.replace(/ /g, "+");
-                    var drzava=$$("combo").getValue().split(" : ")[0];
-                    drzava=drzava.replace(/ /g, "+");
-                    var grad=$$("grad").getValue();
-                    grad=grad.replace(/ /g, "+");
-                    var query=res+"+"+grad+"+"+drzava;
-                    var url="https://maps.googleapis.com/maps/api/geocode/json?address="+query+"&key=AIzaSyBExEHqJmRKJoRhWOT6Ok3fLR5QMGIZ_eg";
-                    fetch(url).then(function(result) {
+                    var drzava = $$("combo").getValue().split(" : ")[0];
+                    drzava = drzava.replace(/ /g, "+");
+                    var grad = $$("grad").getValue();
+                    grad = grad.replace(/ /g, "+");
+                    var query = res + "+" + grad + "+" + drzava;
+                    var url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + query + "&key=AIzaSyBExEHqJmRKJoRhWOT6Ok3fLR5QMGIZ_eg";
+                    fetch(url).then(function (result) {
                         return result.json();
-                    }).then(function(json) {
-                        lat=json['results'][0]['geometry']['location']['lat'];
-                        lng=json['results'][0]['geometry']['location']['lng'];
+                    }).then(function (json) {
+                        lat = json['results'][0]['geometry']['location']['lat'];
+                        lng = json['results'][0]['geometry']['location']['lng'];
                         var newItem = {
                             name: $$("addBuildingForm").getValues().name,
                             description: $$("addBuildingForm").getValues().description,
                             address: $$("addBuildingForm").getValues().adresa,
-                            latitude:lat,
-                            longitude:lng,
+                            latitude: lat,
+                            longitude: lng,
                             companyId: 1
 
                         };
@@ -348,34 +356,36 @@ var buildingView = {
                         util.dismissDialog('addBuildingDialog');
                     });
 
-                }else{
+                } else {
                     var newItem = {
                         name: $$("addBuildingForm").getValues().name,
                         description: $$("addBuildingForm").getValues().description,
                         address: $$("addBuildingForm").getValues().adresa,
-                        latitude:lat,
-                        longitude:lng,
+                        latitude: lat,
+                        longitude: lng,
                         companyId: 1
 
                     };
 
 
-            console.log("aj");
-            console.log("building id:"+newItem.id);
-            connection.sendAjax("PUT", "building/"+newItem.id,
-                function (text, data, xhr) {
-                    if (text) {
-                        util.messages.showMessage("Podaci su uspješno izmijenjeni.");
-                        $$("buildingDT").updateItem(newItem.id, newItem);
-                    } else
-                        util.messages.showErrorMessage("Podaci nisu izmijenjeni.");
-                }, function () {
-                    util.messages.showErrorMessage("Podaci nisu izmijenjeni.");
-                }, newItem);
+                    console.log("aj");
+                    console.log("building id:" + newItem.id);
+                    connection.sendAjax("PUT", "building/" + newItem.id,
+                        function (text, data, xhr) {
+                            if (text) {
+                                util.messages.showMessage("Podaci su uspješno izmijenjeni.");
+                                $$("buildingDT").updateItem(newItem.id, newItem);
+                            } else
+                                util.messages.showErrorMessage("Podaci nisu izmijenjeni.");
+                        }, function () {
+                            util.messages.showErrorMessage("Podaci nisu izmijenjeni.");
+                        }, newItem);
 
-            util.dismissDialog('changeBuildingDialog');
-        }}
-    }}
+                    util.dismissDialog('changeBuildingDialog');
+                }
+            }
+        }
+    }
     ,
     addDialog: {
         view: "popup",
@@ -412,28 +422,32 @@ var buildingView = {
                     label: "Naziv:",
                     invalidMessage: "Unesite naziv zgrade!",
                     required: true
-                },{
+                }, {
                     view: "text",
                     id: "description",
                     name: "description",
                     label: "Opis:",
                     required: false
                 },
-                    {view:"label",
+                    {
+                        view: "label",
                         label: "Unesite lokaciju zgrade: ",
-                        inputWidth:100,
+                        inputWidth: 100,
                     },
-                    { view:"select", options:countries, label:"Drzava:",value:countries[0],id:"combo"
+                    {
+                        view: "select", options: countries, label: "Drzava:", value: countries[0], id: "combo"
 
                     },
-                    {view: "text",
+                    {
+                        view: "text",
                         id: "grad",
                         name: "grad",
                         label: "Grad:",
                         invalidMessage: "Unesite naziv grada!",
                         required: true
                     },
-                    {view: "text",
+                    {
+                        view: "text",
                         id: "adresa",
                         name: "adresa",
                         label: "Adresa:",
@@ -442,12 +456,13 @@ var buildingView = {
                     },
                     {
                         margin: 5,
-                        cols: [{ id: "showMap",
+                        cols: [{
+                            id: "showMap",
                             view: "button",
                             value: "Detaljna lokacija",
                             click: "buildingView.showMap",
                             width: 150
-                        },{}, {
+                        }, {}, {
                             id: "saveBuilding",
                             view: "button",
                             value: "Dodajte zgradu",
@@ -467,7 +482,7 @@ var buildingView = {
                         }
                         return true;
                     },
-                    "description":function (value) {
+                    "description": function (value) {
                         if (value.length > 500) {
                             $$('addBuildingForm').elements.description.config.invalidMessage = 'Maksimalan broj karaktera je 500!';
                             return false;
@@ -481,7 +496,7 @@ var buildingView = {
         }
     }
     ,
-    showMapDialog:{
+    showMapDialog: {
         view: "popup",
         id: "showMapDialog",
         modal: true,
@@ -491,7 +506,7 @@ var buildingView = {
             rows: [{
                 view: "toolbar",
                 cols: [{
-                    id:"mapLabel",
+                    id: "mapLabel",
                     view: "label",
                     label: "<span class='webix_icon fa fa-map-marker '></span> Odaberite lokaciju",
                     width: 600,
@@ -503,16 +518,16 @@ var buildingView = {
                     click: "util.dismissDialog('showMapDialog');"
                 }]
             }, {
-                key:"AIzaSyBExEHqJmRKJoRhWOT6Ok3fLR5QMGIZ_eg",
-                view:"google-map",
-                id:"map",
-                zoom:15,
+                key: "AIzaSyBExEHqJmRKJoRhWOT6Ok3fLR5QMGIZ_eg",
+                view: "google-map",
+                id: "map",
+                zoom: 15,
                 width: 600,
-                height:500,
-                center:tablecentar,
-                data:tabledata
+                height: 500,
+                center: tablecentar,
+                data: tabledata
 
-            },{
+            }, {
                 margin: 5,
                 cols: [{}, {
                     id: "saveMap",
@@ -525,47 +540,47 @@ var buildingView = {
             }]
         }
     },
-    saveLocation:function(){
-        var url="https://maps.googleapis.com/maps/api/geocode/json?latlng="+lat+","+lng+"+&key=AIzaSyBExEHqJmRKJoRhWOT6Ok3fLR5QMGIZ_eg";
-        fetch(url).then(function(result) {
+    saveLocation: function () {
+        var url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + lat + "," + lng + "+&key=AIzaSyBExEHqJmRKJoRhWOT6Ok3fLR5QMGIZ_eg";
+        fetch(url).then(function (result) {
             return result.json();
-        }).then(function(json) {
-            var place=json['results'][0];
-            var filtered_array = place.address_components.filter(function(address_component){
+        }).then(function (json) {
+            var place = json['results'][0];
+            var filtered_array = place.address_components.filter(function (address_component) {
                 return address_component.types.includes("country");
             });
-            var country_long = filtered_array.length ? filtered_array[0].long_name: "";
-            var country_short = filtered_array.length ? filtered_array[0].short_name: "";
+            var country_long = filtered_array.length ? filtered_array[0].long_name : "";
+            var country_short = filtered_array.length ? filtered_array[0].short_name : "";
 
-            var filtered_array2 = place.address_components.filter(function(address_component){
+            var filtered_array2 = place.address_components.filter(function (address_component) {
                 return address_component.types.includes("locality");
             });
-            var city = filtered_array2.length ? filtered_array2[0].long_name: "";
-            var filtered_array3 = place.address_components.filter(function(address_component){
+            var city = filtered_array2.length ? filtered_array2[0].long_name : "";
+            var filtered_array3 = place.address_components.filter(function (address_component) {
                 return address_component.types.includes("route");
             });
-            var adresa = filtered_array3.length ? filtered_array3[0].long_name: "";
-            var filtered_array4 = place.address_components.filter(function(address_component){
+            var adresa = filtered_array3.length ? filtered_array3[0].long_name : "";
+            var filtered_array4 = place.address_components.filter(function (address_component) {
                 return address_component.types.includes("street_number");
             });
 
-            var broj = filtered_array4.length ? filtered_array4[0].long_name: "";
-            $$("adresa").setValue(adresa+" "+broj);
-            $$("combo").setValue(country_long+" : "+country_short);
+            var broj = filtered_array4.length ? filtered_array4[0].long_name : "";
+            $$("adresa").setValue(adresa + " " + broj);
+            $$("combo").setValue(country_long + " : " + country_short);
             $$("grad").setValue(city);
             util.dismissDialog('showMapDialog');
 
         });
     },
     showAddDialog: function () {
-        var url="https://restcountries.eu/rest/v2/all";
-        fetch(url).then(function(result) {
+        var url = "https://restcountries.eu/rest/v2/all";
+        fetch(url).then(function (result) {
             return result.json();
-        }).then(function(json) {
-            for(var i=0;i<json.length;i++){
-                var countryName=json[i].name;
-                var countryCode=json[i].alpha2Code;
-                countries[i]=(countryName+" : "+countryCode);
+        }).then(function (json) {
+            for (var i = 0; i < json.length; i++) {
+                var countryName = json[i].name;
+                var countryCode = json[i].alpha2Code;
+                countries[i] = (countryName + " : " + countryCode);
             }
 
             webix.ui(webix.copy(buildingView.addDialog)).show();
@@ -574,30 +589,35 @@ var buildingView = {
 
 
     },
-    showMap:function(){
-        var adresa=$$("adresa").getValue();
+    showMap: function () {
+        var adresa = $$("adresa").getValue();
         var res = adresa.replace(/ /g, "+");
-        var drzava=$$("combo").getValue().split(" : ")[0];
-        drzava=drzava.replace(/ /g, "+");
-        var grad=$$("grad").getValue();
-        grad=grad.replace(/ /g, "+");
-        var query=res+"+"+grad+"+"+drzava;
-        var url="https://maps.googleapis.com/maps/api/geocode/json?address="+query+"&key=AIzaSyBExEHqJmRKJoRhWOT6Ok3fLR5QMGIZ_eg";
-        fetch(url).then(function(result) {
+        var drzava = $$("combo").getValue().split(" : ")[0];
+        drzava = drzava.replace(/ /g, "+");
+        var grad = $$("grad").getValue();
+        grad = grad.replace(/ /g, "+");
+        var query = res + "+" + grad + "+" + drzava;
+        var url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + query + "&key=AIzaSyBExEHqJmRKJoRhWOT6Ok3fLR5QMGIZ_eg";
+        fetch(url).then(function (result) {
             return result.json();
-        }).then(function(json) {
-            tablecentar[0]=json['results'][0]['geometry']['location']['lat'];
-            tablecentar[1]=json['results'][0]['geometry']['location']['lng'];
-            var mapaObjekat={
-                id:1, draggable:true,lat:json['results'][0]['geometry']['location']['lat'],  lng:json['results'][0]['geometry']['location']['lng'],   label:"A", draggable:true
+        }).then(function (json) {
+            tablecentar[0] = json['results'][0]['geometry']['location']['lat'];
+            tablecentar[1] = json['results'][0]['geometry']['location']['lng'];
+            var mapaObjekat = {
+                id: 1,
+                draggable: true,
+                lat: json['results'][0]['geometry']['location']['lat'],
+                lng: json['results'][0]['geometry']['location']['lng'],
+                label: "A",
+                draggable: true
             }
-            lat=json['results'][0]['geometry']['location']['lat'];
-            lng=json['results'][0]['geometry']['location']['lng'];
-            tabledata[0]=mapaObjekat;
+            lat = json['results'][0]['geometry']['location']['lat'];
+            lng = json['results'][0]['geometry']['location']['lng'];
+            tabledata[0] = mapaObjekat;
             webix.ui(webix.copy(buildingView.showMapDialog)).show();
-            $$("map").attachEvent("onAfterDrop", function(id, item){
-                lat=item.lat;
-                lng=item.lng;
+            $$("map").attachEvent("onAfterDrop", function (id, item) {
+                lat = item.lat;
+                lng = item.lng;
             });
 
         });
@@ -610,49 +630,49 @@ var buildingView = {
             // form.elements.validBuildingName.setValue(1);
 
             if (form.validate()) {
-                if(lat==null && lng==null){
-                    var adresa=$$("adresa").getValue();
+                if (lat == null && lng == null) {
+                    var adresa = $$("adresa").getValue();
                     var res = adresa.replace(/ /g, "+");
-                    var drzava=$$("combo").getValue().split(" : ")[0];
-                    drzava=drzava.replace(/ /g, "+");
-                    var grad=$$("grad").getValue();
-                    grad=grad.replace(/ /g, "+");
-                    var query=res+"+"+grad+"+"+drzava;
-                    var url="https://maps.googleapis.com/maps/api/geocode/json?address="+query+"&key=AIzaSyBExEHqJmRKJoRhWOT6Ok3fLR5QMGIZ_eg";
-                    fetch(url).then(function(result) {
+                    var drzava = $$("combo").getValue().split(" : ")[0];
+                    drzava = drzava.replace(/ /g, "+");
+                    var grad = $$("grad").getValue();
+                    grad = grad.replace(/ /g, "+");
+                    var query = res + "+" + grad + "+" + drzava;
+                    var url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + query + "&key=AIzaSyBExEHqJmRKJoRhWOT6Ok3fLR5QMGIZ_eg";
+                    fetch(url).then(function (result) {
                         return result.json();
-                    }).then(function(json) {
-                        lat=json['results'][0]['geometry']['location']['lat'];
-                        lng=json['results'][0]['geometry']['location']['lng'];
+                    }).then(function (json) {
+                        lat = json['results'][0]['geometry']['location']['lat'];
+                        lng = json['results'][0]['geometry']['location']['lng'];
                         var newItem = {
                             id: $$("changeBuildingForm").getValues().id,
                             name: $$("changeBuildingForm").getValues().name,
                             description: $$("changeBuildingForm").getValues().description,
                             address: $$("changeBuildingForm").getValues().adresa,
-                            latitude:lat,
-                            longitude:lng,
+                            latitude: lat,
+                            longitude: lng,
                             companyId: 1,
-                            deleted:0
+                            deleted: 0
 
                         };
 
 
                     });
 
-                }else{
+                } else {
                     var newItem = {
                         id: $$("changeBuildingForm").getValues().id,
                         name: $$("changeBuildingForm").getValues().name,
                         description: $$("changeBuildingForm").getValues().description,
                         address: $$("changeBuildingForm").getValues().adresa,
-                        latitude:lat,
-                        longitude:lng,
+                        latitude: lat,
+                        longitude: lng,
                         companyId: 1,
-                        deleted:0
+                        deleted: 0
 
                     };
                     console.log(newItem);
-                    connection.sendAjax("PUT", "building/"+newItem.id,
+                    connection.sendAjax("PUT", "building/" + newItem.id,
                         function (text, data, xhr) {
                             if (text) {
                                 util.messages.showMessage("Podaci su uspješno izmijenjeni.");
@@ -662,7 +682,8 @@ var buildingView = {
                         }, function () {
                             util.messages.showErrorMessage("Podaci nisu izmijenjeni.");
                         }, newItem);
-                    util.dismissDialog('changeBuildingDialog');}
+                    util.dismissDialog('changeBuildingDialog');
+                }
             }
         }
     },
@@ -673,26 +694,26 @@ var buildingView = {
             // form.elements.validBuildingName.setValue(1);
 
             if (form.validate()) {
-                if(lat==null && lng==null){
-                    var adresa=$$("adresa").getValue();
+                if (lat == null && lng == null) {
+                    var adresa = $$("adresa").getValue();
                     var res = adresa.replace(/ /g, "+");
-                    var drzava=$$("combo").getValue().split(" : ")[0];
-                    drzava=drzava.replace(/ /g, "+");
-                    var grad=$$("grad").getValue();
-                    grad=grad.replace(/ /g, "+");
-                    var query=res+"+"+grad+"+"+drzava;
-                    var url="https://maps.googleapis.com/maps/api/geocode/json?address="+query+"&key=AIzaSyBExEHqJmRKJoRhWOT6Ok3fLR5QMGIZ_eg";
-                    fetch(url).then(function(result) {
+                    var drzava = $$("combo").getValue().split(" : ")[0];
+                    drzava = drzava.replace(/ /g, "+");
+                    var grad = $$("grad").getValue();
+                    grad = grad.replace(/ /g, "+");
+                    var query = res + "+" + grad + "+" + drzava;
+                    var url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + query + "&key=AIzaSyBExEHqJmRKJoRhWOT6Ok3fLR5QMGIZ_eg";
+                    fetch(url).then(function (result) {
                         return result.json();
-                    }).then(function(json) {
-                        lat=json['results'][0]['geometry']['location']['lat'];
-                        lng=json['results'][0]['geometry']['location']['lng'];
+                    }).then(function (json) {
+                        lat = json['results'][0]['geometry']['location']['lat'];
+                        lng = json['results'][0]['geometry']['location']['lng'];
                         var newItem = {
                             name: $$("addBuildingForm").getValues().name,
                             description: $$("addBuildingForm").getValues().description,
                             address: $$("addBuildingForm").getValues().adresa,
-                            latitude:lat,
-                            longitude:lng,
+                            latitude: lat,
+                            longitude: lng,
                             companyId: 1
 
                         };
@@ -700,18 +721,19 @@ var buildingView = {
                         util.dismissDialog('addBuildingDialog');
                     });
 
-                }else{
+                } else {
                     var newItem = {
                         name: $$("addBuildingForm").getValues().name,
                         description: $$("addBuildingForm").getValues().description,
                         address: $$("addBuildingForm").getValues().adresa,
-                        latitude:lat,
-                        longitude:lng,
+                        latitude: lat,
+                        longitude: lng,
                         companyId: 1
 
                     };
                     $$("buildingDT").add(newItem);
-                    util.dismissDialog('addBuildingDialog');}
+                    util.dismissDialog('addBuildingDialog');
+                }
             }
         }
     }

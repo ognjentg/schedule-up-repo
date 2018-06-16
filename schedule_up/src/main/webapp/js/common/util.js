@@ -203,7 +203,7 @@ var util = {
         validateUponEdit: function (editor, type) {
             switch (type) {
                 case "number": {
-                    var check = ( editor.getValue() != "" && !isNaN(editor.getValue()));
+                    var check = (editor.getValue() != "" && !isNaN(editor.getValue()));
                     if (!check) {
                         util.messages.showErrorMessage("Molimo unesite ispravan broj!");
                         return false;
@@ -340,7 +340,7 @@ var util = {
         importCsvStateCheckbox: function (obj, common, value) {
             if (obj.state != null && obj.state == 0)
                 return "<span style='color:green; padding:2px 7px; background:#f1f1f1; border-radius:3px'>Uspešno</span>";
-            else if(obj.state != null && obj.state == 2)
+            else if (obj.state != null && obj.state == 2)
                 return "<span style='color:#e9b32f; padding:2px 7px; background:#f1f1f1; border-radius:3px'>Postoji</span>";
             else
                 return "<span style='color:red;padding:2px 7px; background:#f1f1f1; border-radius:3px'>Greška</span>";

@@ -10,7 +10,7 @@ var noteView = {
                 view: "label",
                 width: 400,
                 template: "<span class='fa fa-sticky-note'></span> Oglasi"
-            },{}, {
+            }, {}, {
                 id: "addNoteBtn",
                 view: "button",
                 type: "iconButton",
@@ -29,59 +29,59 @@ var noteView = {
             onContext: {},
             columns: [
                 {
-                id: "id",
-                hidden: true,
-                fillspace: true,
+                    id: "id",
+                    hidden: true,
+                    fillspace: true,
 
-            }, {
-                id: "publishTime",
-                editable: false,
-                fillspace: false,
-                width:150,
-                editor: "date",
-                header: ["Datum objave", {
-                    content: "textFilter"
-                }],
-                    format:function(value){
+                }, {
+                    id: "publishTime",
+                    editable: false,
+                    fillspace: false,
+                    width: 150,
+                    editor: "date",
+                    header: ["Datum objave", {
+                        content: "textFilter"
+                    }],
+                    format: function (value) {
                         date = new Date(value);
                         var hours = date.getHours();
                         var minutes = date.getMinutes();
 
-                        minutes = minutes < 10 ? '0'+minutes : minutes;
-                        var strTime = hours + ':' + minutes+"h";
-                        return date.getDate() + "." + (date.getMonth()+1) + "." + date.getFullYear() + ".  " + strTime;
-                         }
+                        minutes = minutes < 10 ? '0' + minutes : minutes;
+                        var strTime = hours + ':' + minutes + "h";
+                        return date.getDate() + "." + (date.getMonth() + 1) + "." + date.getFullYear() + ".  " + strTime;
+                    }
 
-            }, {
+                }, {
                     id: "username",
                     fillspace: false,
                     editor: "text",
-                    width:200,
-                    editable:false,
+                    width: 200,
+                    editable: false,
                     header: ["Korisnik", {
-                    content: "textFilter"
-                }],
+                        content: "textFilter"
+                    }],
 
                 }, {
-                id: "name",
-                editable: false,
-                fillspace: false, width:400,
-                editor: "text",
-                header: ["Naziv", {
-                    content: "textFilter"
-                }],
+                    id: "name",
+                    editable: false,
+                    fillspace: false, width: 400,
+                    editor: "text",
+                    header: ["Naziv", {
+                        content: "textFilter"
+                    }],
 
-            },
+                },
                 {
-                id: "description",
-                fillspace: true,
-                editor: "text",
-                editable:false,
-                header: ["Opis", {
-                    content: "textFilter"
-                }],
+                    id: "description",
+                    fillspace: true,
+                    editor: "text",
+                    editable: false,
+                    header: ["Opis", {
+                        content: "textFilter"
+                    }],
 
-            }
+                }
             ],
             select: "row",
             navigation: true,
@@ -95,13 +95,13 @@ var noteView = {
             }
         }]
     },
-    selectPanel: function(){
+    selectPanel: function () {
         $$("main").removeView(rightPanel);
         rightPanel = "notePanel";
         var panelCopy = webix.copy(this.panel);
         $$("main").addView(webix.copy(panelCopy));
         connection.attachAjaxEvents("noteDT", "note");
-       $$("noteDT").detachEvent("onBeforeDelete");
+        $$("noteDT").detachEvent("onBeforeDelete");
 
         webix.ui({
             view: "contextmenu",
@@ -124,15 +124,15 @@ var noteView = {
                     var context = this.getContext();
                     switch (id) {
                         case "1":
-                             noteView.showChangeNoteDialog($$("noteDT").getItem(context.id.row));
+                            noteView.showChangeNoteDialog($$("noteDT").getItem(context.id.row));
                             break;
                         case "2":
-                            var delBox = (webix.copy(commonViews.brisanjePotvrda("oglasa","oglas")));
-                            var newItem=$$("noteDT").getItem(context.id.row);
+                            var delBox = (webix.copy(commonViews.brisanjePotvrda("oglasa", "oglas")));
+                            var newItem = $$("noteDT").getItem(context.id.row);
                             delBox.callback = function (result) {
                                 if (result == 1) {
 
-                                    connection.sendAjax("DELETE", "note/"+newItem.id,
+                                    connection.sendAjax("DELETE", "note/" + newItem.id,
                                         function (text, data, xhr) {
                                             if (text) {
                                                 util.messages.showMessage("Oglas uspješno uklonjen.");
@@ -193,7 +193,7 @@ var noteView = {
                     id: "description",
                     name: "description",
                     label: "Tekst",
-                    height:200,
+                    height: 200,
                     invalidMessage: "Unesite tekst oglasa!",
                     required: true
                 }, {
@@ -295,7 +295,7 @@ var noteView = {
                     id: "description",
                     name: "description",
                     label: "Opis",
-                    height:200,
+                    height: 200,
                     invalidMessage: "Unesite tekst oglasa!",
                     required: true
                 }, {
@@ -340,7 +340,7 @@ var noteView = {
         form.elements.id.setValue(note.id);
         form.elements.name.setValue(note.name);
         form.elements.description.setValue(note.description);
-       // form.elements.publishedTime.setValue(note.publishedTime);
+        // form.elements.publishedTime.setValue(note.publishedTime);
         //datum?!?
         setTimeout(function () {
             $$("changeNoteDialog").show();
@@ -352,7 +352,7 @@ var noteView = {
         if ($$("changeNoteForm").validate()) {
             //changeItem is a copy of add new item, same atributes
             var newItem = {
-               id: $$("changeNoteForm").getValues().id,
+                id: $$("changeNoteForm").getValues().id,
                 name: $$("changeNoteForm").getValues().name,
                 description: $$("changeNoteForm").getValues().description,
                 publishedTime: new Date(),
@@ -360,7 +360,7 @@ var noteView = {
                 userId: 1, // we need to change this when userBean is made
                 companyId: 1, // also needs change
             };
-            connection.sendAjax("PUT", "note/"+newItem.id,
+            connection.sendAjax("PUT", "note/" + newItem.id,
                 function (text, data, xhr) {
                     if (text) {
                         util.messages.showMessage("Oglas uspješno izmjenjen.");
@@ -376,4 +376,4 @@ var noteView = {
         }
     }
 
-    };
+};

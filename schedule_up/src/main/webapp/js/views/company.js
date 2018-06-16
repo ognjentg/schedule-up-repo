@@ -34,7 +34,7 @@ var companyView = {
 
             }, {
                 id: "name",
-                editable:false,
+                editable: false,
                 fillspace: true,
                 editor: "text",
                 sort: "string",
@@ -46,10 +46,10 @@ var companyView = {
             }, {
                 id: "timeFrom",
                 fillspace: true,
-                editable:false,
+                editable: false,
                 editor: "text",
-                format:function (value) {
-                    return value.substring(0,value.length-3);
+                format: function (value) {
+                    return value.substring(0, value.length - 3);
                 },
                 header: ["Radno vrijeme od",
                     {
@@ -59,18 +59,18 @@ var companyView = {
                 {
                     id: "timeTo",
                     fillspace: true,
-                    editable:false,
+                    editable: false,
                     editor: "text",
-                    format:function (value) {
-                        return value.substring(0,value.length-3);
+                    format: function (value) {
+                        return value.substring(0, value.length - 3);
                     },
-                    header: ["Radno vrijeme do",{
+                    header: ["Radno vrijeme do", {
                         content: "textFilter"
                     }],
                 }, {
                     id: "email",
                     fillspace: true,
-                    editable:false,
+                    editable: false,
                     editor: "text",
                     sort: "text",
                     header: [
@@ -100,7 +100,7 @@ var companyView = {
         var panelCopy = webix.copy(this.panel);
 
         $$("main").addView(webix.copy(panelCopy));
-        connection.attachAjaxEvents("companyDT", "company",true);
+        connection.attachAjaxEvents("companyDT", "company", true);
 
 
         webix.ui({
@@ -132,22 +132,22 @@ var companyView = {
                                 if (result == 1) {
                                     var item = $$("companyDT").getItem(context.id.row);
                                     $$("companyDT").detachEvent("onBeforeDelete");
-                                    connection.sendAjax("DELETE","/company/"+item.id,function (text,data,xhr) {
-                                        if (text)
-                                        {
+                                    connection.sendAjax("DELETE", "/company/" + item.id, function (text, data, xhr) {
+                                        if (text) {
                                             $$("companyDT").remove(context.id.row);
                                             util.messages.showMessage("Uspjesno uklanjanje");
                                         }
-                                    },function (text,data,xhr) {
+                                    }, function (text, data, xhr) {
                                         util.messages.showErrorMessage("Neuspjesno uklanjanje");
-                                    },item);
+                                    }, item);
                                 }
                             };
                             webix.confirm(delBox);
                             break;
+                    }
                 }
             }
-        }})
+        })
     },
 
     addDialog: {
@@ -187,7 +187,7 @@ var companyView = {
                     required: true
                 }, {
                     id: "timeFrom",
-                    invalidMessage:"Unesite početak radnog vremena!",
+                    invalidMessage: "Unesite početak radnog vremena!",
                     name: "timeFrom",
                     view: "datepicker",
                     stringResult: true,
@@ -207,7 +207,7 @@ var companyView = {
                     id: "timeTo",
                     name: "timeTo",
                     view: "datepicker",
-                    invalidMessage:"Unesite kraj radnog vremena!",
+                    invalidMessage: "Unesite kraj radnog vremena!",
                     stringResult: true,
                     label: "Kraj radnog vremena",
                     timepicker: true,
@@ -250,7 +250,7 @@ var companyView = {
                         }
                         return true;
                     },
-                    "email":function (value) {
+                    "email": function (value) {
                         if (!value) {
                             $$('addCompanyForm').elements.email.config.invalidMessage = 'Unesite E-mail!';
                             return false;
@@ -259,7 +259,7 @@ var companyView = {
                             $$('addCompanyForm').elements.email.config.invalidMessage = 'Maksimalan broj karaktera je 100';
                             return false;
                         }
-                        if(!webix.rules.isEmail(value)) {
+                        if (!webix.rules.isEmail(value)) {
                             $$('addCompanyForm').elements.email.config.invalidMessage = 'E-mail nije u validnom formatu.';
                             return false;
                         }
@@ -283,7 +283,7 @@ var companyView = {
                 name: form.getValues().name,
                 timeFrom: form.getValues().timeFrom + ":00",
                 timeTo: form.getValues().timeTo + ":00",
-                email:form.getValues().email
+                email: form.getValues().email
             };
             $$("companyDT").add(newCompany);
             util.dismissDialog('addCompanyDialog');
@@ -332,7 +332,7 @@ var companyView = {
                     required: true
                 }, {
                     id: "timeFrom",
-                    invalidMessage:"Unesite početak radnog vremena!",
+                    invalidMessage: "Unesite početak radnog vremena!",
                     name: "timeFrom",
                     view: "datepicker",
                     stringResult: true,
@@ -352,7 +352,7 @@ var companyView = {
                     id: "timeTo",
                     name: "timeTo",
                     view: "datepicker",
-                    invalidMessage:"Unesite kraj radnog vremena!",
+                    invalidMessage: "Unesite kraj radnog vremena!",
                     stringResult: true,
                     label: "Kraj radnog vremena:",
                     timepicker: true,
@@ -373,7 +373,7 @@ var companyView = {
                         name: "email",
                         label: "E-mail:",
                         required: true
-                    },  {
+                    }, {
                         margin: 5,
                         cols: [{}, {
                             id: "saveChangedCompany",
@@ -395,7 +395,7 @@ var companyView = {
                         }
                         return true;
                     },
-                    "email":function (value) {
+                    "email": function (value) {
                         if (!value) {
                             $$('changeCompanyForm').elements.email.config.invalidMessage = 'Unesite E-mail!';
                             return false;
@@ -404,7 +404,7 @@ var companyView = {
                             $$('changeCompanyForm').elements.email.config.invalidMessage = 'Maksimalan broj karaktera je 100';
                             return false;
                         }
-                        if(!webix.rules.isEmail(value)) {
+                        if (!webix.rules.isEmail(value)) {
                             $$('changeCompanyForm').elements.email.config.invalidMessage = 'E-mail nije u validnom formatu.';
                             return false;
                         }
@@ -418,17 +418,17 @@ var companyView = {
 
     showChangeCompanyDialog: function (company) {
 
-            webix.ui(webix.copy(companyView.changeCompanyDialog));
-            var form = $$("changeCompanyForm");
-            form.elements.id.setValue(company.id);
-            form.elements.name.setValue(company.name);
-            form.elements.timeFrom.setValue(company.timeFrom);
-            form.elements.timeTo.setValue(company.timeTo);
-            form.elements.email.setValue(company.email);
-            setTimeout(function () {
-                $$("changeCompanyDialog").show();
-                webix.UIManager.setFocus("name");
-            }, 0);
+        webix.ui(webix.copy(companyView.changeCompanyDialog));
+        var form = $$("changeCompanyForm");
+        form.elements.id.setValue(company.id);
+        form.elements.name.setValue(company.name);
+        form.elements.timeFrom.setValue(company.timeFrom);
+        form.elements.timeTo.setValue(company.timeTo);
+        form.elements.email.setValue(company.email);
+        setTimeout(function () {
+            $$("changeCompanyDialog").show();
+            webix.UIManager.setFocus("name");
+        }, 0);
 
 
     },
@@ -444,7 +444,7 @@ var companyView = {
                 email: $$("changeCompanyForm").getValues().email,
 
             };
-            connection.sendAjax("PUT", "company/custom/"+newItem.id,
+            connection.sendAjax("PUT", "company/custom/" + newItem.id,
                 function (text, data, xhr) {
                     if (text) {
                         util.messages.showMessage("Kompanija uspješno izmjenjena.");

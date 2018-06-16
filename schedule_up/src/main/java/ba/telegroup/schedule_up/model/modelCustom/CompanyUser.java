@@ -50,7 +50,6 @@ public class CompanyUser extends Company implements Serializable {
         this.email = email;
     }
 
-    @JsonIgnore
     @Override
     public Byte getDeleted() {
         return super.getDeleted();

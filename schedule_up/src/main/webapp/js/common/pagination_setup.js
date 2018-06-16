@@ -32,7 +32,7 @@ var pagerCols = [
             var pagerConfig = data.config || {page: 0, size: 10, group: 5}; // $$("pagingDiv").config; count
             var filteredRowsCount = data.filteredRowsCount || 0;
 
-           // if (data.config.count === 0) {data.config.group = 1; data.render();}
+            // if (data.config.count === 0) {data.config.group = 1; data.render();}
 
             var currentPage = pagerConfig.page; // starting from 0
             var rowsPerPage = pagerConfig.size;

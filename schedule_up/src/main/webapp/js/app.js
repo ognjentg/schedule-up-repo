@@ -4,12 +4,12 @@ var MENU_STATES = {
 };
 var menuState = MENU_STATES.COLLAPSED;
 
-var userData=null;
-var companyData=null;
+var userData = null;
+var companyData = null;
 
 var menuActions = function (id) {
 
-    switch(id){
+    switch (id) {
         case "company":
             companyView.selectPanel();
             break;
@@ -29,54 +29,54 @@ var menuActions = function (id) {
             gearView.selectPanel();
             break;
         case "logger":
-        loggerView.selectPanel();
-        break;
+            loggerView.selectPanel();
+            break;
     }
 };
 
-var menuSuperAdmin=[
+var menuSuperAdmin = [
     {
-    id: "company",
-    value: "Kompanije",
-    icon: "briefcase"
+        id: "company",
+        value: "Kompanije",
+        icon: "briefcase"
     }
 ];
 
-var menuAdmin=[
+var menuAdmin = [
     {
-        id:"building",
-        value:"Zgrade",
-        icon:"building"
+        id: "building",
+        value: "Zgrade",
+        icon: "building"
     },
     {
-        id:"note",
-        value:"Oglasi",
-        icon:"sticky-note"
+        id: "note",
+        value: "Oglasi",
+        icon: "sticky-note"
     },
     {
-        id:"settings",
-        value:"Podešavanja",
-        icon:"cog"
+        id: "settings",
+        value: "Podešavanja",
+        icon: "cog"
     },
     {
-        id:"room",
-        value:"Sale",
-        icon:"cube"
+        id: "room",
+        value: "Sale",
+        icon: "cube"
     },
     {
-        id:"gear",
+        id: "gear",
         value: "Oprema",
         icon: "wrench"
-    },{
-        id:"logger",
+    }, {
+        id: "logger",
         value: "Logovi",
         icon: "history"
     }
 ];
 
-var menuAdvancedUser=[];
+var menuAdvancedUser = [];
 
-var menuUser=[];
+var menuUser = [];
 
 var panel = {id: "empty"};
 var rightPanel = null;
@@ -90,58 +90,58 @@ var init = function () {
     else showApp();
 };
 
-var loginLayout={
-    id:"login",
-    width:"auto",
-    height:"auto",
-    rows:[
+var loginLayout = {
+    id: "login",
+    width: "auto",
+    height: "auto",
+    rows: [
         {
-            cols:[
+            cols: [
                 {},
                 {
-                    height:60,
-                    view:"label",
-                    label:"Schedule Up",
-                    css:"appNameLabel"
+                    height: 60,
+                    view: "label",
+                    label: "Schedule Up",
+                    css: "appNameLabel"
                 }
             ]
 
         },
         {
-            cols:[
+            cols: [
                 {},
                 {
-                    view:"form",
-                    id:"loginForm",
+                    view: "form",
+                    id: "loginForm",
                     width: 400,
                     elementsConfig: {
                         labelWidth: 140,
                         bottomPadding: 18
                     },
-                    elements:[
+                    elements: [
                         {
-                            id:"username",
-                            name:"username",
-                            view:"text",
-                            label:"Korisničko ime",
-                            invalidMessage:"Korisničke ime je obavezno!",
-                            required:true
+                            id: "username",
+                            name: "username",
+                            view: "text",
+                            label: "Korisničko ime",
+                            invalidMessage: "Korisničke ime je obavezno!",
+                            required: true
                         },
                         {
-                            id:"password",
-                            name:"password",
-                            view:"text",
-                            type:"password",
-                            label:"Lozinka",
-                            invalidMessage:"Lozinka je obavezna!",
-                            required:true
+                            id: "password",
+                            name: "password",
+                            view: "text",
+                            type: "password",
+                            label: "Lozinka",
+                            invalidMessage: "Lozinka je obavezna!",
+                            required: true
                         },
                         {
-                            id:"companyName",
-                            name:"companyName",
-                            view:"text",
-                            label:"Kompanija"
-                        },{
+                            id: "companyName",
+                            name: "companyName",
+                            view: "text",
+                            label: "Kompanija"
+                        }, {
                             margin: 5,
                             cols: [{}, {
                                 id: "loginBtn",
@@ -157,34 +157,35 @@ var loginLayout={
                 }
                 ,
                 {}
-                ]
+            ]
         }
     ]
 };
 
-var login =function () {
+var login = function () {
 
     console.log($$("loginForm").getValues());
-    if ($$("loginForm").validate()){
+    if ($$("loginForm").validate()) {
         webix.ajax().headers({
             "Content-type": "application/json"
-        }).post("user/login",$$("loginForm").getValues(), {
+        }).post("user/login", $$("loginForm").getValues(), {
             success: function (text, data, xhr) {
-                var user=data.json();
+                var user = data.json();
                 console.log(user);
-                if (user!=null){
-                    if (user.roleId===1){
-                        userData=user;
-                        companyData=null;
+                if (user != null) {
+                    if (user.roleId === 1) {
+                        userData = user;
+                        companyData = null;
                         showApp();
 
-                    }else {
+                    } else {
                         webix.ajax().get("company/" + user.companyId, {
                             success: function (text, data, xhr) {
                                 var company = data.json();
                                 if (company != null) {
                                     userData = user;
                                     companyData = company;
+                                    companyData.deleted = 0;
                                     showApp();
                                 } else {
                                     util.messages.showErrorMessage("Prijavljivanje nije uspjelo!");
@@ -196,12 +197,12 @@ var login =function () {
                             }
                         });
                     }
-                }else{
+                } else {
                     util.messages.showErrorMessage("Prijavljivanje nije uspjelo!");
                 }
             },
-            error:function (text, data, xhr) {
-                console.log("NIJE"+text);
+            error: function (text, data, xhr) {
+                console.log("NIJE" + text);
                 util.messages.showErrorMessage("Prijavljivanje nije uspjelo!");
             }
         });
@@ -209,11 +210,11 @@ var login =function () {
 
 };
 
-var logout=function () {
-    webix.ajax().get("user/logout",function(text,data,xhr){
-        if (xhr.status=="200"){
-            userData=null;
-            companyData=null;
+var logout = function () {
+    webix.ajax().get("user/logout", function (text, data, xhr) {
+        if (xhr.status == "200") {
+            userData = null;
+            companyData = null;
             util.messages.showLogoutMessage();
             connection.reload();
         }
@@ -240,39 +241,39 @@ var mainLayout = {
                         view: "label",
                         css: "appNameLabel",
                         label: "Schedule Up"
-                    },{
+                    }, {
                         id: "logoutBtn",
                         view: "button",
                         type: "iconButton",
                         label: "Odjavite se",
-                        click:"logout",
+                        click: "logout",
                         icon: "sign-out",
                         autowidth: true
                     }
                 ]
             }
-                ]
+            ]
 
         },
         {
             id: "main", cols: [{
-            rows: [
-                {id: "mainMenu", css: "mainMenu", view: "sidebar", gravity: 0.01, minWidth: 41, collapsed: true},
-                {
-                    id: "sidebarBelow",
-                    css: "sidebar-below",
-                    view: "template",
-                    template: "",
-                    height: 50,
-                    gravity: 0.01,
-                    minWidth: 41,
-                    width: 41,
-                    type: "clean"
-                }
+                rows: [
+                    {id: "mainMenu", css: "mainMenu", view: "sidebar", gravity: 0.01, minWidth: 41, collapsed: true},
+                    {
+                        id: "sidebarBelow",
+                        css: "sidebar-below",
+                        view: "template",
+                        template: "",
+                        height: 50,
+                        gravity: 0.01,
+                        minWidth: 41,
+                        width: 41,
+                        type: "clean"
+                    }
+                ]
+            },
+                {id: "emptyRightPanel"}
             ]
-        },
-            {id: "emptyRightPanel"}
-        ]
         }
     ]
 };
@@ -284,9 +285,9 @@ var menuEvents = {
 };
 
 var showLogin = function () {
-    var login=webix.copy(loginLayout);
-    webix.ui(login,panel);
-    panel=$$("login");
+    var login = webix.copy(loginLayout);
+    webix.ui(login, panel);
+    panel = $$("login");
 };
 
 var showApp = function () {
@@ -294,19 +295,19 @@ var showApp = function () {
     webix.ui(main, panel);
     panel = $$("app");
 
-    var localMenuData =null;
-    switch(userData.roleId){
+    var localMenuData = null;
+    switch (userData.roleId) {
         case 1:
-            localMenuData=webix.copy(menuSuperAdmin);
+            localMenuData = webix.copy(menuSuperAdmin);
             break;
         case 2:
-            localMenuData=webix.copy(menuAdmin);
+            localMenuData = webix.copy(menuAdmin);
             break;
         case 3:
-            localMenuData=webix.copy(menuAdvancedUser);
+            localMenuData = webix.copy(menuAdvancedUser);
             break;
         case 4:
-            localMenuData=webix.copy(menuUser);
+            localMenuData = webix.copy(menuUser);
             break;
     }
 

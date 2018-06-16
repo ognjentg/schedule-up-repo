@@ -1,4 +1,3 @@
-
 var roomView = {
 
     panel: {
@@ -36,7 +35,7 @@ var roomView = {
 
             }, {
                 id: "name",
-                editable:false,
+                editable: false,
                 fillspace: true,
                 editor: "text",
                 sort: "string",
@@ -48,7 +47,7 @@ var roomView = {
             }, {
                 id: "floor",
                 fillspace: true,
-                editable:false,
+                editable: false,
                 editor: "text",
                 sort: "int",
                 header: ["Sprat",
@@ -59,17 +58,17 @@ var roomView = {
                 {
                     id: "capacity",
                     fillspace: true,
-                    editable:false,
+                    editable: false,
                     editor: "text",
                     sort: "int",
-                    header: ["Kapacitet",{
+                    header: ["Kapacitet", {
                         content: "numberFilter"
                     }],
                 },
                 {
                     id: "buildingName",
                     fillspace: true,
-                    editable:false,
+                    editable: false,
                     editor: "text",
                     sort: "string",
                     header: [
@@ -80,7 +79,7 @@ var roomView = {
                 },
                 {
                     id: "description",
-                    editable:false,
+                    editable: false,
                     fillspace: true,
                     editor: "text",
                     sort: "string",
@@ -112,7 +111,7 @@ var roomView = {
         var panelCopy = webix.copy(this.panel);
 
         $$("main").addView(webix.copy(panelCopy));
-        connection.attachAjaxEvents("roomDT", "room",true);
+        connection.attachAjaxEvents("roomDT", "room", true);
         $$("roomDT").detachEvent("onBeforeDelete");
 
         webix.ui({
@@ -139,12 +138,12 @@ var roomView = {
 
                             break;
                         case "2":
-                            var delBox = (webix.copy(commonViews.brisanjePotvrda("sale","salu")));
-                            var newItem=$$("roomDT").getItem(context.id.row);
+                            var delBox = (webix.copy(commonViews.brisanjePotvrda("sale", "salu")));
+                            var newItem = $$("roomDT").getItem(context.id.row);
                             delBox.callback = function (result) {
                                 if (result == 1) {
 
-                                    connection.sendAjax("DELETE", "room/"+newItem.id,
+                                    connection.sendAjax("DELETE", "room/" + newItem.id,
                                         function (text, data, xhr) {
                                             if (text) {
                                                 util.messages.showMessage("Sala uspješno obrisana.");
@@ -208,8 +207,8 @@ var roomView = {
                     invalidMessage: "Unesite naziv zgrade!",
                     required: true,
                     options: {
-                        filter:function(item, value){
-                            if(item.name.toString().toLowerCase().indexOf(value.toLowerCase())===0)
+                        filter: function (item, value) {
+                            if (item.name.toString().toLowerCase().indexOf(value.toLowerCase()) === 0)
                                 return true;
                             return false;
                         },
@@ -390,8 +389,8 @@ var roomView = {
                     invalidMessage: "Unesite naziv zgrade!",
                     required: true,
                     options: {
-                        filter:function(item, value){
-                            if(item.name.toString().toLowerCase().indexOf(value.toLowerCase())===0)
+                        filter: function (item, value) {
+                            if (item.name.toString().toLowerCase().indexOf(value.toLowerCase()) === 0)
                                 return true;
                             return false;
                         },

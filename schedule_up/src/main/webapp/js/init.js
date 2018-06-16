@@ -15,9 +15,9 @@ var scriptsToLoad = [
         "files": ["connection", "util", "view_components", "pagination_setup"]
     },
     {
-        "section":"views",
-        "path":"js/views/",
-        "files":["company", "building", "note", "company_settings", "room", "gear","logger"]
+        "section": "views",
+        "path": "js/views/",
+        "files": ["company", "building", "note", "company_settings", "room", "gear", "logger"]
     },
     {
         "section": "core",
@@ -40,7 +40,7 @@ function loadScript(index) {
 
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.charset="utf-8";
+    script.charset = "utf-8";
     if (script.readyState) {  //IE
         script.onreadystatechange = function () {
             if (script.readyState == "loaded" ||

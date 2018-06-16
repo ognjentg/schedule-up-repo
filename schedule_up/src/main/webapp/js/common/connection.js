@@ -112,7 +112,7 @@ var connection = {
     },
 
     //attach triggers to datatables
-    attachAjaxEvents: function (dtId, link,customInsert, preserveId, editValidationRules) {
+    attachAjaxEvents: function (dtId, link, customInsert, preserveId, editValidationRules) {
         $$(dtId).attachEvent("onBeforeAdd", function (index, obj) {
             if (obj.isNew) {
                 return true;
@@ -120,9 +120,9 @@ var connection = {
             if (typeof preserveId === 'undefined' || preserveId !== true) {
                 delete obj["id"];
             }
-            var addLink=link;
+            var addLink = link;
             if (typeof customInsert !== 'undefined' && customInsert === true) {
-                addLink=addLink+"/custom/";
+                addLink = addLink + "/custom/";
             }
             util.preloader.inc();
 
@@ -161,113 +161,114 @@ var connection = {
         });
 
         $$(dtId).attachEvent("onBeforeEditStop", function (state, editor, ignore) {
-            if (ignore) {
-                this.editCancel();
-                return;
-            }
+                if (ignore) {
+                    this.editCancel();
+                    return;
+                }
 
-            var column = editor.column;
-            var id = editor.row;
+                var column = editor.column;
+                var id = editor.row;
 
-            var newValue = state.value;
-            var oldValue = state.old;
+                var newValue = state.value;
+                var oldValue = state.old;
 
-            if (newValue == oldValue) return;
-            if (typeof preserveId === 'undefined' || preserveId !== true) {
-                delete obj["id"];
-            }
-            var editLink="";
-            if (typeof customInsert !== 'undefined' && customInsert === true) {
-                editLink=link+"/custom/"+id;
-            }else {
-                editLink = link + "/" + id;
-            }
-            var data = $$(dtId).getItem(id);
-            data[column] = newValue;
+                if (newValue == oldValue) return;
+                if (typeof preserveId === 'undefined' || preserveId !== true) {
+                    delete obj["id"];
+                }
+                var editLink = "";
+                if (typeof customInsert !== 'undefined' && customInsert === true) {
+                    editLink = link + "/custom/" + id;
+                } else {
+                    editLink = link + "/" + id;
+                }
+                var data = $$(dtId).getItem(id);
+                data[column] = newValue;
 
-            var commitEdit = function () {
-                util.preloader.inc();
-                webix.ajax().headers({
-                    "Content-type": "application/json"
-                }).put(editLink, JSON.stringify(data), {
-                    error: function (text, data, xhr) {
-                        if (xhr.status == 401) {
-                            if (connection.showSEM) {
-                                util.messages.showSessionExpiredError();
-                                connection.showSEM = false;
-                            }
-                            connection.reload();
-                        } else {
-                            util.messages.showErrorMessage("Greška pri izmeni podataka");
-                            data[column] = oldValue;
-                            try {
-                                $$(dtId).updateItem(id, data);
-                            } catch (ex) {
-                            }
-                        }
-                        util.preloader.dec();
-                    }, success: function (text, data) {
-                        if (!data.json()) {
-                            util.messages.showErrorMessage("Greška pri izmeni podataka");
-                            data[column] = oldValue;
-                            try {
-                                $$(dtId).updateItem(id, data);
-                            } catch (ex) {
-                            }
-                        }
-
-                        util.preloader.dec();
-                    }
-                });
-            };
-
-            if (typeof editValidationRules !== 'undefined') {
-                for (var i = 0; i < editValidationRules.length; i++) {
-                    if (editValidationRules[i].column == editor.column) {
-
-                        if (editValidationRules[i].rule == "canChange") {
-
-                            var url = editValidationRules[i].validateUrl.replace("{id}", id).replace("{value}", newValue);
-
-                            var editError = function () {
-                                util.messages.showErrorMessage("Unesena vrednost već postoji!");
+                var commitEdit = function () {
+                    util.preloader.inc();
+                    webix.ajax().headers({
+                        "Content-type": "application/json"
+                    }).put(editLink, JSON.stringify(data), {
+                        error: function (text, data, xhr) {
+                            if (xhr.status == 401) {
+                                if (connection.showSEM) {
+                                    util.messages.showSessionExpiredError();
+                                    connection.showSEM = false;
+                                }
+                                connection.reload();
+                            } else {
+                                util.messages.showErrorMessage("Greška pri izmeni podataka");
                                 data[column] = oldValue;
-                                $$(dtId).updateItem(id, data);
-                            };
-
-
-                            connection.sendAjax("GET", url,
-                                function (text, data, xhr) {
-                                    if (text != "true") editError();
-                                    else {
-                                        commitEdit();
-                                    }
-                                }, function () {
-                                    editError();
-                                });
-
-                            return true;
-
-                        } else if (editValidationRules[i].rule == "isEmpty") {
-                            if (/^\s*$/.test(state.value)) {
-                                state.value = state.old;
-                                data[column] = state.old;
-                                util.messages.showErrorMessage("Polje je obavezno za unos.")
-                            }}
-                        else if (editValidationRules[i].rule == "isValidMac") {
-                            if (!util.validation.checkMacAddress(state.value)) {
-                                state.value = state.old;
-                                data[column] = state.old;
-                                util.messages.showErrorMessage("Unesite validnu MAC adresu za uređaj.")
+                                try {
+                                    $$(dtId).updateItem(id, data);
+                                } catch (ex) {
+                                }
                             }
-                        }
-                        else if (editValidationRules[i].rule == "isValidNumber") {
-                            if (!util.validation.checkPhoneNumber(state.value)) {
-                                state.value = state.old;
-                                data[column] = state.old;
-                                util.messages.showErrorMessage("Unesite validan broj telefona.")
+                            util.preloader.dec();
+                        }, success: function (text, data) {
+                            if (!data.json()) {
+                                util.messages.showErrorMessage("Greška pri izmeni podataka");
+                                data[column] = oldValue;
+                                try {
+                                    $$(dtId).updateItem(id, data);
+                                } catch (ex) {
+                                }
                             }
+
+                            util.preloader.dec();
                         }
+                    });
+                };
+
+                if (typeof editValidationRules !== 'undefined') {
+                    for (var i = 0; i < editValidationRules.length; i++) {
+                        if (editValidationRules[i].column == editor.column) {
+
+                            if (editValidationRules[i].rule == "canChange") {
+
+                                var url = editValidationRules[i].validateUrl.replace("{id}", id).replace("{value}", newValue);
+
+                                var editError = function () {
+                                    util.messages.showErrorMessage("Unesena vrednost već postoji!");
+                                    data[column] = oldValue;
+                                    $$(dtId).updateItem(id, data);
+                                };
+
+
+                                connection.sendAjax("GET", url,
+                                    function (text, data, xhr) {
+                                        if (text != "true") editError();
+                                        else {
+                                            commitEdit();
+                                        }
+                                    }, function () {
+                                        editError();
+                                    });
+
+                                return true;
+
+                            } else if (editValidationRules[i].rule == "isEmpty") {
+                                if (/^\s*$/.test(state.value)) {
+                                    state.value = state.old;
+                                    data[column] = state.old;
+                                    util.messages.showErrorMessage("Polje je obavezno za unos.")
+                                }
+                            }
+                            else if (editValidationRules[i].rule == "isValidMac") {
+                                if (!util.validation.checkMacAddress(state.value)) {
+                                    state.value = state.old;
+                                    data[column] = state.old;
+                                    util.messages.showErrorMessage("Unesite validnu MAC adresu za uređaj.")
+                                }
+                            }
+                            else if (editValidationRules[i].rule == "isValidNumber") {
+                                if (!util.validation.checkPhoneNumber(state.value)) {
+                                    state.value = state.old;
+                                    data[column] = state.old;
+                                    util.messages.showErrorMessage("Unesite validan broj telefona.")
+                                }
+                            }
 
 
                             else if (util.validation.validateUponEdit(editor, editValidationRules[i].rule)) break;

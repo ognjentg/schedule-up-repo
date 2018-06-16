@@ -10,7 +10,7 @@ var gearView = {
                 view: "label",
                 width: 400,
                 template: "<span class='fa fa-wrench'></span> Oprema"
-            },{}, {
+            }, {}, {
                 id: "addGearBtn",
                 view: "button",
                 type: "iconButton",
@@ -19,7 +19,7 @@ var gearView = {
                 click: 'gearView.showAddDialog',
                 autowidth: true
             }]
-        },{
+        }, {
             view: "datatable",
             css: "webixDatatable",
             multiselect: false,
@@ -43,27 +43,27 @@ var gearView = {
                         content: "textFilter"
                     }
                 ]
-            },  {
+            }, {
                 id: "description",
                 fillspace: true,
                 editor: "text",
                 sort: "text",
-                editable:false,
+                editable: false,
                 adjust: "data",
                 header: [
                     "Opis", {
                         content: "textFilter"
                     }
                 ]
-            } ,{
+            }, {
                 id: "available",
                 fillspace: true,
                 editor: "text",
                 sort: "text",
-                editable:false,
-                format: function(value){
-                  if(value == 1) return "Da";
-                  else return "Ne";
+                editable: false,
+                format: function (value) {
+                    if (value == 1) return "Da";
+                    else return "Ne";
                 },
                 header: [
                     "Slobodno", {
@@ -85,14 +85,14 @@ var gearView = {
         }]
     },
 
-    selectPanel: function(){
+    selectPanel: function () {
         $$("main").removeView(rightPanel);
         rightPanel = "gearPanel";
 
         var panelCopy = webix.copy(this.panel);
 
         $$("main").addView(webix.copy(panelCopy));
-        connection.attachAjaxEvents("gearDT", "gear-unit",true);
+        connection.attachAjaxEvents("gearDT", "gear-unit", true);
         $$("gearDT").detachEvent("onBeforeDelete");
 
         webix.ui({
@@ -120,10 +120,10 @@ var gearView = {
                             break;
                         case "2":
                             var delBox = (webix.copy(commonViews.brisanjePotvrda("opreme", "opremu")));
-                            var newItem=$$("gearDT").getItem(context.id.row);
+                            var newItem = $$("gearDT").getItem(context.id.row);
                             delBox.callback = function (result) {
                                 if (result == 1) {
-                                    connection.sendAjax("DELETE", "gear-unit/"+newItem.id,
+                                    connection.sendAjax("DELETE", "gear-unit/" + newItem.id,
                                         function (text, data, xhr) {
                                             if (text) {
                                                 util.messages.showMessage("Oprema uspješno uklonjena.");
@@ -132,7 +132,8 @@ var gearView = {
                                                 util.messages.showErrorMessage("Neuspješno uklanjanje.");
                                         }, function () {
                                             util.messages.showErrorMessage("Neuspješno uklanjanje.");
-                                        }, null);}
+                                        }, null);
+                                }
                             };
                             webix.confirm(delBox);
                             break;
@@ -205,7 +206,7 @@ var gearView = {
                 }],
                 rules: {
                     "name": function (value) {
-                        if (!value || value.length>100)
+                        if (!value || value.length > 100)
                             return false;
                         return true;
                     },
@@ -247,7 +248,7 @@ var gearView = {
                 name: $$("changeGearForm").getValues().name
             };
 
-            if(newItem.available == "Da") newItem.available = 1;
+            if (newItem.available == "Da") newItem.available = 1;
             else newItem.available = 0;
 
             //provjeriti da li je gear nov, ako jeste staviti gearId na null
@@ -255,18 +256,18 @@ var gearView = {
             var allGearNames = $$("gearSuggest").getList().data;
             allGearNames.each(
                 function (obj) {
-                    if(obj.value == newItem.name) gearExists = true;
+                    if (obj.value == newItem.name) gearExists = true;
                 }
             );
 
-            if(!gearExists) newItem.gearId = null;
+            if (!gearExists) newItem.gearId = null;
 
             connection.sendAjax("PUT", "gear-unit/custom/",
                 function (text, data, xhr) {
                     if (text) {
                         util.messages.showMessage("Podaci su uspješno izmijenjeni.");
 
-                        if(newItem.available == 1) newItem.available = "Da";
+                        if (newItem.available == 1) newItem.available = "Da";
                         else newItem.available = "Ne";
                         $$("gearDT").updateItem(newItem.id, newItem);
                     } else
@@ -309,7 +310,7 @@ var gearView = {
                     labelWidth: 200,
                     bottomPadding: 18
                 },
-                elements: [ {
+                elements: [{
                     view: "text",
                     id: "name",
                     name: "name",
@@ -350,7 +351,7 @@ var gearView = {
                         }
                         return true;
                     },
-                    "description":function (value) {
+                    "description": function (value) {
                         if (value.length > 500) {
                             $$('addGearForm').elements.email.config.invalidMessage = 'Maksimalan broj karaktera je 500';
                             return false;
@@ -373,9 +374,9 @@ var gearView = {
             var newItem = {
                 name: $$("addGearForm").getValues().name,
                 description: $$("addGearForm").getValues().description,
-                available:1,
-                companyId:1,
-                gearId:null
+                available: 1,
+                companyId: 1,
+                gearId: null
             };
 
 
@@ -384,16 +385,16 @@ var gearView = {
             var allGearNames = $$("gearSuggest").getList().data;
             allGearNames.each(
                 function (obj) {
-                    if(obj.value == newItem.name) gearExists = true;
+                    if (obj.value == newItem.name) gearExists = true;
                 }
             );
             //alert("vrijednost:"+gearExists);
 
-            if(gearExists){
-                connection.sendAjax("GET", "gear/"+newItem.name,
+            if (gearExists) {
+                connection.sendAjax("GET", "gear/" + newItem.name,
                     function (text, data, xhr) {
                         if (text) {
-                            newItem.gearId=JSON.parse(text)[0].id;
+                            newItem.gearId = JSON.parse(text)[0].id;
                             //alert(newItem.gearId);
                             //alert("proslo");
                             $$("gearDT").add(newItem);
@@ -416,7 +417,7 @@ var gearView = {
 
                 util.dismissDialog('addGearDialog');
 
-            }else {
+            } else {
                 $$("gearDT").add(newItem);
                 //util.dismissDialog('addGearDialog');
                 util.messages.showMessage("Oprema je uspješno kreirana.");

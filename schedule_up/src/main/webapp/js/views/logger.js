@@ -30,8 +30,8 @@ var loggerView = {
                     id: "username",
                     fillspace: false,
                     editor: "text",
-                    width:200,
-                    editable:false,
+                    width: 200,
+                    editable: false,
                     header: [
                         "Korisnik", {
                             content: "textFilter"
@@ -72,14 +72,14 @@ var loggerView = {
                     editable: false,
                     editor: "Date",
                     width: 150,
-                    format:function(value){
+                    format: function (value) {
                         date = new Date(value);
                         var hours = date.getHours();
                         var minutes = date.getMinutes();
 
-                        minutes = minutes < 10 ? '0'+minutes : minutes;
+                        minutes = minutes < 10 ? '0' + minutes : minutes;
                         var strTime = hours + ':' + minutes;
-                        return date.getDate() + "." + (date.getMonth()+1) + "." + date.getFullYear() + ".  " + strTime;
+                        return date.getDate() + "." + (date.getMonth() + 1) + "." + date.getFullYear() + ".  " + strTime;
                     },
                     header: ["Datum", {
                         content: "textFilter"
@@ -98,6 +98,6 @@ var loggerView = {
         rightPanel = "loggerPanel";
         var panelCopy = webix.copy(this.panel);
         $$("main").addView(webix.copy(panelCopy));
-        connection.attachAjaxEvents("loggerDT", "loggerUser",true);
+        connection.attachAjaxEvents("loggerDT", "loggerUser", true);
     }
 };
