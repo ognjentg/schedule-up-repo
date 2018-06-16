@@ -22,7 +22,8 @@ import java.util.List;
 @Scope("request")
 public class UserController extends GenericController<User, Integer> {
 
-    private static final String SQL_LOGIN = "SELECT u.id FROM user u JOIN company c ON u.company_id=c.id WHERE u.username=? AND c.name=? AND u.active=true AND u.deleted=false";
+    private static final String SQL_SELECT_USER_ID_BY_USERNAME = "SELECT id FROM user WHERE username=? AND active=true AND deleted=false";
+    private static final String SQL_SELECT_COMPANY_NAME_BY_COMPANY_ID = "SELECT name FROM company WHERE id=? AND deleted=false";
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -32,21 +33,35 @@ public class UserController extends GenericController<User, Integer> {
     public @ResponseBody
     User login(@RequestBody LoginInformation loginInformation) {
 
-        List<Integer> userId = (List<Integer>) entityManager.createNativeQuery(SQL_LOGIN).setParameter(1, loginInformation.getUsername().trim()).setParameter(2, loginInformation.getCompanyName().trim()).getResultList();
+        List<Integer> userId = (List<Integer>) entityManager.createNativeQuery(SQL_SELECT_USER_ID_BY_USERNAME).setParameter(1, loginInformation.getUsername().trim()).getResultList();
         User user = null;
         if(userId != null && !userId.isEmpty()){
             user = entityManager.find(User.class, userId.get(0));
         }
+        if(user != null && Integer.valueOf(1).equals(user.getRoleId())){
+            if(Util.checkPassword(loginInformation.getPassword().trim(), new String(user.getPassword()))){
+                user.setPassword(null);
+                userBean.setUser(user);
+                userBean.setLoggedIn(true);
 
-        if(user != null && Util.checkPassword(loginInformation.getPassword().trim(), new String(user.getPassword()))){
-            user.setPassword(null);
-            userBean.setUser(user);
-            userBean.setLoggedIn(true);
-
-            return userBean.getUser();
+                return userBean.getUser();
+            }
+            else{
+                return null;
+            }
         }
         else{
-            return null;
+            List<String> companyName = (List<String>) entityManager.createNativeQuery(SQL_SELECT_COMPANY_NAME_BY_COMPANY_ID).setParameter(1, user.getCompanyId()).getResultList();
+            if(companyName != null && companyName.get(0).equals(loginInformation.getCompanyName().trim()) && Util.checkPassword(loginInformation.getPassword().trim(), new String(user.getPassword()))){
+                user.setPassword(null);
+                userBean.setUser(user);
+                userBean.setLoggedIn(true);
+
+                return userBean.getUser();
+            }
+            else{
+                return null;
+            }
         }
     }
 
