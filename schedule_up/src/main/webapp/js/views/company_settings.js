@@ -35,8 +35,22 @@ var companySettingsView = {
                         format: "%H:%i",
                             on:{
                             onChange:function( item,oldv){
-                                    webix.message("Value changed from:  to: "+oldv)}
-                            }
+                                var newItem = {
+                                    timeFrom: $$("customizeForm").getValues().timeFrom+":00",
+                                    timeTo: $$("customizeForm").getValues().timeTo+":00",
+                                    id: 1,
+                                    deleted:0,
+                                    name:"Telegroup"
+
+                                };
+                                connection.sendAjax("PUT", "company/1",
+                                    function (text, data, xhr) {
+                                        if (text) {
+                                        } else
+                                            util.messages.showErrorMessage("Greška pri izmjeni.");
+                                    }, function () {}
+                                    , newItem)
+                            }}
                                 ,
                         suggest: {
                             type: "calendar",
@@ -55,6 +69,23 @@ var companySettingsView = {
                         timepicker: true,
                         type: "time",
                         format: "%H:%i",
+                            on:{
+                                onChange:function( item,oldv){
+                                    var newItem = {
+                                        timeFrom: $$("customizeForm").getValues().timeFrom+":00",
+                                        timeTo: $$("customizeForm").getValues().timeTo+":00",
+                                        id: 1,
+                                        deleted:0,
+                                        name:"Telegroup"
+
+                                    };
+                                    connection.sendAjax("PUT", "company/1",
+                                        function (text, data, xhr) {
+                                            if (text) {
+                                            } else
+                                                util.messages.showErrorMessage("Greškaa pri izmjeni.");
+                                        }, function () {}, newItem)
+                                }},
                         suggest: {
                             type: "calendar",
                             body: {
@@ -68,13 +99,120 @@ var companySettingsView = {
                             width:400,
                             value:"One",
                             options:["0 minuta", "5 minuta", "15 minuta","30 minuta", "1 sat","12 sati","1 dan"],
-                            label:"Podsjetnik:"
-                        },{
+                            label:"Podsjetnik:",
+                            on:{
+                                onChange:function( item,oldv){
+                                var newCancelTime=$$("cancelTime").getValue();
+                                    switch(newCancelTime){
+                                        case "0 minuta":{
+                                            newCancelTime="00:00:00";break;
+                                        }
+                                        case "5 minuta":{
+                                            newCancelTime="00:05:00";break;
+                                        }case "15 minuta":{
+                                        newCancelTime="00:15:00";break;
+                                    }case "30 minuta":{
+                                        newCancelTime="00:30:00";break;
+                                    }case "1 sat":{
+                                        newCancelTime="01:00:00";break;
+                                    }case "12 sati":{
+                                        newCancelTime="12:00:00";break;
+                                    }case "1 dan":{
+                                        newCancelTime="24:00:00";break;
+                                    }}
+                                        var newReminderTime=$$("reminderTime").getValue();
+                                        switch(newReminderTime){
+                                            case "0 minuta":{
+                                                newReminderTime="00:00:00";break;
+                                            }
+                                            case "5 minuta":{
+                                                newReminderTime="00:05:00";break;
+                                            }case "15 minuta":{
+                                            newReminderTime="00:15:00";break;
+                                        }case "30 minuta":{
+                                            newReminderTime="00:30:00";break;
+                                        }case "1 sat":{
+                                            newReminderTime="01:00:00";break;
+                                        }case "12 sati":{
+                                            newReminderTime="12:00:00";break;
+                                        }case "1 dan":{
+                                            newReminderTime="24:00:00";break;
+                                        }}
+                                    var newItem = {
+                                        cancelTime:newCancelTime,
+                                        reminderTime:newReminderTime,
+                                        id: 9,
+                                        companyId:1
+                                    };
+                                    connection.sendAjax("PUT", "settings/9",
+                                        function (text, data, xhr) {
+                                            if (text) {
+                                            } else
+                                                util.messages.showErrorMessage("Greška pri izmjeni.");
+                                        }, function () {}
+                                        , newItem)
+                                }}
+                        },
+                            {
                             view:"combo",
                             id:"cancelTime",
                             label:"Minimalno vrijeme za otkazivanje sastanka:",
                             width:400,
-                            options:["15 minuta","30 minuta", "1 sat","12 sati","1 dan"]
+                            options:["15 minuta","30 minuta", "1 sat","12 sati","1 dan"],
+                                on:{
+                                    onChange:function( item,oldv){
+
+                                        var newCancelTime=$$("cancelTime").getValue();
+                                        switch(newCancelTime){
+                                            case "0 minuta":{
+                                                newCancelTime="00:00:00";break;
+                                            }
+                                            case "5 minuta":{
+                                                newCancelTime="00:05:00";break;
+                                            }case "15 minuta":{
+                                            newCancelTime="00:15:00";break;
+                                        }case "30 minuta":{
+                                            newCancelTime="00:30:00";break;
+                                        }case "1 sat":{
+                                            newCancelTime="01:00:00";break;
+                                        }case "12 sati":{
+                                            newCancelTime="12:00:00";break;
+                                        }case "1 dan":{
+                                            newCancelTime="24:00:00";break;
+                                        }}
+                                        var newReminderTime=$$("reminderTime").getValue();
+                                        switch(newReminderTime){
+                                            case "0 minuta":{
+                                                newReminderTime="00:00:00";break;
+                                            }
+                                            case "5 minuta":{
+                                                newReminderTime="00:05:00";break;
+                                            }case "15 minuta":{
+                                            newReminderTime="00:15:00";break;
+                                        }case "30 minuta":{
+                                            newReminderTime="00:30:00";break;
+                                        }case "1 sat":{
+                                            newReminderTime="01:00:00";break;
+                                        }case "12 sati":{
+                                            newReminderTime="12:00:00";break;
+                                        }case "1 dan":{
+                                            newReminderTime="24:00:00";break;
+                                        }}
+                                        var newItem = {
+                                            cancelTime:newCancelTime,
+                                            reminderTime:newReminderTime,
+                                            id: 9,
+                                            companyId:1
+                                        };
+                                        connection.sendAjax("PUT", "settings/9",
+                                            function (text, data, xhr) {
+                                                if (text) {
+                                                } else
+                                                    util.messages.showErrorMessage("Greška pri izmjeni.");
+                                            }, function () {}
+                                            , newItem)
+                                    }}
+
                         }
                 ]},{rows:[{
                         id: "holiday",
@@ -123,13 +261,9 @@ var companySettingsView = {
 
         $$("main").addView(webix.copy(panelCopy));
         $$("t3").bind($$("holiday"), "value");
-        var newItem = {
-            timeFrom: $$("customizeForm").getValues().timeFrom + ":00",
-            timeTo: $$("customizeForm").getValues().timeTo + ":00"
-
-        };
         connection.sendAjax("GET", "settings/9",
             function (text, data, xhr) {
+            oldSettings=data.json();
             var time;
             var cancelTime;
                 if (text) {
