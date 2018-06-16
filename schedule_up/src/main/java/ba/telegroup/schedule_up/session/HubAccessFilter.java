@@ -21,10 +21,7 @@ public class HubAccessFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) req;
 
         UserBean userBean = (UserBean) springContext.getBean("userBean");
-        if (!userBean.getLoggedIn()) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
-        }
+
 
         chain.doFilter(req, res);
     }

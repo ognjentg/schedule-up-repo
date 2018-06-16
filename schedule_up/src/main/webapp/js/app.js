@@ -4,12 +4,45 @@ var MENU_STATES = {
 };
 var menuState = MENU_STATES.COLLAPSED;
 
-var menuData = [
+var userData=null;
+var companyData=null;
+
+var menuActions = function (id) {
+
+    switch(id){
+        case "company":
+            companyView.selectPanel();
+            break;
+        case "building":
+            buildingView.selectPanel();
+            break;
+        case "note":
+            noteView.selectPanel();
+            break;
+        case "settings":
+            companySettingsView.selectPanel();
+            break;
+        case "room":
+            roomView.selectPanel();
+            break;
+        case "gear":
+            gearView.selectPanel();
+            break;
+        case "logger":
+        loggerView.selectPanel();
+        break;
+    }
+};
+
+var menuSuperAdmin=[
     {
-        id: "company",
-        value: "Kompanije",
-        icon: "briefcase"
-    },
+    id: "company",
+    value: "Kompanije",
+    icon: "briefcase"
+    }
+];
+
+var menuAdmin=[
     {
         id:"building",
         value:"Zgrade",
@@ -41,32 +74,9 @@ var menuData = [
     }
 ];
 
-var menuActions = function (id) {
+var menuAdvancedUser=[];
 
-    switch(id){
-        case "company":
-            companyView.selectPanel();
-            break;
-        case "building":
-            buildingView.selectPanel();
-            break;
-        case "note":
-            noteView.selectPanel();
-            break;
-        case "settings":
-            companySettingsView.selectPanel();
-            break;
-        case "room":
-            roomView.selectPanel();
-            break;
-        case "gear":
-            gearView.selectPanel();
-            break;
-        case "logger":
-        loggerView.selectPanel();
-        break;
-    }
-};
+var menuUser=[];
 
 var panel = {id: "empty"};
 var rightPanel = null;
@@ -75,9 +85,140 @@ var init = function () {
     if (!webix.env.touch && webix.ui.scrollSize) webix.CustomScroll.init();
     webix.ui(panel);
     panel = $$("empty");
-    showApp();
+    if (userData == null)
+        showLogin();
+    else showApp();
 };
 
+var loginLayout={
+    id:"login",
+    width:"auto",
+    height:"auto",
+    rows:[
+        {
+            cols:[
+                {},
+                {
+                    height:60,
+                    view:"label",
+                    label:"Schedule Up",
+                    css:"appNameLabel"
+                }
+            ]
+
+        },
+        {
+            cols:[
+                {},
+                {
+                    view:"form",
+                    id:"loginForm",
+                    width: 400,
+                    elementsConfig: {
+                        labelWidth: 140,
+                        bottomPadding: 18
+                    },
+                    elements:[
+                        {
+                            id:"username",
+                            name:"username",
+                            view:"text",
+                            label:"Korisničko ime",
+                            invalidMessage:"Korisničke ime je obavezno!",
+                            required:true
+                        },
+                        {
+                            id:"password",
+                            name:"password",
+                            view:"text",
+                            type:"password",
+                            label:"Lozinka",
+                            invalidMessage:"Lozinka je obavezna!",
+                            required:true
+                        },
+                        {
+                            id:"companyName",
+                            name:"companyName",
+                            view:"text",
+                            label:"Kompanija"
+                        },{
+                            margin: 5,
+                            cols: [{}, {
+                                id: "loginBtn",
+                                view: "button",
+                                value: "Prijavite se",
+                                type: "form",
+                                click: "login",
+                                hotkey: "enter",
+                                width: 150
+                            }]
+                        }
+                    ]
+                }
+                ,
+                {}
+                ]
+        }
+    ]
+};
+
+var login =function () {
+
+    console.log($$("loginForm").getValues());
+    if ($$("loginForm").validate()){
+        webix.ajax().headers({
+            "Content-type": "application/json"
+        }).post("user/login",$$("loginForm").getValues(), {
+            success: function (text, data, xhr) {
+                var user=data.json();
+                console.log(user);
+                if (user!=null){
+                    if (user.roleId===1){
+                        userData=user;
+                        companyData=null;
+                        showApp();
+
+                    }else {
+                        webix.ajax().get("company/" + user.companyId, {
+                            success: function (text, data, xhr) {
+                                var company = data.json();
+                                if (company != null) {
+                                    userData = user;
+                                    companyData = company;
+                                    showApp();
+                                } else {
+                                    util.messages.showErrorMessage("Prijavljivanje nije uspjelo!");
+
+                                }
+                            },
+                            error: function (text, data, xhr) {
+                                util.messages.showErrorMessage("Prijavljivanje nije uspjelo!");
+                            }
+                        });
+                    }
+                }else{
+                    util.messages.showErrorMessage("Prijavljivanje nije uspjelo!");
+                }
+            },
+            error:function (text, data, xhr) {
+                console.log("NIJE"+text);
+                util.messages.showErrorMessage("Prijavljivanje nije uspjelo!");
+            }
+        });
+    }
+
+};
+
+var logout=function () {
+    webix.ajax().get("user/logout",function(text,data,xhr){
+        if (xhr.status=="200"){
+            userData=null;
+            companyData=null;
+            util.messages.showLogoutMessage();
+            connection.reload();
+        }
+    });
+};
 var mainLayout = {
     id: "app",
     width: "auto",
@@ -99,9 +240,18 @@ var mainLayout = {
                         view: "label",
                         css: "appNameLabel",
                         label: "Schedule Up"
+                    },{
+                        id: "logoutBtn",
+                        view: "button",
+                        type: "iconButton",
+                        label: "Odjavite se",
+                        click:"logout",
+                        icon: "sign-out",
+                        autowidth: true
                     }
                 ]
-            }]
+            }
+                ]
 
         },
         {
@@ -133,12 +283,32 @@ var menuEvents = {
     }
 };
 
+var showLogin = function () {
+    var login=webix.copy(loginLayout);
+    webix.ui(login,panel);
+    panel=$$("login");
+};
+
 var showApp = function () {
     var main = webix.copy(mainLayout);
     webix.ui(main, panel);
     panel = $$("app");
 
-    var localMenuData = webix.copy(menuData);
+    var localMenuData =null;
+    switch(userData.roleId){
+        case 1:
+            localMenuData=webix.copy(menuSuperAdmin);
+            break;
+        case 2:
+            localMenuData=webix.copy(menuAdmin);
+            break;
+        case 3:
+            localMenuData=webix.copy(menuAdvancedUser);
+            break;
+        case 4:
+            localMenuData=webix.copy(menuUser);
+            break;
+    }
 
     webix.ui({
         id: "menu-collapse",
