@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.List;
 
 @RequestMapping(value = "/user")
@@ -24,6 +26,8 @@ public class UserController extends GenericController<User, Integer> {
 
     private static final String SQL_SELECT_USER_ID_BY_USERNAME = "SELECT id FROM user WHERE username=? AND active=true AND deleted=false";
     private static final String SQL_SELECT_COMPANY_NAME_BY_COMPANY_ID = "SELECT name FROM company WHERE id=? AND deleted=false";
+    private static final String SQL_SELECT_TOKEN_TIME_BY_TOKEN = "SELECT token_time FROM user WHERE token=?";
+
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -32,36 +36,37 @@ public class UserController extends GenericController<User, Integer> {
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public @ResponseBody
     User login(@RequestBody LoginInformation loginInformation) {
-
+        Boolean successLogin = false;
         List<Integer> userId = (List<Integer>) entityManager.createNativeQuery(SQL_SELECT_USER_ID_BY_USERNAME).setParameter(1, loginInformation.getUsername().trim()).getResultList();
         User user = null;
         if(userId != null && !userId.isEmpty()){
             user = entityManager.find(User.class, userId.get(0));
         }
+        else{
+            return null;
+        }
+        
         if(user != null && Integer.valueOf(1).equals(user.getRoleId())){
             if(Util.checkPassword(loginInformation.getPassword().trim(), new String(user.getPassword()))){
-                user.setPassword(null);
-                userBean.setUser(user);
-                userBean.setLoggedIn(true);
-
-                return userBean.getUser();
-            }
-            else{
-                return null;
+                successLogin = true;
             }
         }
         else{
             List<String> companyName = (List<String>) entityManager.createNativeQuery(SQL_SELECT_COMPANY_NAME_BY_COMPANY_ID).setParameter(1, user.getCompanyId()).getResultList();
             if(companyName != null && companyName.get(0).equals(loginInformation.getCompanyName().trim()) && Util.checkPassword(loginInformation.getPassword().trim(), new String(user.getPassword()))){
-                user.setPassword(null);
-                userBean.setUser(user);
-                userBean.setLoggedIn(true);
+                successLogin = true;
+            }
+        }
 
-                return userBean.getUser();
-            }
-            else{
-                return null;
-            }
+        if(successLogin){
+            user.setPassword(null);
+            userBean.setUser(user);
+            userBean.setLoggedIn(true);
+
+            return userBean.getUser();
+        }
+        else{
+            return null;
         }
     }
 
@@ -73,6 +78,54 @@ public class UserController extends GenericController<User, Integer> {
             userBean.setLoggedIn(false);
 
             return "Success";
+        } catch(Exception ex){
+            ex.printStackTrace();
+            throw new BadRequestException("Bad Request");
+        }
+    }
+
+    @RequestMapping(value = "/invitationToRegistration", method = RequestMethod.POST)
+    public @ResponseBody
+    String requestForRegistration(@RequestParam("mail") String mail, @RequestParam("role") Integer roleId) throws BadRequestException
+    {
+        try{
+            User newUser = new User();
+            newUser.setEmail(mail);
+            newUser.setUsername(null);
+            newUser.setPassword(null);
+            newUser.setPin(null);
+            newUser.setFirstName(null);
+            newUser.setLastName(null);
+            newUser.setPhoto(null);
+            newUser.setActive((byte)0);
+            newUser.setDeleted((byte)0);
+            newUser.setDeactivationReason(null);
+            newUser.setToken(Util.randomString(16));
+            newUser.setTokenTime(new Timestamp(System.currentTimeMillis()));
+            newUser.setCompanyId(userBean.getUser().getCompanyId());
+            newUser.setRoleId(roleId);
+            repo.saveAndFlush(newUser);
+
+            //poslati mail sa tokenom
+
+            return "Success";
+        } catch(Exception ex){
+            ex.printStackTrace();
+            throw new BadRequestException("Bad Request");
+        }
+    }
+
+    @RequestMapping(value = "/registration/{token}", method = RequestMethod.GET)
+    public @ResponseBody
+    String requestForRegistration(@PathVariable String token) throws BadRequestException {
+        try{
+            List<Timestamp> tokenTime = (List<Timestamp>) entityManager.createNativeQuery(SQL_SELECT_TOKEN_TIME_BY_TOKEN).setParameter(1, token.trim()).getResultList();
+            if(tokenTime != null && new Timestamp(System.currentTimeMillis()).before(new Timestamp(tokenTime.get(0).getTime() + 10*60*1000))){
+                return "Success";
+            }
+            else{
+                throw new BadRequestException("Bad Request");
+            }
         } catch(Exception ex){
             ex.printStackTrace();
             throw new BadRequestException("Bad Request");

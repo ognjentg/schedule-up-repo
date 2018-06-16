@@ -1,6 +1,7 @@
 package ba.telegroup.schedule_up.model;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -17,6 +18,8 @@ public class User {
     private Byte active;
     private Byte deleted;
     private String deactivationReason;
+    private String token;
+    private Timestamp tokenTime;
     private Integer companyId;
     private Integer roleId;
 
@@ -132,6 +135,26 @@ public class User {
     }
 
     @Basic
+    @Column(name = "token", nullable = true, length = 16)
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    @Basic
+    @Column(name = "token_time", nullable = false)
+    public Timestamp getTokenTime() {
+        return tokenTime;
+    }
+
+    public void setTokenTime(Timestamp tokenTime) {
+        this.tokenTime = tokenTime;
+    }
+
+    @Basic
     @Column(name = "company_id", nullable = false)
     public Integer getCompanyId() {
         return companyId;
@@ -167,6 +190,8 @@ public class User {
                 Objects.equals(active, user.active) &&
                 Objects.equals(deleted, user.deleted) &&
                 Objects.equals(deactivationReason, user.deactivationReason) &&
+                Objects.equals(token, user.token) &&
+                Objects.equals(tokenTime, user.tokenTime) &&
                 Objects.equals(companyId, user.companyId) &&
                 Objects.equals(roleId, user.roleId);
     }
@@ -174,7 +199,7 @@ public class User {
     @Override
     public int hashCode() {
 
-        int result = Objects.hash(id, email, username, firstName, lastName, active, deleted, deactivationReason, companyId, roleId);
+        int result = Objects.hash(id, email, username, firstName, lastName, active, deleted, deactivationReason, token, tokenTime, companyId, roleId);
         result = 31 * result + Arrays.hashCode(password);
         result = 31 * result + Arrays.hashCode(pin);
         result = 31 * result + Arrays.hashCode(photo);

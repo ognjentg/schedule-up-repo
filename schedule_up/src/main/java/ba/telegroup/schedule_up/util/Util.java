@@ -2,9 +2,22 @@ package ba.telegroup.schedule_up.util;
 
 import org.mindrot.jbcrypt.BCrypt;
 
+import java.security.SecureRandom;
+
 public class Util {
 
     private static int workload = 12;
+    private static final String alphaNumericString = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    private static SecureRandom random = new SecureRandom();
+
+    public static String randomString(int length){
+        StringBuilder sb = new StringBuilder(length);
+        for(int i = 0; i < length; i++){
+            sb.append(alphaNumericString.charAt(random.nextInt(alphaNumericString.length())));
+        }
+
+        return sb.toString();
+    }
 
     public static String hashPassword(String password_plaintext) {
         String salt = BCrypt.gensalt(workload);
