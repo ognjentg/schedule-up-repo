@@ -230,7 +230,7 @@ var mainLayout = {
                 view: "template",
                 width: 240,
                 css: "logoInside",
-                template: '<img src="img/telegroup-logo.png"/>'
+                template: '<img id="appLogo" src="img/telegroup-logo.png"/>'
             }, {
                 view: "toolbar",
                 css: "mainToolbar",
@@ -294,7 +294,8 @@ var showApp = function () {
     var main = webix.copy(mainLayout);
     webix.ui(main, panel);
     panel = $$("app");
-
+    if (companyData!=null)
+    document.getElementById("appLogo").src="data:image/jpg;base64,"+companyData.companyLogo;
     var localMenuData = null;
     switch (userData.roleId) {
         case 1:

@@ -21,6 +21,7 @@ import java.sql.Time;
                         @ColumnResult(name = "name"),
                         @ColumnResult(name="time_from"),
                         @ColumnResult(name="time_to"),
+                        @ColumnResult(name="company_logo"),
                         @ColumnResult(name = "email")
                 }
         )
@@ -34,11 +35,12 @@ public class CompanyUser extends Company implements Serializable {
     }
 
     //Workaround to get time, DB returns java.util.Date
-    public CompanyUser(Integer id, String name, Date timeFrom,Date timeTo,String email) {
+    public CompanyUser(Integer id, String name, Date timeFrom,Date timeTo,byte[] companyLogo,String email) {
         setId(id);
         setName(name);
         setTimeFrom(new Time(timeFrom.getTime()));
         setTimeTo(new Time(timeTo.getTime()));
+        setCompanyLogo(companyLogo);
         this.email = email;
     }
 

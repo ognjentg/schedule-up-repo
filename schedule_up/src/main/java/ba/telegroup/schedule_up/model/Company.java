@@ -14,6 +14,18 @@ public class Company {
     private Time timeFrom;
     private Time timeTo;
     private Byte deleted;
+    private byte[] companyLogo;
+
+    @Basic
+    @Column(name = "company_logo",nullable = false)
+    public byte[] getCompanyLogo() {
+        return companyLogo;
+    }
+
+    public void setCompanyLogo(byte[] companyLogo) {
+        this.companyLogo = companyLogo;
+    }
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
