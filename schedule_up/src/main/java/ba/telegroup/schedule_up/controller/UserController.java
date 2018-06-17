@@ -26,7 +26,7 @@ public class UserController extends GenericController<User, Integer> {
 
     private static final String SQL_SELECT_USER_ID_BY_USERNAME = "SELECT id FROM user WHERE username=? AND active=true AND deleted=false";
     private static final String SQL_SELECT_COMPANY_NAME_BY_COMPANY_ID = "SELECT name FROM company WHERE id=? AND deleted=false";
-    private static final String SQL_SELECT_TOKEN_TIME_BY_TOKEN = "SELECT token_time FROM user WHERE token=?";
+    private static final String SQL_SELECT_USER_ID_BY_TOKEN = "SELECT id FROM user WHERE token=?";
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -86,7 +86,7 @@ public class UserController extends GenericController<User, Integer> {
 
     @RequestMapping(value = "/invitationToRegistration", method = RequestMethod.POST)
     public @ResponseBody
-    String requestForRegistration(@RequestParam("mail") String mail, @RequestParam("role") Integer roleId) throws BadRequestException
+    String invitationToRegistration(@RequestParam("mail") String mail, @RequestParam("role") Integer roleId, @RequestParam("company") Integer companyId) throws BadRequestException
     {
         try{
             User newUser = new User();
@@ -102,7 +102,7 @@ public class UserController extends GenericController<User, Integer> {
             newUser.setDeactivationReason(null);
             newUser.setToken(Util.randomString(16));
             newUser.setTokenTime(new Timestamp(System.currentTimeMillis()));
-            newUser.setCompanyId(userBean.getUser().getCompanyId());
+            newUser.setCompanyId(companyId);
             newUser.setRoleId(roleId);
             repo.saveAndFlush(newUser);
 
@@ -117,15 +117,42 @@ public class UserController extends GenericController<User, Integer> {
 
     @RequestMapping(value = "/registration/{token}", method = RequestMethod.GET)
     public @ResponseBody
-    String requestForRegistration(@PathVariable String token) throws BadRequestException {
+    User requestForRegistration(@PathVariable String token) throws BadRequestException {
+        List<Integer> userId = (List<Integer>) entityManager.createNativeQuery(SQL_SELECT_USER_ID_BY_TOKEN).setParameter(1, token.trim()).getResultList();
+        User user = null;
+        if(userId != null && !userId.isEmpty()){
+            user = entityManager.find(User.class, userId.get(0));
+        }
+        else{
+            return null;
+        }
+
+        if(user != null && new Timestamp(System.currentTimeMillis()).before(new Timestamp(user.getTokenTime().getTime() + 10*60*1000))){
+            return user;
+        }
+        else{
+            return null;
+        }
+    }
+
+    @RequestMapping(value = "/registration", method = RequestMethod.POST)
+    public @ResponseBody
+    String registration(@RequestBody User newUser) throws BadRequestException {
         try{
-            List<Timestamp> tokenTime = (List<Timestamp>) entityManager.createNativeQuery(SQL_SELECT_TOKEN_TIME_BY_TOKEN).setParameter(1, token.trim()).getResultList();
-            if(tokenTime != null && new Timestamp(System.currentTimeMillis()).before(new Timestamp(tokenTime.get(0).getTime() + 10*60*1000))){
-                return "Success";
-            }
-            else{
-                throw new BadRequestException("Bad Request");
-            }
+            User user = entityManager.find(User.class, newUser.getId());
+            user.setUsername(newUser.getUsername());
+
+            //vidjeti sta cemo sa password-om, kako ce se slati sa frontend-a
+
+            user.setFirstName(newUser.getFirstName());
+            user.setLastName(newUser.getLastName());
+            user.setPhoto(newUser.getPhoto());
+            user.setPin(newUser.getPin());
+            user.setActive((byte)1);
+
+            repo.saveAndFlush(user);
+
+            return "Success";
         } catch(Exception ex){
             ex.printStackTrace();
             throw new BadRequestException("Bad Request");
