@@ -22,7 +22,7 @@ public class Notification {
         return properties;
     }
 
-    public static void notify(String recipientMail, String messageText) throws BadRequestException{
+    public static void notify(String recipientMail, String messageText) throws BadRequestException {
 
         Properties properties = getTLSSetProperty();
 
@@ -38,6 +38,29 @@ public class Notification {
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientMail));
             message.setSubject("Notification");
             message.setText(messageText);
+
+            Transport.send(message);
+
+        } catch (MessagingException | UnsupportedEncodingException e) {
+            throw new BadRequestException("Recipient mail not found.");
+        }
+    }
+
+    public static void sendRegistrationLink(String recipientMail, String registrationLink) throws BadRequestException {
+        Properties properties = getTLSSetProperty();
+
+        Session session = Session.getDefaultInstance(properties, new Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(SENDER_MAIL, PASSWORD);
+            }
+        });
+
+        try {
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(SENDER_MAIL, "TeleGroup ScheduleUp"));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientMail));
+            message.setSubject("Registration");
+            message.setText("Potvrdite registraciju klikom na sljedeći link: " + registrationLink + ".");
 
             Transport.send(message);
 
