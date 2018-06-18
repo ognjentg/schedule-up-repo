@@ -1,3 +1,9 @@
+var countries=[];
+var tabledata=[];
+var tablecentar=[];
+var lat;
+var lng;
+
 var roomView = {
 
     panel: {
@@ -89,6 +95,17 @@ var roomView = {
                         }
                     ]
 
+                },
+                {
+                    id: "location",
+                    editable: false,
+                    fillspace: true,
+                    header: {
+                        text: "Lokacija",
+                        css: {"text-align": "justify"},
+                    },
+                    template: "<span class='fa fa-map-marker info'></span>",
+
                 }
             ],
             select: "row",
@@ -100,8 +117,62 @@ var roomView = {
                 onAfterContextMenu: function (item) {
                     this.select(item.row);
                 }
+            },
+            onMouseMove:{
+                info:function(e, id){
+                    roomView.showMapDetailsDialog(this.getItem(id).latitude,this.getItem(id).longitude);
+                    return false;
+                }
             }
         }]
+    },
+
+    showMapDetailsDialog: function(latitude,longitude){
+        tablecentar[0]=latitude;
+        tablecentar[1]=longitude;
+        var mapaObjekat={
+            id:1,lat:tablecentar[0],  lng:tablecentar[1]
+        };
+        tabledata[0]=mapaObjekat;
+        webix.ui(webix.copy(roomView.showMapDialog));
+        $$("mapLabel").data.label="<span class='webix_icon fa fa-map-marker '></span> Lokacija sale";
+        $$("showMapDialog").show();
+    },
+
+
+    showMapDialog:{
+        view: "popup",
+        id: "showMapDialog",
+        modal: true,
+        position: "center",
+        body: {
+            id: "showMapDialogInside",
+            rows: [{
+                view: "toolbar",
+                cols: [{
+                    id:"mapLabel",
+                    view: "label",
+                    label: "<span class='webix_icon fa fa-map-marker '></span> Lokacija sale",
+                    width: 600,
+                }, {}, {
+                    hotkey: 'esc',
+                    view: "icon",
+                    icon: "close",
+                    align: "right",
+                    click: "util.dismissDialog('showMapDialog');"
+                }]
+            }, {
+                key:"AIzaSyBExEHqJmRKJoRhWOT6Ok3fLR5QMGIZ_eg",
+                view:"google-map",
+                id:"map",
+                zoom:15,
+                width: 600,
+                height:500,
+                center:tablecentar,
+                data:tabledata
+
+            },]
+        }
     },
 
     selectPanel: function () {
