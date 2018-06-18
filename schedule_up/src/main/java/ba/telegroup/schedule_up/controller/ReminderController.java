@@ -28,14 +28,7 @@ public class ReminderController extends GenericController<Reminder, Integer> {
     @RequestMapping(method = RequestMethod.GET)
     public @ResponseBody
     List<Reminder> getAll() {
-        List<Reminder> reminders = ((ReminderRepository) repo).findAll();
-        List<Reminder> retVal = new ArrayList<>();
-        for (Reminder reminder : reminders) {
-            if (reminder.getDeleted() != (byte) 1) {
-                retVal.add(reminder);
-            }
-        }
-        return retVal;
+        return ((ReminderRepository) repo).getAllByDeletedEquals((byte) 0);
     }
 
     @Override
@@ -43,13 +36,12 @@ public class ReminderController extends GenericController<Reminder, Integer> {
     public @ResponseBody
     String delete(@PathVariable Integer id) throws BadRequestException {
         Reminder reminder = ((ReminderRepository) repo).findById(id).orElse(null);
-        Reminder oldObject = cloner.deepClone(reminder);
         reminder.setDeleted((byte) 1);
         if (((ReminderRepository) repo).saveAndFlush(reminder) != null) {
-            logUpdateAction(reminder, oldObject);
+            logDeleteAction(reminder);
             return "Success";
         }
         throw new BadRequestException("Bad request");
     }
-    
+
 }

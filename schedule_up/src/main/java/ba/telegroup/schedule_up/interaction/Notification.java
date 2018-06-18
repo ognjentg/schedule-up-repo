@@ -7,11 +7,19 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
 import java.util.Properties;
+import java.util.PropertyResourceBundle;
+import java.util.ResourceBundle;
 
 public class Notification {
 
-    private static final String SENDER_MAIL = "telegrouptestmail@gmail.com";
-    private static final String PASSWORD = "123456789!a";
+    private static final String SENDER_MAIL;
+    private static final String PASSWORD;
+
+    static {
+        ResourceBundle propertyResourceBundle = PropertyResourceBundle.getBundle("mail");
+        SENDER_MAIL = propertyResourceBundle.getString("SENDER_MAIL");
+        PASSWORD = propertyResourceBundle.getString("PASSWORD");
+    }
 
     private static Properties getTLSSetProperty() {
         Properties properties = new Properties();
