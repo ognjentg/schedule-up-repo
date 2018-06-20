@@ -297,7 +297,6 @@ var companyView = {
     }
 
     ,
-
     changeCompanyDialog: {
         view: "popup",
         id: "changeCompanyDialog",
@@ -328,6 +327,10 @@ var companyView = {
                 elements: [{
                     view: "text",
                     name: "id",
+                    hidden: true
+                },{
+                    view: "text",
+                    name: "base64ImageCompany",
                     hidden: true
                 }, {
                     view: "text",
@@ -379,6 +382,30 @@ var companyView = {
                         name: "email",
                         label: "E-mail:",
                         required: true
+                    },   {
+                        view:"uploader",
+                        value:"Logo kompanije",
+                        accept:"image/jpeg, image/png",
+                        autosend:false,
+                        width:200,
+                        align:"center",
+                        multiple:false,
+                        on:{
+                            onBeforeFileAdd: function(upload){
+                                var file = upload.file;
+                                var reader = new FileReader();
+                                reader.onload = function(event) {
+                                    var pomoc;
+                                    $$("logoPopup").show();
+                                    $$("template").setValues({src:event.target.result});
+                                    var form = $$("changeCompanyForm");
+                                    form.elements.base64ImageCompany.setValue(event.target.result.split("base64,")[1]);
+
+                                };
+                                reader.readAsDataURL(file)
+                                return false;
+                            }
+                        }
                     }, {
                         margin: 5,
                         cols: [{}, {
@@ -431,6 +458,7 @@ var companyView = {
         form.elements.timeFrom.setValue(company.timeFrom);
         form.elements.timeTo.setValue(company.timeTo);
         form.elements.email.setValue(company.email);
+        form.elements.base64ImageCompany.setValue(company.companyLogo);
         setTimeout(function () {
             $$("changeCompanyDialog").show();
             webix.UIManager.setFocus("name");
@@ -441,6 +469,7 @@ var companyView = {
 
 
     saveChangedCompany: function () {
+
         if ($$("changeCompanyForm").validate()) {
             var newItem = {
                 id: $$("changeCompanyForm").getValues().id,
@@ -448,6 +477,7 @@ var companyView = {
                 timeFrom: $$("changeCompanyForm").getValues().timeFrom + ":00",
                 timeTo: $$("changeCompanyForm").getValues().timeTo + ":00",
                 email: $$("changeCompanyForm").getValues().email,
+                companyLogo:$$("changeCompanyForm").getValues().base64ImageCompany,
 
             };
             connection.sendAjax("PUT", "company/custom/" + newItem.id,
@@ -463,5 +493,62 @@ var companyView = {
 
             util.dismissDialog('changeCompanyDialog');
         }
+    },
+    hide:function(){
+        $$("logoPopup").hide();
     }
+
 };
+webix.ui({
+    view:"popup",
+    id:"logoPopup",
+    position:"center",
+    close:true,
+    body:{
+        rows: [{
+            view: "toolbar",
+            cols: [{
+                view: "label",
+                label: "<span class='webix_icon fa fa-image'></span> Logo kompanije",
+                width: 400
+            }, {}, {
+                hotkey: 'esc',
+                view: "icon",
+                icon: "close",
+                align: "right",
+                click: "companyView.hide",
+            }]
+        }, {
+            id:"template",
+            view:"template",
+            template:"<img src='#src#' style='width: 100%;height: 100%; max-width:100%; alignment: center; max-height:100%'></img>",
+            width:500,
+            autoheight:true
+        },
+            {
+                view:"uploader",
+                value:"Izmjena logoa",
+                accept:"image/jpeg, image/png",
+                autosend:false,
+                width:200,
+                align:"center",
+                multiple:false,
+                on:{
+                    onBeforeFileAdd: function(upload){
+                        var pomoc;
+                        var file = upload.file;
+                        var reader = new FileReader();
+                        reader.onload = function(event) {
+                            $$("template").setValues({src:event.target.result});
+                            var form = $$("changeCompanyForm");
+                            form.elements.base64ImageCompany.setValue(event.target.result.split("base64,")[1]);
+
+
+                        };
+                        reader.readAsDataURL(file)
+                        return false;
+                    }
+                }
+            }
+        ]}
+})
