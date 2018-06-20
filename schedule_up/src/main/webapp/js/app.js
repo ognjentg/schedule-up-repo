@@ -85,9 +85,26 @@ var init = function () {
     if (!webix.env.touch && webix.ui.scrollSize) webix.CustomScroll.init();
     webix.ui(panel);
     panel = $$("empty");
-    if (userData == null)
-        showLogin();
-    else showApp();
+    webix.ajax("user/state", {
+        error: function (text, data, xhr) {
+            if (xhr.status == 403) {
+                showLogin();
+            }
+        },
+        success: function (text, data, xhr) {
+            if (xhr.status == "200") {
+                if (data.json() != null && data.json().id != null) {
+                    userData = data.json();
+                    showApp();
+                }
+                else {
+                    //TODO SHOW ERROR MESSAGE
+                }
+            } else {
+                //TODO ERROR LOGIN
+            }
+        }
+    });
 };
 
 var loginLayout = {

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.servlet.http.HttpServletRequest;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.List;
@@ -157,5 +158,17 @@ public class UserController extends GenericController<User, Integer> {
             ex.printStackTrace();
             throw new BadRequestException("Bad Request");
         }
+    }
+
+
+    @RequestMapping(value={"/state"},method = RequestMethod.GET)
+
+    public
+     @ResponseBody  User checkState() throws ForbiddenException {
+        System.out.println("LOGGED"+userBean.getLoggedIn()+" user:"+userBean.getUser().getUsername());
+        if (userBean.getLoggedIn()) {
+            return userBean.getUser();
+        }else
+            throw new ForbiddenException("Forbidden");
     }
 }

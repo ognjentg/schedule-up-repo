@@ -16,10 +16,7 @@ public class UserBean {
 
     public UserBean() {
         user = new User();
-        loggedIn = true;
-        user.setId(1);
-        user.setCompanyId(1);
-        user.setRoleId(1);
+        loggedIn = false;
     }
 
     public User getUser() {
