@@ -31,6 +31,9 @@ var menuActions = function (id) {
         case "logger":
             loggerView.selectPanel();
             break;
+        case "dashboard":
+            dashboardView.selectPanel();
+            break;
     }
 };
 
@@ -43,6 +46,11 @@ var menuSuperAdmin = [
 ];
 
 var menuAdmin = [
+    {
+        id: "dashboard",
+        value: "Početna",
+        icon: "home"
+    },
     {
         id: "building",
         value: "Zgrade",
@@ -74,9 +82,21 @@ var menuAdmin = [
     }
 ];
 
-var menuAdvancedUser = [];
+var menuAdvancedUser = [
+    {
+        id: "dashboard",
+        value: "Početna",
+        icon: "home"
+    },
+];
 
-var menuUser = [];
+var menuUser = [
+    {
+        id: "dashboard",
+        value: "Početna",
+        icon: "home"
+    },
+];
 
 var panel = {id: "empty"};
 var rightPanel = null;
@@ -357,6 +377,13 @@ var showApp = function () {
     $$("mainMenu").define("on", menuEvents);
 
     rightPanel = "emptyRightPanel";
+    if (userData.roleId===1){
+        companyView.selectPanel();
+        $$("mainMenu").select("company");
+    } else{
+        dashboardView.selectPanel();
+        $$("mainMenu").select("dashboard");
+    }
 };
 
 

@@ -2,12 +2,12 @@ var scriptsToLoad = [
     {
         "section": "webix",
         "path": "webix/codebase/",
-        "files": ["webix"]
+        "files": ["webix","dhtmlxscheduler"]
     },
     {
         "section": "extensions",
         "path": "webix/extensions/",
-        "files": ["sidebar/sidebar"]
+        "files": ["sidebar/sidebar", "dhtmlxscheduler_readonly"]
     },
     {
         "section": "common",
@@ -17,7 +17,7 @@ var scriptsToLoad = [
     {
         "section": "views",
         "path": "js/views/",
-        "files": ["company", "building", "note", "company_settings", "room", "gear", "logger"]
+        "files": ["company", "building", "note", "company_settings", "room", "gear", "logger","dashboard"]
     },
     {
         "section": "core",
@@ -30,7 +30,8 @@ var cssToLoad = [
     "https://fonts.googleapis.com/css?family=PT+Sans:400,400i,700,700i",
     "webix/codebase/webix-orange.css",
     "css/extended-orange.css",
-    "webix/extensions/sidebar/sidebar-orange.css"
+    "webix/extensions/sidebar/sidebar-orange.css",
+    "webix/codebase/dhtmlxscheduler_material.css"
 ];
 
 var linearJsDownloadOrder = [];
