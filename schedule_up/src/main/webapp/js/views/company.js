@@ -32,7 +32,13 @@ var companyView = {
                 hidden: true,
                 fillspace: true,
 
-            }, {
+            },{
+                id:"companyLogo",
+                fillspace:true,
+                header:{text:"Logo", css:"wrap-line"},
+                template:"<img src='data:image/jpg;base64,#companyLogo#'/>"
+
+            } ,{
                 id: "name",
                 editable: false,
                 fillspace: true,

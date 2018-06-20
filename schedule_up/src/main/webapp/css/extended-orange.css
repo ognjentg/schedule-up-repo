@@ -6,6 +6,11 @@
     background: #ffffff !important;
 }
 
+.wrap-line{
+    line-height: 20px !important;
+    top:15px !important;
+    position: relative;
+}
 /*
 .webixDatatable .webix_cell:nth-child(odd) {
     background: #f1f1f1;
