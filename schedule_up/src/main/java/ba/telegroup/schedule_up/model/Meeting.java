@@ -1,8 +1,8 @@
 package ba.telegroup.schedule_up.model;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -48,7 +48,7 @@ public class Meeting {
     @Column(name = "start_time", nullable = false)
     @JsonProperty("start_date")
     @JsonFormat
-            (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm")
+            (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm",timezone="Europe/Belgrade")
     public Timestamp getStartTime() {
         return startTime;
     }
@@ -61,7 +61,7 @@ public class Meeting {
     @Column(name = "end_time", nullable = false)
     @JsonProperty("end_date")
     @JsonFormat
-            (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm")
+            (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm",timezone = "Europe/Belgrade")
     public Timestamp getEndTime() {
         return endTime;
     }

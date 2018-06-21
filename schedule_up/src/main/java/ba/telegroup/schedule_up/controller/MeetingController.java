@@ -28,6 +28,12 @@ public class MeetingController extends GenericController<Meeting,Integer>{
     private Integer advancedUser;
     @Value("${user.id}")
     private Integer user;
+    @Value("${meetingStatus.scheduled}")
+    private Byte scheduled;
+    @Value("${meetingStatus.finished}")
+    private Byte finished;
+    @Value("${meetingStatus.canceled}")
+    private Byte canceled;
     @Autowired
     public MeetingController(MeetingRepository repo) {
         super(repo);
@@ -42,7 +48,7 @@ public class MeetingController extends GenericController<Meeting,Integer>{
     public @ResponseBody
     List<Meeting> getAll() throws ForbiddenException {
         if(userBean.getUser().getRoleId().equals(admin)) {
-            return meetingRepository.getAllByStatusAndCompanyId((byte) 0,userBean.getUser().getCompanyId());
+            return meetingRepository.getAllByStatusAndCompanyId(scheduled,userBean.getUser().getCompanyId());
         }else if(userBean.getUser().getRoleId().equals(advancedUser) || userBean.getUser().getRoleId().equals(user)){
             return meetingRepository.getAllByParticipant(userBean.getUser().getId());
         }
@@ -56,7 +62,7 @@ public class MeetingController extends GenericController<Meeting,Integer>{
     public @ResponseBody
     String finish(@RequestBody Meeting meeting) throws BadRequestException,ForbiddenException {
         if(userBean.getUser().getId().equals(meeting.getUserId()) ) {
-            return updateStatus(meeting, (byte) 1);
+            return updateStatus(meeting, finished);
         }
         throw new ForbiddenException("Forbidden action");
     }
@@ -72,7 +78,7 @@ public class MeetingController extends GenericController<Meeting,Integer>{
             Timestamp minimalCancelTime = new Timestamp(meeting.getStartTime().getTime() + meetingRepository.getCancelTimeByCompanyId(userBean.getUser().getCompanyId()).getTime());
             if (currentTime.before(minimalCancelTime)) {
                 if(meeting.getCancelationReason()!=null) {
-                    return updateStatus(meeting, (byte) 2);
+                    return updateStatus(meeting, canceled);
                 }
                 throw new BadRequestException("Bad request");
             }
