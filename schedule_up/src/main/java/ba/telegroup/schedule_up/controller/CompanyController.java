@@ -3,10 +3,15 @@ package ba.telegroup.schedule_up.controller;
 import ba.telegroup.schedule_up.common.exceptions.BadRequestException;
 import ba.telegroup.schedule_up.common.exceptions.ForbiddenException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
+import ba.telegroup.schedule_up.interaction.Notification;
 import ba.telegroup.schedule_up.model.Company;
+import ba.telegroup.schedule_up.model.User;
 import ba.telegroup.schedule_up.model.modelCustom.CompanyUser;
 import ba.telegroup.schedule_up.repository.CompanyRepository;
+import ba.telegroup.schedule_up.repository.UserRepository;
 import ba.telegroup.schedule_up.repository.repositoryCustom.CompanyRepositoryCustom;
+import ba.telegroup.schedule_up.util.Util;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
@@ -14,6 +19,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import java.sql.Timestamp;
 import java.util.List;
 
 @RequestMapping(value = "/company")
@@ -21,9 +29,19 @@ import java.util.List;
 @Scope("request")
 public class CompanyController extends GenericController<Company, Integer> {
 
+    CompanyRepository companyRepository;
+    UserRepository userRepository;
 
-    public CompanyController(JpaRepository<Company, Integer> repo) {
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    @Value("${randomString.length}")
+    private Integer randomStringLength;
+
+    public CompanyController(CompanyRepository repo, UserRepository userRepository) {
         super(repo);
+        this.companyRepository = repo;
+        this.userRepository = userRepository;
     }
 
     /*
@@ -32,7 +50,7 @@ public class CompanyController extends GenericController<Company, Integer> {
 
     @Override
     public List getAll() throws BadRequestException, ForbiddenException {
-        return ((CompanyRepositoryCustom) repo).getAllExtended();
+        return companyRepository.getAllExtended();
     }
 
 
@@ -42,7 +60,7 @@ public class CompanyController extends GenericController<Company, Integer> {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public @ResponseBody
     CompanyUser findById(@PathVariable Integer id) {
-        return ((CompanyRepositoryCustom) repo).getAllExtendedById(id);
+        return companyRepository.getAllExtendedById(id);
     }
 
     /*
@@ -51,7 +69,7 @@ public class CompanyController extends GenericController<Company, Integer> {
     @RequestMapping(value = "/custom/{name}", method = RequestMethod.GET)
     public @ResponseBody
     List getAllExtendedByNameContains(@PathVariable String name) {
-        return ((CompanyRepositoryCustom) repo).getAllExtendedByNameContains(name);
+        return companyRepository.getAllExtendedByNameContains(name);
     }
 
     //Ovo je metoda za insert CompanyUser
@@ -60,7 +78,40 @@ public class CompanyController extends GenericController<Company, Integer> {
     @ResponseStatus(HttpStatus.CREATED)
     public @ResponseBody
     CompanyUser insertExtended(@RequestBody CompanyUser companyUser) throws BadRequestException {
-        return  ((CompanyRepositoryCustom)repo).insertExtended(companyUser);
+        Company company = new Company();
+        company.setId(null);
+        company.setName(companyUser.getName());
+        company.setTimeTo(companyUser.getTimeTo());
+        company.setTimeFrom(companyUser.getTimeFrom());
+        company.setDeleted((byte) 0);
+        if(companyRepository.saveAndFlush(company) != null){
+            entityManager.refresh(company);
+
+            String randomToken = Util.randomString(randomStringLength);
+            User user = new User();
+            user.setActive((byte)0);
+            user.setUsername(null);
+            user.setCompanyId(company.getId());
+            user.setDeactivationReason(null);
+            user.setDeleted((byte) 0);
+            user.setEmail(companyUser.getEmail());
+            user.setFirstName(null);
+            user.setLastName(null);
+            user.setPassword(null);
+            user.setToken(randomToken);
+            user.setTokenTime(new Timestamp(System.currentTimeMillis()));
+            user.setId(null);
+            user.setPhoto(null);
+            user.setPin(null);
+            user.setRoleId(2);
+            userRepository.saveAndFlush(user);
+
+            Notification.sendRegistrationLink(companyUser.getEmail().trim(), "http://127.0.0.1:8020/user/registration/" + randomToken);
+
+            companyUser.setId(company.getId());
+        }
+
+        return  companyUser;
     }
 
     /*
@@ -69,13 +120,45 @@ public class CompanyController extends GenericController<Company, Integer> {
     Path varijabla id se odnosi na id korisnika
     */
 
-
-
     @Transactional
     @RequestMapping(value ="/custom/{id}", method = RequestMethod.PUT)
     public @ResponseBody
     CompanyUser updateExtended(@PathVariable Integer id, @RequestBody CompanyUser companyUser) throws BadRequestException {
-        return  ((CompanyRepositoryCustom)repo).updateExtended(id, companyUser);
+        Company company = companyRepository.findById(id).orElse(null);
+        User adminUser = userRepository.getByCompanyIdAndRoleIdAndActiveAndDeleted(company.getId(), 2, (byte)1, (byte)0);
+        if(adminUser != null && !companyUser.getEmail().equals(adminUser.getEmail())){
+            adminUser.setActive((byte)0);
+            userRepository.saveAndFlush(adminUser);
+
+            String randomToken = Util.randomString(randomStringLength);
+            User newAdminUser = new User();
+            newAdminUser.setId(null);
+            newAdminUser.setActive((byte) 0);
+            newAdminUser.setCompanyId(company.getId());
+            newAdminUser.setDeactivationReason(null);
+            newAdminUser.setDeleted((byte) 0);
+            newAdminUser.setEmail(companyUser.getEmail());
+            newAdminUser.setFirstName(null);
+            newAdminUser.setLastName(null);
+            newAdminUser.setPassword(null);
+            newAdminUser.setId(null);
+            newAdminUser.setToken(randomToken);
+            newAdminUser.setTokenTime(new Timestamp(System.currentTimeMillis()));
+            newAdminUser.setPhoto(null);
+            newAdminUser.setPin(null);
+            newAdminUser.setRoleId(2);
+            userRepository.saveAndFlush(newAdminUser);
+
+            Notification.sendRegistrationLink(companyUser.getEmail().trim(), "http://127.0.0.1:8020/user/registration/" + randomToken);
+        }
+
+        company.setName(companyUser.getName());
+        company.setTimeFrom(companyUser.getTimeFrom());
+        company.setTimeTo(companyUser.getTimeTo());
+        company.setCompanyLogo(companyUser.getCompanyLogo());
+        companyRepository.saveAndFlush(company);
+
+        return companyUser;
     }
 
 
@@ -91,11 +174,10 @@ public class CompanyController extends GenericController<Company, Integer> {
         Company company=((CompanyRepository) repo).findById(id).orElse(null);
         Company oldObject = cloner.deepClone(company);
         company.setDeleted((byte)1);
-        if (((CompanyRepositoryCustom) repo).deleteCompany(company) != null) {
+        if (companyRepository.deleteCompany(company) != null) {
             logDeleteAction(company);
             return "Success";
         }
         throw new BadRequestException("Bad request");
     }
-
 }

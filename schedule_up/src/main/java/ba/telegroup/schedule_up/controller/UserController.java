@@ -5,11 +5,13 @@ import ba.telegroup.schedule_up.common.exceptions.ForbiddenException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.interaction.Notification;
 import ba.telegroup.schedule_up.model.User;
+import ba.telegroup.schedule_up.repository.CompanyRepository;
 import ba.telegroup.schedule_up.repository.UserRepository;
 import ba.telegroup.schedule_up.util.LoginInformation;
 import ba.telegroup.schedule_up.util.Util;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.MediaType;
@@ -23,6 +25,7 @@ import javax.servlet.http.HttpSession;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Optional;
 
 @RequestMapping(value = "/user")
 @Controller
@@ -30,14 +33,38 @@ import java.util.List;
 public class UserController extends GenericController<User, Integer> {
 
     UserRepository userRepository;
+    CompanyRepository companyRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
 
+    @Value("${randomString.length}")
+    private Integer randomStringLength;
+
     @Autowired
-    public UserController(UserRepository repo) {
+    public UserController(UserRepository repo, CompanyRepository companyRepository) {
         super(repo);
         this.userRepository = repo;
+        this.companyRepository = companyRepository;
+    }
+
+    @Override
+    public @ResponseBody
+    List<User> getAll(){
+        return userRepository.getAllByCompanyId(userBean.getUser().getCompanyId());
+    }
+
+    @Override
+    public @ResponseBody
+    User findById(@PathVariable("id") Integer id) throws BadRequestException,ForbiddenException {
+        User user = userRepository.findById(id).orElse(null);
+        if(user != null && user.getCompanyId() == userBean.getUser().getCompanyId()){
+            user.setPassword(null);
+            return user;
+        }
+        else{
+            throw new BadRequestException("Bad request");
+        }
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
@@ -55,7 +82,7 @@ public class UserController extends GenericController<User, Integer> {
             }
         }
         else{
-            String companyName = userRepository.getCompanyNameByCompanyId(user.getCompanyId());
+            String companyName = companyRepository.getById(user.getCompanyId()).getName();
             if(companyName != null && companyName.equals(loginInformation.getCompanyName().trim()) && user.getPassword().trim().equals(Util.hashPassword(loginInformation.getPassword().trim()))){
                 successLogin = true;
             }
@@ -89,7 +116,7 @@ public class UserController extends GenericController<User, Integer> {
     String invitationToRegistration(@RequestParam("mail") String mail, @RequestParam("role") Integer roleId, @RequestParam("company") Integer companyId) throws BadRequestException
     {
         try{
-            String randomToken = Util.randomString(16);
+            String randomToken = Util.randomString(randomStringLength);
             User newUser = new User();
             newUser.setEmail(mail);
             newUser.setUsername(null);
@@ -138,9 +165,7 @@ public class UserController extends GenericController<User, Integer> {
         try{
             User user = entityManager.find(User.class, newUser.getId());
             user.setUsername(newUser.getUsername());
-
-            //vidjeti sta cemo sa password-om, kako ce se slati sa frontend-a
-
+            user.setPassword(newUser.getPassword());
             user.setFirstName(newUser.getFirstName());
             user.setLastName(newUser.getLastName());
             user.setPhoto(newUser.getPhoto());

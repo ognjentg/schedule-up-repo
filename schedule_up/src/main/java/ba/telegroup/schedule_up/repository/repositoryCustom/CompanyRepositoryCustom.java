@@ -13,9 +13,5 @@ public interface CompanyRepositoryCustom {
 
     List getAllExtendedByNameContains(String name);
 
-    CompanyUser updateExtended(Integer userId, CompanyUser companyUser);
-
     String deleteCompany(Company company);
-
-    CompanyUser insertExtended(CompanyUser companyUser);
 }
