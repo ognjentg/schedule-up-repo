@@ -191,16 +191,6 @@ var companyView = {
                     label: "Naziv",
                     invalidMessage: "Unesite naziv kompanije!",
                     required: true
-                },{
-                    view:"template",
-                    id:"companyLogo",
-                    name:"companyLogo",
-                    template:"<img src='data:image/jpg;base64,#companyLogo#'/>",
-                    required:"true",
-                    label:"Logo",
-                    invalidMessage: "Morate postaviti logo!",
-
-
                 }, {
                     id: "timeFrom",
                     invalidMessage: "Unesite početak radnog vremena!",
@@ -257,10 +247,11 @@ var companyView = {
                                 var file = upload.file;
                                 var reader = new FileReader();
                                 reader.onload = function(event) {
+                                    var form = $$("addCompanyForm");
                                     form.elements.companyLogo.setValue(event.target.result.split("base64,")[1]);
 
                                 };
-                                reader.readAsDataURL(file)
+                                reader.readAsDataURL(file);
                                 return false;
                             }
                         }

@@ -47,9 +47,9 @@ var menuSuperAdmin = [
 
 var menuAdmin = [
     {
-        id:"dashboard",
-        value:"Početna",
-        icon:"home"
+        id: "dashboard",
+        value: "Početna",
+        icon: "home"
     },
 
     {
@@ -85,18 +85,18 @@ var menuAdmin = [
 
 var menuAdvancedUser = [
     {
-    id:"dashboard",
-    value:"Početna",
-    icon:"home"
-}
+        id: "dashboard",
+        value: "Početna",
+        icon: "home"
+    }
 
 ];
 
 var menuUser = [
     {
-        id:"dashboard",
-        value:"Početna",
-        icon:"home"
+        id: "dashboard",
+        value: "Početna",
+        icon: "home"
     }
 ];
 
@@ -117,24 +117,29 @@ var init = function () {
             if (xhr.status == "200") {
                 if (data.json() != null && data.json().id != null) {
                     userData = data.json();
-                    webix.ajax().get("company/" + userData.companyId, {
-                        success: function (text, data, xhr) {
-                            var company = data.json();
-                            if (company != null) {
-                                companyData = company;
-                                companyData.deleted = 0;
-                                showApp();
-                            } else {
-                                userData=null;
-                                showLogin();
+                    if (userData.roleId !== 1) {
+                        webix.ajax().get("company/" + userData.companyId, {
+                            success: function (text, data, xhr) {
+                                var company = data.json();
+                                if (company != null) {
+                                    companyData = company;
+                                    companyData.deleted = 0;
+                                    showApp();
+                                } else {
+                                    userData = null;
+                                    showLogin();
 
+                                }
+                            },
+                            error: function (text, data, xhr) {
+                                userData = null;
+                                showLogin();
                             }
-                        },
-                        error: function (text, data, xhr) {
-                            userData=null;
-                            showLogin();
-                        }
-                    });
+                        });
+                    } else {
+                        showApp();
+                    }
+
                 }
                 else {
                     //TODO SHOW ERROR MESSAGE
@@ -350,8 +355,8 @@ var showApp = function () {
     var main = webix.copy(mainLayout);
     webix.ui(main, panel);
     panel = $$("app");
-    if (companyData!=null)
-    document.getElementById("appLogo").src="data:image/jpg;base64,"+companyData.companyLogo;
+    if (companyData != null)
+        document.getElementById("appLogo").src = "data:image/jpg;base64," + companyData.companyLogo;
     var localMenuData = null;
     switch (userData.roleId) {
         case 1:
@@ -396,10 +401,10 @@ var showApp = function () {
     $$("mainMenu").define("on", menuEvents);
 
     rightPanel = "emptyRightPanel";
-    if (userData.roleId===1){
+    if (userData.roleId === 1) {
         companyView.selectPanel();
         $$("mainMenu").select("company");
-    }else{
+    } else {
         dashboardView.selectPanel();
         $$("mainMenu").select("dashboard");
     }
