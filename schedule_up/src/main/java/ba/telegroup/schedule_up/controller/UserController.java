@@ -3,10 +3,13 @@ package ba.telegroup.schedule_up.controller;
 import ba.telegroup.schedule_up.common.exceptions.BadRequestException;
 import ba.telegroup.schedule_up.common.exceptions.ForbiddenException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
+import ba.telegroup.schedule_up.interaction.Notification;
 import ba.telegroup.schedule_up.model.User;
+import ba.telegroup.schedule_up.repository.UserRepository;
 import ba.telegroup.schedule_up.util.LoginInformation;
 import ba.telegroup.schedule_up.util.Util;
 import org.apache.tomcat.util.codec.binary.Base64;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.MediaType;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.List;
@@ -25,36 +29,34 @@ import java.util.List;
 @Scope("request")
 public class UserController extends GenericController<User, Integer> {
 
-    private static final String SQL_SELECT_USER_ID_BY_USERNAME = "SELECT id FROM user WHERE username=? AND active=true AND deleted=false";
-    private static final String SQL_SELECT_COMPANY_NAME_BY_COMPANY_ID = "SELECT name FROM company WHERE id=? AND deleted=false";
-    private static final String SQL_SELECT_USER_ID_BY_TOKEN = "SELECT id FROM user WHERE token=?";
+    UserRepository userRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
 
-    public UserController(JpaRepository<User, Integer> repo) { super(repo); }
+    @Autowired
+    public UserController(UserRepository repo) {
+        super(repo);
+        this.userRepository = repo;
+    }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public @ResponseBody
-    User login(@RequestBody LoginInformation loginInformation) {
+    User login(@RequestBody LoginInformation loginInformation) throws ForbiddenException{
         Boolean successLogin = false;
-        List<Integer> userId = (List<Integer>) entityManager.createNativeQuery(SQL_SELECT_USER_ID_BY_USERNAME).setParameter(1, loginInformation.getUsername().trim()).getResultList();
-        User user = null;
-        if(userId != null && !userId.isEmpty()){
-            user = entityManager.find(User.class, userId.get(0));
-        }
-        else{
-            return null;
+        User user = userRepository.getByUsername(loginInformation.getUsername());
+        if(user == null){
+            throw new ForbiddenException("Forbidden");
         }
         
         if(user != null && Integer.valueOf(1).equals(user.getRoleId())){
-            if(Util.checkPassword(loginInformation.getPassword().trim(), new String(user.getPassword()))){
+            if(user.getPassword().trim().equals(Util.hashPassword(loginInformation.getPassword().trim()))){
                 successLogin = true;
             }
         }
         else{
-            List<String> companyName = (List<String>) entityManager.createNativeQuery(SQL_SELECT_COMPANY_NAME_BY_COMPANY_ID).setParameter(1, user.getCompanyId()).getResultList();
-            if(companyName != null && companyName.get(0).equals(loginInformation.getCompanyName().trim()) && Util.checkPassword(loginInformation.getPassword().trim(), new String(user.getPassword()))){
+            String companyName = userRepository.getCompanyNameByCompanyId(user.getCompanyId());
+            if(companyName != null && companyName.equals(loginInformation.getCompanyName().trim()) && user.getPassword().trim().equals(Util.hashPassword(loginInformation.getPassword().trim()))){
                 successLogin = true;
             }
         }
@@ -67,22 +69,19 @@ public class UserController extends GenericController<User, Integer> {
             return userBean.getUser();
         }
         else{
-            return null;
+            throw new ForbiddenException("Forbidden");
         }
     }
 
     @RequestMapping(value = "/logout", method = RequestMethod.GET)
     public @ResponseBody
-    String logout() throws BadRequestException {
-        try{
-            userBean.setUser(new User());
-            userBean.setLoggedIn(false);
-
-            return "Success";
-        } catch(Exception ex){
-            ex.printStackTrace();
-            throw new BadRequestException("Bad Request");
+    String logout(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
         }
+
+        return "Success";
     }
 
     @RequestMapping(value = "/invitationToRegistration", method = RequestMethod.POST)
@@ -90,6 +89,7 @@ public class UserController extends GenericController<User, Integer> {
     String invitationToRegistration(@RequestParam("mail") String mail, @RequestParam("role") Integer roleId, @RequestParam("company") Integer companyId) throws BadRequestException
     {
         try{
+            String randomToken = Util.randomString(16);
             User newUser = new User();
             newUser.setEmail(mail);
             newUser.setUsername(null);
@@ -101,13 +101,13 @@ public class UserController extends GenericController<User, Integer> {
             newUser.setActive((byte)0);
             newUser.setDeleted((byte)0);
             newUser.setDeactivationReason(null);
-            newUser.setToken(Util.randomString(16));
+            newUser.setToken(randomToken);
             newUser.setTokenTime(new Timestamp(System.currentTimeMillis()));
             newUser.setCompanyId(companyId);
             newUser.setRoleId(roleId);
             repo.saveAndFlush(newUser);
 
-            //poslati mail sa tokenom
+            Notification.sendRegistrationLink(mail.trim(), "http://127.0.0.1:8020/user/registration/" + randomToken);
 
             return "Success";
         } catch(Exception ex){
@@ -119,12 +119,8 @@ public class UserController extends GenericController<User, Integer> {
     @RequestMapping(value = "/registration/{token}", method = RequestMethod.GET)
     public @ResponseBody
     User requestForRegistration(@PathVariable String token) throws BadRequestException {
-        List<Integer> userId = (List<Integer>) entityManager.createNativeQuery(SQL_SELECT_USER_ID_BY_TOKEN).setParameter(1, token.trim()).getResultList();
-        User user = null;
-        if(userId != null && !userId.isEmpty()){
-            user = entityManager.find(User.class, userId.get(0));
-        }
-        else{
+        User user = userRepository.getByToken(token);
+        if(user == null){
             return null;
         }
 
@@ -162,7 +158,6 @@ public class UserController extends GenericController<User, Integer> {
 
 
     @RequestMapping(value={"/state"},method = RequestMethod.GET)
-
     public
      @ResponseBody  User checkState() throws ForbiddenException {
         System.out.println("LOGGED"+userBean.getLoggedIn()+" user:"+userBean.getUser().getUsername());

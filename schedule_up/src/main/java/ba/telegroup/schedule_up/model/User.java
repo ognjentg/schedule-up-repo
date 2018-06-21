@@ -10,7 +10,7 @@ public class User {
     private Integer id;
     private String email;
     private String username;
-    private byte[] password;
+    private String password;
     private byte[] pin;
     private String firstName;
     private String lastName;
@@ -55,12 +55,12 @@ public class User {
     }
 
     @Basic
-    @Column(name = "password", nullable = true)
-    public byte[] getPassword() {
+    @Column(name = "password", nullable = true, length = 128)
+    public String getPassword() {
         return password;
     }
 
-    public void setPassword(byte[] password) {
+    public void setPassword(String password) {
         this.password = password;
     }
 
@@ -182,7 +182,7 @@ public class User {
         return Objects.equals(id, user.id) &&
                 Objects.equals(email, user.email) &&
                 Objects.equals(username, user.username) &&
-                Arrays.equals(password, user.password) &&
+                Objects.equals(password, user.password) &&
                 Arrays.equals(pin, user.pin) &&
                 Objects.equals(firstName, user.firstName) &&
                 Objects.equals(lastName, user.lastName) &&
@@ -199,8 +199,7 @@ public class User {
     @Override
     public int hashCode() {
 
-        int result = Objects.hash(id, email, username, firstName, lastName, active, deleted, deactivationReason, token, tokenTime, companyId, roleId);
-        result = 31 * result + Arrays.hashCode(password);
+        int result = Objects.hash(id, email, username, password, firstName, lastName, active, deleted, deactivationReason, token, tokenTime, companyId, roleId);
         result = 31 * result + Arrays.hashCode(pin);
         result = 31 * result + Arrays.hashCode(photo);
         return result;
