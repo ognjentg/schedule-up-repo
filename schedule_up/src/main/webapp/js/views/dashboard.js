@@ -52,10 +52,75 @@ var dashboardView = {
                 }]
             },
                 {
-                    cols:[
-                        {view:"label",width:200, label:"Naziv"},
-                        {id:"lblMeetingName",view:"label",width:400,label:"Placeholder"}
+                    view: "form",
+                    id: "eventDialogForm",
+                    width: 250,
+                    elementsConfig: {
+                        labelWidth: 120,
+                        bottomPadding: 8
+                    },
+                    elements: [{
+                        view: "text",
+                        id: "text",
+                        name: "text",
+                        label: "Naziv",
+                        readonly: true
+                    }, {
+                        view: "text",
+                        id: "start_date",
+                        name: "start_date",
+                        label: "Početak",
+
+                        readonly: true
+                    },
+                        {
+                            view: "text",
+                            id: "end_date",
+                            name: "end_date",
+                            label: "Kraj",
+                            readonly: true
+                        },
+                        {
+                            view: "text",
+                            id: "roomName",
+                            name: "roomName",
+                            label: "Sala",
+                            readonly: true
+                        },
+                        {
+                            view: "text",
+                            id: "participantNumber",
+                            name: "participantNumber",
+                            label: "Broj učesnika",
+                            readonly: true
+                        },
+                        {
+                            view: "textarea",
+                            id: "description",
+                            name: "description",
+                            label: "Opis",
+                            readonly: true,
+                            height: 100
+                        },
+
                     ]
+
+                },
+                {
+                    view: "toolbar",
+                    cols: [
+                        {
+                            id: "creatorNameLbl",
+                            view: "label",
+                            label: "Autor"
+                        }
+                        , {}, {
+                            id: "eventDetailsBtn",
+                            view: "button",
+                            value: "Detaljnije",
+                            type: "form",
+                            width: 150
+                        }]
                 }
             ]
         }
@@ -66,8 +131,16 @@ var dashboardView = {
 
     showEventPopup: function (event) {
         webix.ui(webix.copy(dashboardView.eventDialog));
-        $$("lblMeetingName").data.label=event.text;
+        var form = $$("eventDialogForm");
+        var format = webix.Date.dateToStr("%d.%m.%Y. %H:%i");
 
+        form.elements.text.setValue(event.text);
+        form.elements.start_date.setValue(format(event.start_date));
+        form.elements.end_date.setValue(format(event.end_date));
+        form.elements.participantNumber.setValue(event.participantsNumber);
+        form.elements.description.setValue(event.description);
+        form.elements.roomName.setValue(event.roomName);
+        $$("creatorNameLbl").data.label = "Autor: " + event.creatorUsername;
         $$("eventDialog").show();
     }
 
