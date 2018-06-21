@@ -115,7 +115,23 @@ var init = function () {
             if (xhr.status == "200") {
                 if (data.json() != null && data.json().id != null) {
                     userData = data.json();
-                    showApp();
+                    webix.ajax().get("company/" + userData.companyId, {
+                        success: function (text, data, xhr) {
+                            var company = data.json();
+                            if (company != null) {
+                                companyData = company;
+                                companyData.deleted = 0;
+                                showApp();
+                            } else {
+                                connection.reload();
+
+                            }
+                        },
+                        error: function (text, data, xhr) {
+                            connection.reload();
+
+                        }
+                    });
                 }
                 else {
                     //TODO SHOW ERROR MESSAGE
