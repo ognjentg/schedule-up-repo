@@ -1,13 +1,12 @@
 var dashboardView = {
     panel: {
-        id: "dashBoardPanel",
+        id: "dashboardPanel",
         adjust: true,
         rows: [{
-                id:"dashboardTimetable",
-                view:"template",
-                template:"<div id='scheduler_here' class='dhx_cal_container' style='width:100%; height:100%;'><div class='dhx_cal_navline'><div class='dhx_cal_prev_button'>&nbsp;</div><div class='dhx_cal_next_button'>&nbsp;</div><div class='dhx_cal_today_button'></div><div class='dhx_cal_date'></div></div><div class='dhx_cal_header'></div><div class='dhx_cal_data'></div></div>",
-
-            }]
+            view:"template",
+            template:"<div id='scheduler_here' class='dhx_cal_container' style='width:100%; height:100%;'><div class='dhx_cal_navline'><div class='dhx_cal_prev_button'>&nbsp;</div><div class='dhx_cal_next_button'>&nbsp;</div><div class='dhx_cal_today_button'></div><div class='dhx_cal_date'></div></div><div class='dhx_cal_header'></div><div class='dhx_cal_data'></div></div>",
+        }
+        ]
     },
 
     selectPanel: function () {
@@ -20,7 +19,6 @@ var dashboardView = {
         scheduler.config.readonly = true;
         scheduler.init('scheduler_here', new Date(),"week");
         scheduler.load("meeting/","json");
+
     }
-
-
 };

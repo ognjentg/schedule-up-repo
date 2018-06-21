@@ -47,10 +47,11 @@ var menuSuperAdmin = [
 
 var menuAdmin = [
     {
-        id: "dashboard",
-        value: "Početna",
-        icon: "home"
+        id:"dashboard",
+        value:"Početna",
+        icon:"home"
     },
+
     {
         id: "building",
         value: "Zgrade",
@@ -84,18 +85,19 @@ var menuAdmin = [
 
 var menuAdvancedUser = [
     {
-        id: "dashboard",
-        value: "Početna",
-        icon: "home"
-    },
+    id:"dashboard",
+    value:"Početna",
+    icon:"home"
+}
+
 ];
 
 var menuUser = [
     {
-        id: "dashboard",
-        value: "Početna",
-        icon: "home"
-    },
+        id:"dashboard",
+        value:"Početna",
+        icon:"home"
+    }
 ];
 
 var panel = {id: "empty"};
@@ -396,7 +398,7 @@ var showApp = function () {
     if (userData.roleId===1){
         companyView.selectPanel();
         $$("mainMenu").select("company");
-    } else{
+    }else{
         dashboardView.selectPanel();
         $$("mainMenu").select("dashboard");
     }
