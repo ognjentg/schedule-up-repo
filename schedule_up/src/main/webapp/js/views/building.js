@@ -228,6 +228,7 @@ var buildingView = {
         var panelCopy = webix.copy(this.panel);
 
         $$("main").addView(webix.copy(panelCopy));
+        this.preloadDependencies();
         connection.attachAjaxEvents("buildingDT", "building");
 
         webix.ui({
@@ -435,7 +436,7 @@ var buildingView = {
                         inputWidth: 100,
                     },
                     {
-                        view: "select", options: countries, label: "Drzava:", value: countries[0], id: "combo"
+                        view: "select", options: countries, label: "Drzava:", id: "combo"
 
                     },
                     {
@@ -540,86 +541,82 @@ var buildingView = {
             }]
         }
     },
-    saveLocation: function () {
-        var url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + lat + "," + lng + "+&key=AIzaSyBExEHqJmRKJoRhWOT6Ok3fLR5QMGIZ_eg";
-        fetch(url).then(function (result) {
-            return result.json();
-        }).then(function (json) {
-            var place = json['results'][0];
-            var filtered_array = place.address_components.filter(function (address_component) {
+    saveLocation:function(){
+        var url="https://maps.googleapis.com/maps/api/geocode/json?latlng="+lat+","+lng+"+&key=AIzaSyBExEHqJmRKJoRhWOT6Ok3fLR5QMGIZ_eg&language=hr";
+        fetch(url).then(function(result) {
+            if(result.ok) {
+                return result.json();
+            }
+            throw new Error('Neuspješno dobavljanje tačne lokacije.');
+        }).then(function(json) {
+            var place=json['results'][0];
+            var filtered_array = place.address_components.filter(function(address_component){
                 return address_component.types.includes("country");
             });
-            var country_long = filtered_array.length ? filtered_array[0].long_name : "";
-            var country_short = filtered_array.length ? filtered_array[0].short_name : "";
-
-            var filtered_array2 = place.address_components.filter(function (address_component) {
+            var country_long = filtered_array.length ? filtered_array[0].long_name: "";
+            var country_short = filtered_array.length ? filtered_array[0].short_name: "";
+            var filtered_array2 = place.address_components.filter(function(address_component){
                 return address_component.types.includes("locality");
             });
-            var city = filtered_array2.length ? filtered_array2[0].long_name : "";
-            var filtered_array3 = place.address_components.filter(function (address_component) {
+            var city = filtered_array2.length ? filtered_array2[0].long_name: "";
+            var filtered_array3 = place.address_components.filter(function(address_component){
                 return address_component.types.includes("route");
             });
-            var adresa = filtered_array3.length ? filtered_array3[0].long_name : "";
-            var filtered_array4 = place.address_components.filter(function (address_component) {
+            var adresa = filtered_array3.length ? filtered_array3[0].long_name: "";
+            var filtered_array4 = place.address_components.filter(function(address_component){
                 return address_component.types.includes("street_number");
             });
 
-            var broj = filtered_array4.length ? filtered_array4[0].long_name : "";
-            $$("adresa").setValue(adresa + " " + broj);
+            var broj = filtered_array4.length ? filtered_array4[0].long_name: "";
+            var broj2 = filtered_array4.length ? filtered_array4[0].short_name: "";
+            $$("adresa").setValue(adresa+" "+broj);
             $$("combo").setValue(country_long + " : " + country_short);
             $$("grad").setValue(city);
             util.dismissDialog('showMapDialog');
 
+        }).catch(function(error) {
+            util.messages.showErrorMessage("Neuspješno dobavljanje detaljne lokacije.")
         });
     },
     showAddDialog: function () {
-        var url = "https://restcountries.eu/rest/v2/all";
-        fetch(url).then(function (result) {
-            return result.json();
-        }).then(function (json) {
-            for (var i = 0; i < json.length; i++) {
-                var countryName = json[i].name;
-                var countryCode = json[i].alpha2Code;
-                countries[i] = (countryName + " : " + countryCode);
-            }
-
-            webix.ui(webix.copy(buildingView.addDialog)).show();
-            webix.UIManager.setFocus("name");
-        });
 
 
+        webix.ui(webix.copy(buildingView.addDialog)).show();
+        webix.UIManager.setFocus("name");
     },
-    showMap: function () {
-        var adresa = $$("adresa").getValue();
+
+    showMap:function(){
+        var adresa=$$("adresa").getValue();
         var res = adresa.replace(/ /g, "+");
-        var drzava = $$("combo").getValue().split(" : ")[0];
-        drzava = drzava.replace(/ /g, "+");
-        var grad = $$("grad").getValue();
-        grad = grad.replace(/ /g, "+");
-        var query = res + "+" + grad + "+" + drzava;
-        var url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + query + "&key=AIzaSyBExEHqJmRKJoRhWOT6Ok3fLR5QMGIZ_eg";
-        fetch(url).then(function (result) {
-            return result.json();
-        }).then(function (json) {
-            tablecentar[0] = json['results'][0]['geometry']['location']['lat'];
-            tablecentar[1] = json['results'][0]['geometry']['location']['lng'];
-            var mapaObjekat = {
-                id: 1,
-                draggable: true,
-                lat: json['results'][0]['geometry']['location']['lat'],
-                lng: json['results'][0]['geometry']['location']['lng'],
-                label: "A",
-                draggable: true
+        var drzava=$$("combo").getValue().split(" : ")[0];
+        drzava=drzava.replace(/ /g, "+");
+        var grad=$$("grad").getValue();
+        grad=grad.replace(/ /g, "+");
+        var query=res+"+"+grad+"+"+drzava;
+        var url="https://maps.googleapis.com/maps/api/geocode/json?address="+query+"&key=AIzaSyBExEHqJmRKJoRhWOT6Ok3fLR5QMGIZ_eg&language=hr";
+        fetch(url).then(function(result) {
+            if(result.ok) {
+                return result.json();
             }
-            lat = json['results'][0]['geometry']['location']['lat'];
-            lng = json['results'][0]['geometry']['location']['lng'];
-            tabledata[0] = mapaObjekat;
+            throw new Error('Neuspješno dobavljanje tačne lokacije.');
+        }).then(function(json) {
+            tablecentar[0]=json['results'][0]['geometry']['location']['lat'];
+            tablecentar[1]=json['results'][0]['geometry']['location']['lng'];
+            var mapaObjekat={
+                id:1, draggable:true,lat:json['results'][0]['geometry']['location']['lat'],  lng:json['results'][0]['geometry']['location']['lng'],   label:"A", draggable:true
+            }
+            lat=json['results'][0]['geometry']['location']['lat'];
+            lng=json['results'][0]['geometry']['location']['lng'];
+            entered=true;
+            tabledata[0]=mapaObjekat;
             webix.ui(webix.copy(buildingView.showMapDialog)).show();
-            $$("map").attachEvent("onAfterDrop", function (id, item) {
-                lat = item.lat;
-                lng = item.lng;
+            $$("map").attachEvent("onAfterDrop", function(id, item){
+                lat=item.lat;
+                lng=item.lng;
             });
 
+        }).catch(function(error) {
+            util.messages.showErrorMessage("Nije moguće prikazati mapu.")
         });
 
     },
@@ -694,48 +691,76 @@ var buildingView = {
             // form.elements.validBuildingName.setValue(1);
 
             if (form.validate()) {
-                if (lat == null && lng == null) {
-                    var adresa = $$("adresa").getValue();
+                if((lat==null && lng==null) || entered){
+                    entered=true;
+                    var adresa=$$("adresa").getValue();
                     var res = adresa.replace(/ /g, "+");
-                    var drzava = $$("combo").getValue().split(" : ")[0];
-                    drzava = drzava.replace(/ /g, "+");
-                    var grad = $$("grad").getValue();
-                    grad = grad.replace(/ /g, "+");
-                    var query = res + "+" + grad + "+" + drzava;
-                    var url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + query + "&key=AIzaSyBExEHqJmRKJoRhWOT6Ok3fLR5QMGIZ_eg";
-                    fetch(url).then(function (result) {
-                        return result.json();
-                    }).then(function (json) {
-                        lat = json['results'][0]['geometry']['location']['lat'];
-                        lng = json['results'][0]['geometry']['location']['lng'];
+                    var drzava=$$("combo").getValue().split(" : ")[0];
+                    drzava=drzava.replace(/ /g, "+");
+                    var grad=$$("grad").getValue();
+                    grad=grad.replace(/ /g, "+");
+                    var query=res+"+"+grad+"+"+drzava;
+                    var url="https://maps.googleapis.com/maps/api/geocode/json?address="+query+"&key=AIzaSyBExEHqJmRKJoRhWOT6Ok3fLR5QMGIZ_eg&language=hr";
+                    fetch(url).then(function(result) {
+                        if(result.ok) {
+                            return result.json();
+                        }
+                        throw new Error('Neuspješno dobavljanje tačne lokacije.');
+                    }).then(function(json) {
+                        lat=json['results'][0]['geometry']['location']['lat'];
+                        lng=json['results'][0]['geometry']['location']['lng'];
                         var newItem = {
                             name: $$("addBuildingForm").getValues().name,
                             description: $$("addBuildingForm").getValues().description,
                             address: $$("addBuildingForm").getValues().adresa,
-                            latitude: lat,
-                            longitude: lng,
+                            latitude:lat,
+                            longitude:lng,
                             companyId: 1
 
                         };
                         $$("buildingDT").add(newItem);
+                        util.messages.showMessage("Uspješno dodavanje nove zgrade.");
                         util.dismissDialog('addBuildingDialog');
+                    }).catch(function(error) {
+                        util.messages.showErrorMessage("Neuspješno dobavljanje tačne lokacije.")
+
                     });
 
-                } else {
+                }else{
                     var newItem = {
                         name: $$("addBuildingForm").getValues().name,
                         description: $$("addBuildingForm").getValues().description,
                         address: $$("addBuildingForm").getValues().adresa,
-                        latitude: lat,
-                        longitude: lng,
+                        latitude:lat,
+                        longitude:lng,
                         companyId: 1
 
                     };
                     $$("buildingDT").add(newItem);
-                    util.dismissDialog('addBuildingDialog');
-                }
+                    util.messages.showMessage("Uspješno dodavanje nove zgrade.");
+                    util.dismissDialog('addBuildingDialog');}
             }
         }
+    },
+    preloadDependencies: function () {
+
+        var url="https://restcountries.eu/rest/v2/all";
+        fetch(url).then(function(result) {
+            if(result.ok) {
+                return result.json();
+            }
+            throw new Error('Neuspješno učitavanje podataka o državama.');
+        }).then(function(json) {
+
+            for(var i=0;i<json.length;i++){
+                var countryName=json[i]['translations']['hr'];
+                var countryCode=json[i].alpha2Code;
+                countries[i]=countryName+" : "+countryCode;
+            }
+        }).catch(function(error) {
+            util.messages.showErrorMessage("Nije moguće prikupiti podatke o državama.")
+        });
     }
+
 
 };
