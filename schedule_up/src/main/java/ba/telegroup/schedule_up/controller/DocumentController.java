@@ -37,21 +37,13 @@ public class DocumentController extends GenericController<Document, Integer> {
     public @ResponseBody
     List getAllByNameContains(@PathVariable String name) {
         List<Document> documents = ((DocumentRepository) repo).getAllByNameContains(name);
-        List<Document> result = new ArrayList<>();
-        for (Document n : documents) {
-            result.add(n);
-        }
-        return result;
+        return new ArrayList<>(documents);
     }
 
     @RequestMapping(value = "/getAllByMeetingId/{id}", method = RequestMethod.GET)
     public @ResponseBody
     List getAllByUserId(@PathVariable Integer id) {
         List<Document> documents = ((DocumentRepository) repo).getAllByMeetingId(id);
-        List<Document> result = new ArrayList<>();
-        for (Document n : documents) {
-            result.add(n);
-        }
-        return result;
+        return new ArrayList<>(documents);
     }
 }

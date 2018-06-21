@@ -1,10 +1,8 @@
 package ba.telegroup.schedule_up.controller;
 
-import ba.telegroup.schedule_up.common.exceptions.BadRequestException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.model.GearUnit;
 import ba.telegroup.schedule_up.model.modelCustom.GearUnitGear;
-import ba.telegroup.schedule_up.repository.GearUnitRepository;
 import ba.telegroup.schedule_up.repository.repositoryCustom.GearUnitRepositoryCustom;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,9 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
-@RequestMapping(value="/gear-unit")
+@RequestMapping(value = "/gear-unit")
 @Controller
 @Scope("request")
 public class GearUnitController extends GenericController<GearUnit, Integer> {
@@ -25,48 +23,44 @@ public class GearUnitController extends GenericController<GearUnit, Integer> {
         super(repo);
     }
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @Override
+    @RequestMapping(method = RequestMethod.GET)
     public @ResponseBody
-    List<GearUnitGear> getAllExtended() {
+    List getAll() {
         return ((GearUnitRepositoryCustom) repo).getAllExtendedByCompanyId(userBean.getUser().getCompanyId());
     }
 
-    @RequestMapping(value ="/custom/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/custom/{id}", method = RequestMethod.GET)
     public @ResponseBody
     List<GearUnitGear> getAllExtendedById(@PathVariable Integer id) {
-        return ((GearUnitRepositoryCustom)repo).getAllExtendedById(id);
+        return ((GearUnitRepositoryCustom) repo).getAllExtendedById(id);
     }
 
     @Transactional
-    @RequestMapping(value ="/custom/", method = RequestMethod.POST)
+    @RequestMapping(value = "/custom/", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public @ResponseBody
-    GearUnitGear insertExtended(@RequestBody GearUnitGear gearUnitGear) throws BadRequestException {
-        return  ((GearUnitRepositoryCustom)repo).insertExtended(gearUnitGear);
+    GearUnitGear insertExtended(@RequestBody GearUnitGear gearUnitGear) {
+        return ((GearUnitRepositoryCustom) repo).insertExtended(gearUnitGear);
     }
 
     @Transactional
-    @RequestMapping(value ="/custom/", method = RequestMethod.PUT)
+    @RequestMapping(value = "/custom/", method = RequestMethod.PUT)
     public @ResponseBody
-    GearUnitGear updateExtended(@RequestBody GearUnitGear gearUnitGear) throws BadRequestException {
-        return  ((GearUnitRepositoryCustom)repo).updateExtended(gearUnitGear);
+    GearUnitGear updateExtended(@RequestBody GearUnitGear gearUnitGear) {
+        return ((GearUnitRepositoryCustom) repo).updateExtended(gearUnitGear);
     }
 
     @Override
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.DELETE)
     public @ResponseBody
-    String delete(@PathVariable Integer id) throws BadRequestException {
-        GearUnit gearUnit=((GearUnitRepository) repo).findById(id).orElse(null);
-        gearUnit.setDeleted((byte)1);
-        if (((GearUnitRepository) repo).saveAndFlush(gearUnit) != null) {
-            logDeleteAction(gearUnit);
-            return "Success";
-        }
-        else {
-            throw new BadRequestException("Bad request");
-        }
+    String delete(@PathVariable Integer id) {
+        GearUnit gearUnit = repo.findById(id).orElse(null);
+        Objects.requireNonNull(gearUnit).setDeleted((byte) 1);
+        repo.saveAndFlush(gearUnit);
+        logDeleteAction(gearUnit);
+        return "Success";
     }
-
 
 
 }

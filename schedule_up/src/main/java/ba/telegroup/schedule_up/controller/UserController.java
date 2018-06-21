@@ -9,12 +9,9 @@ import ba.telegroup.schedule_up.repository.CompanyRepository;
 import ba.telegroup.schedule_up.repository.UserRepository;
 import ba.telegroup.schedule_up.util.LoginInformation;
 import ba.telegroup.schedule_up.util.Util;
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,17 +20,16 @@ import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.sql.Timestamp;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 
 @RequestMapping(value = "/user")
 @Controller
 @Scope("request")
 public class UserController extends GenericController<User, Integer> {
 
-    UserRepository userRepository;
-    CompanyRepository companyRepository;
+    private final UserRepository userRepository;
+    private final CompanyRepository companyRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -50,56 +46,56 @@ public class UserController extends GenericController<User, Integer> {
 
     @Override
     public @ResponseBody
-    List<User> getAll(){
+    List<User> getAll() {
         return userRepository.getAllByCompanyId(userBean.getUser().getCompanyId());
     }
 
+
     @Override
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public @ResponseBody
-    User findById(@PathVariable("id") Integer id) throws BadRequestException,ForbiddenException {
+    User findById(@PathVariable("id") Integer id) throws BadRequestException {
         User user = userRepository.findById(id).orElse(null);
-        if(user != null && user.getCompanyId() == userBean.getUser().getCompanyId()){
+        if (user != null && Objects.equals(user.getCompanyId(), userBean.getUser().getCompanyId())) {
             user.setPassword(null);
             return user;
-        }
-        else{
+        } else {
             throw new BadRequestException("Bad request");
         }
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public @ResponseBody
-    User login(@RequestBody LoginInformation loginInformation) throws ForbiddenException{
+    User login(@RequestBody LoginInformation loginInformation) throws ForbiddenException {
         Boolean successLogin = false;
         User user = userRepository.getByUsername(loginInformation.getUsername());
-        if(user == null){
+        if (user == null) {
             throw new ForbiddenException("Forbidden");
         }
-        
-        if(user != null && Integer.valueOf(1).equals(user.getRoleId())){
-            if(user.getPassword().trim().equals(Util.hashPassword(loginInformation.getPassword().trim()))){
+
+        if (Integer.valueOf(1).equals(user.getRoleId())) {
+            if (user.getPassword().trim().equals(Util.hashPassword(loginInformation.getPassword().trim()))) {
                 successLogin = true;
             }
-        }
-        else{
+        } else {
             String companyName = companyRepository.getById(user.getCompanyId()).getName();
-            if(companyName != null && companyName.equals(loginInformation.getCompanyName().trim()) && user.getPassword().trim().equals(Util.hashPassword(loginInformation.getPassword().trim()))){
+            if (companyName != null && companyName.equals(loginInformation.getCompanyName().trim()) && user.getPassword().trim().equals(Util.hashPassword(loginInformation.getPassword().trim()))) {
                 successLogin = true;
             }
         }
 
-        if(successLogin){
+        if (successLogin) {
             user.setPassword(null);
             userBean.setUser(user);
             userBean.setLoggedIn(true);
 
             return userBean.getUser();
-        }
-        else{
+        } else {
             throw new ForbiddenException("Forbidden");
         }
     }
 
+    @SuppressWarnings("SameReturnValue")
     @RequestMapping(value = "/logout", method = RequestMethod.GET)
     public @ResponseBody
     String logout(HttpServletRequest request) {
@@ -111,11 +107,11 @@ public class UserController extends GenericController<User, Integer> {
         return "Success";
     }
 
+    @SuppressWarnings("SameReturnValue")
     @RequestMapping(value = "/invitationToRegistration", method = RequestMethod.POST)
     public @ResponseBody
-    String invitationToRegistration(@RequestParam("mail") String mail, @RequestParam("role") Integer roleId, @RequestParam("company") Integer companyId) throws BadRequestException
-    {
-        try{
+    String invitationToRegistration(@RequestParam("mail") String mail, @RequestParam("role") Integer roleId, @RequestParam("company") Integer companyId) throws BadRequestException {
+        try {
             String randomToken = Util.randomString(randomStringLength);
             User newUser = new User();
             newUser.setEmail(mail);
@@ -125,8 +121,8 @@ public class UserController extends GenericController<User, Integer> {
             newUser.setFirstName(null);
             newUser.setLastName(null);
             newUser.setPhoto(null);
-            newUser.setActive((byte)0);
-            newUser.setDeleted((byte)0);
+            newUser.setActive((byte) 0);
+            newUser.setDeleted((byte) 0);
             newUser.setDeactivationReason(null);
             newUser.setToken(randomToken);
             newUser.setTokenTime(new Timestamp(System.currentTimeMillis()));
@@ -137,7 +133,7 @@ public class UserController extends GenericController<User, Integer> {
             Notification.sendRegistrationLink(mail.trim(), "http://127.0.0.1:8020/user/registration/" + randomToken);
 
             return "Success";
-        } catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
             throw new BadRequestException("Bad Request");
         }
@@ -145,24 +141,24 @@ public class UserController extends GenericController<User, Integer> {
 
     @RequestMapping(value = "/registration/{token}", method = RequestMethod.GET)
     public @ResponseBody
-    User requestForRegistration(@PathVariable String token) throws BadRequestException {
+    User requestForRegistration(@PathVariable String token) {
         User user = userRepository.getByToken(token);
-        if(user == null){
+        if (user == null) {
             return null;
         }
 
-        if(user != null && new Timestamp(System.currentTimeMillis()).before(new Timestamp(user.getTokenTime().getTime() + 10*60*1000))){
+        if (new Timestamp(System.currentTimeMillis()).before(new Timestamp(user.getTokenTime().getTime() + 10 * 60 * 1000))) {
             return user;
-        }
-        else{
+        } else {
             return null;
         }
     }
 
+    @SuppressWarnings("SameReturnValue")
     @RequestMapping(value = "/registration", method = RequestMethod.POST)
     public @ResponseBody
     String registration(@RequestBody User newUser) throws BadRequestException {
-        try{
+        try {
             User user = entityManager.find(User.class, newUser.getId());
             user.setUsername(newUser.getUsername());
             user.setPassword(newUser.getPassword());
@@ -170,25 +166,26 @@ public class UserController extends GenericController<User, Integer> {
             user.setLastName(newUser.getLastName());
             user.setPhoto(newUser.getPhoto());
             user.setPin(newUser.getPin());
-            user.setActive((byte)1);
+            user.setActive((byte) 1);
 
             repo.saveAndFlush(user);
 
             return "Success";
-        } catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
             throw new BadRequestException("Bad Request");
         }
     }
 
 
-    @RequestMapping(value={"/state"},method = RequestMethod.GET)
+    @RequestMapping(value = {"/state"}, method = RequestMethod.GET)
     public
-     @ResponseBody  User checkState() throws ForbiddenException {
-        System.out.println("LOGGED"+userBean.getLoggedIn()+" user:"+userBean.getUser().getUsername());
+    @ResponseBody
+    User checkState() throws ForbiddenException {
+        System.out.println("LOGGED" + userBean.getLoggedIn() + " user:" + userBean.getUser().getUsername());
         if (userBean.getLoggedIn()) {
             return userBean.getUser();
-        }else
+        } else
             throw new ForbiddenException("Forbidden");
     }
 }

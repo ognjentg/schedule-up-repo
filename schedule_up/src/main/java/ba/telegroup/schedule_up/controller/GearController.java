@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequestMapping(value="/gear")
+@RequestMapping(value = "/gear")
 @Controller
 @Scope("request")
 public class GearController extends GenericController<Gear, Integer> {
@@ -32,7 +32,7 @@ public class GearController extends GenericController<Gear, Integer> {
     @RequestMapping(value = "/getAllNames", method = RequestMethod.GET)
     @ResponseBody
     public List<String> getAllNames() {
-        return ((GearRepository)repo).getAllNames();
+        return ((GearRepository) repo).getAllNames();
     }
 
     @Override
@@ -64,7 +64,7 @@ public class GearController extends GenericController<Gear, Integer> {
         throw new BadRequestException("Bad request");
     }
 
-    @RequestMapping(value = "/", method = RequestMethod.PUT)
+    @RequestMapping(method = RequestMethod.PUT)
     public @ResponseBody
     String update(@RequestBody Gear object) throws BadRequestException, ForbiddenException {
         return update(null, object);
@@ -73,7 +73,7 @@ public class GearController extends GenericController<Gear, Integer> {
     @Override
     public String update(Integer integer, Gear object) throws ForbiddenException, BadRequestException {
         List<Gear> gears = ((GearRepository) repo).getAllByNameContainsIgnoreCase(object.getName());
-        if(gears == null || gears.size() != 1)
+        if (gears == null || gears.size() != 1)
             throw new BadRequestException("Bad request");
         Gear oldObj = gears.get(0);
         if (Integer.valueOf(2).equals(userBean.getUser().getRoleId()) || Integer.valueOf(3).equals(userBean.getUser().getRoleId())) {

@@ -1,7 +1,6 @@
 package ba.telegroup.schedule_up.controller;
 
 import ba.telegroup.schedule_up.common.exceptions.BadRequestException;
-import ba.telegroup.schedule_up.common.exceptions.ForbiddenException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.interaction.Notification;
 import ba.telegroup.schedule_up.model.Company;
@@ -9,11 +8,9 @@ import ba.telegroup.schedule_up.model.User;
 import ba.telegroup.schedule_up.model.modelCustom.CompanyUser;
 import ba.telegroup.schedule_up.repository.CompanyRepository;
 import ba.telegroup.schedule_up.repository.UserRepository;
-import ba.telegroup.schedule_up.repository.repositoryCustom.CompanyRepositoryCustom;
 import ba.telegroup.schedule_up.util.Util;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,14 +20,15 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Objects;
 
 @RequestMapping(value = "/company")
 @Controller
 @Scope("request")
 public class CompanyController extends GenericController<Company, Integer> {
 
-    CompanyRepository companyRepository;
-    UserRepository userRepository;
+    private final CompanyRepository companyRepository;
+    private final UserRepository userRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -49,7 +47,7 @@ public class CompanyController extends GenericController<Company, Integer> {
      */
 
     @Override
-    public List getAll() throws BadRequestException, ForbiddenException {
+    public List getAll() {
         return companyRepository.getAllExtended();
     }
 
@@ -74,7 +72,7 @@ public class CompanyController extends GenericController<Company, Integer> {
 
     //Ovo je metoda za insert CompanyUser
     @Transactional
-    @RequestMapping(value ="/custom/", method = RequestMethod.POST)
+    @RequestMapping(value = "/custom/", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public @ResponseBody
     CompanyUser insertExtended(@RequestBody CompanyUser companyUser) throws BadRequestException {
@@ -84,34 +82,33 @@ public class CompanyController extends GenericController<Company, Integer> {
         company.setTimeTo(companyUser.getTimeTo());
         company.setTimeFrom(companyUser.getTimeFrom());
         company.setDeleted((byte) 0);
-        if(companyRepository.saveAndFlush(company) != null){
-            entityManager.refresh(company);
+        companyRepository.saveAndFlush(company);
+        entityManager.refresh(company);
 
-            String randomToken = Util.randomString(randomStringLength);
-            User user = new User();
-            user.setActive((byte)0);
-            user.setUsername(null);
-            user.setCompanyId(company.getId());
-            user.setDeactivationReason(null);
-            user.setDeleted((byte) 0);
-            user.setEmail(companyUser.getEmail());
-            user.setFirstName(null);
-            user.setLastName(null);
-            user.setPassword(null);
-            user.setToken(randomToken);
-            user.setTokenTime(new Timestamp(System.currentTimeMillis()));
-            user.setId(null);
-            user.setPhoto(null);
-            user.setPin(null);
-            user.setRoleId(2);
-            userRepository.saveAndFlush(user);
+        String randomToken = Util.randomString(randomStringLength);
+        User user = new User();
+        user.setActive((byte) 0);
+        user.setUsername(null);
+        user.setCompanyId(company.getId());
+        user.setDeactivationReason(null);
+        user.setDeleted((byte) 0);
+        user.setEmail(companyUser.getEmail());
+        user.setFirstName(null);
+        user.setLastName(null);
+        user.setPassword(null);
+        user.setToken(randomToken);
+        user.setTokenTime(new Timestamp(System.currentTimeMillis()));
+        user.setId(null);
+        user.setPhoto(null);
+        user.setPin(null);
+        user.setRoleId(2);
+        userRepository.saveAndFlush(user);
 
-            Notification.sendRegistrationLink(companyUser.getEmail().trim(), "http://127.0.0.1:8020/user/registration/" + randomToken);
+        Notification.sendRegistrationLink(companyUser.getEmail().trim(), "http://127.0.0.1:8020/user/registration/" + randomToken);
 
-            companyUser.setId(company.getId());
-        }
+        companyUser.setId(company.getId());
 
-        return  companyUser;
+        return companyUser;
     }
 
     /*
@@ -121,13 +118,13 @@ public class CompanyController extends GenericController<Company, Integer> {
     */
 
     @Transactional
-    @RequestMapping(value ="/custom/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/custom/{id}", method = RequestMethod.PUT)
     public @ResponseBody
     CompanyUser updateExtended(@PathVariable Integer id, @RequestBody CompanyUser companyUser) throws BadRequestException {
         Company company = companyRepository.findById(id).orElse(null);
-        User adminUser = userRepository.getByCompanyIdAndRoleIdAndActiveAndDeleted(company.getId(), 2, (byte)1, (byte)0);
-        if(adminUser != null && !companyUser.getEmail().equals(adminUser.getEmail())){
-            adminUser.setActive((byte)0);
+        User adminUser = userRepository.getByCompanyIdAndRoleIdAndActiveAndDeleted(Objects.requireNonNull(company).getId(), 2, (byte) 1, (byte) 0);
+        if (adminUser != null && !companyUser.getEmail().equals(adminUser.getEmail())) {
+            adminUser.setActive((byte) 0);
             userRepository.saveAndFlush(adminUser);
 
             String randomToken = Util.randomString(randomStringLength);
@@ -170,10 +167,11 @@ public class CompanyController extends GenericController<Company, Integer> {
      */
     @Override
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.DELETE)
-    public @ResponseBody String delete(@PathVariable Integer id) throws BadRequestException {
-        Company company=((CompanyRepository) repo).findById(id).orElse(null);
-        Company oldObject = cloner.deepClone(company);
-        company.setDeleted((byte)1);
+    public @ResponseBody
+    String delete(@PathVariable Integer id) throws BadRequestException {
+        Company company = repo.findById(id).orElse(null);
+        cloner.deepClone(company);
+        Objects.requireNonNull(company).setDeleted((byte) 1);
         if (companyRepository.deleteCompany(company) != null) {
             logDeleteAction(company);
             return "Success";

@@ -2,15 +2,7 @@ package ba.telegroup.schedule_up.controller;
 
 import ba.telegroup.schedule_up.common.exceptions.BadRequestException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
-import ba.telegroup.schedule_up.model.Building;
-import ba.telegroup.schedule_up.model.Note;
 import ba.telegroup.schedule_up.model.Room;
-import ba.telegroup.schedule_up.model.modelCustom.LoggerUser;
-import ba.telegroup.schedule_up.model.modelCustom.RoomBuilding;
-import ba.telegroup.schedule_up.repository.BuildingRepository;
-import ba.telegroup.schedule_up.repository.NoteRepository;
-import ba.telegroup.schedule_up.repository.RoomRepository;
-import ba.telegroup.schedule_up.repository.repositoryCustom.LoggerRepositoryCustom;
 import ba.telegroup.schedule_up.repository.repositoryCustom.RoomRepositoryCustom;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -32,20 +24,22 @@ public class RoomController extends GenericController<Room, Integer> {
 
     @Override
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.DELETE)
-    public @ResponseBody String delete(@PathVariable Integer id) throws BadRequestException {
-        Room room=((RoomRepository) repo).findById(id).orElse(null);
-        if (room!=null) {
+    public @ResponseBody
+    String delete(@PathVariable Integer id) throws BadRequestException {
+        Room room = repo.findById(id).orElse(null);
+        if (room != null) {
             room.setDeleted((byte) 1);
-            if (((RoomRepository) repo).saveAndFlush(room) != null) {
-                logDeleteAction(room);
-                return "Success";
-            }
+            repo.saveAndFlush(room);
+            logDeleteAction(room);
+            return "Success";
         }
         throw new BadRequestException("Bad request");
     }
 
+    @Override
     @RequestMapping(method = RequestMethod.GET)
     public @ResponseBody
-    List getAll() { return ((RoomRepositoryCustom) repo).getAllExtendedByCompanyId(userBean.getUser().getCompanyId());
+    List getAll() {
+        return ((RoomRepositoryCustom) repo).getAllExtendedByCompanyId(userBean.getUser().getCompanyId());
     }
 }

@@ -3,9 +3,6 @@ package ba.telegroup.schedule_up.controller;
 
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.model.Logger;
-import ba.telegroup.schedule_up.model.modelCustom.CompanyUser;
-import ba.telegroup.schedule_up.model.modelCustom.LoggerUser;
-import ba.telegroup.schedule_up.repository.repositoryCustom.CompanyRepositoryCustom;
 import ba.telegroup.schedule_up.repository.repositoryCustom.LoggerRepositoryCustom;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,9 +22,11 @@ public class LoggerController extends GenericController<Logger, Integer> {
         super(repo);
     }
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @Override
+    @RequestMapping(method = RequestMethod.GET)
     public @ResponseBody
-    List<LoggerUser> getAllExtendedByCompanyId() { return ((LoggerRepositoryCustom) repo).getAllExtendedByCompanyId(userBean.getUser().getCompanyId());
+    List getAll() {
+        return ((LoggerRepositoryCustom) repo).getAllExtendedByCompanyId(userBean.getUser().getCompanyId());
     }
 
 }
