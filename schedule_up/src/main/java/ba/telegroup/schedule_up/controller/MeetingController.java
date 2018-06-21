@@ -20,15 +20,14 @@ import java.util.Objects;
 @RequestMapping(value = "/meeting")
 @Controller
 @Scope("request")
-public class MeetingController extends GenericController<Meeting, Integer> {
-    private final MeetingRepository meetingRepository;
-    @Value("${admin.name}")
-    private String admin;
-    @Value("${advancedUser.name}")
-    private String advancedUser;
-    @Value("${user.name")
-    private String user;
-
+public class MeetingController extends GenericController<Meeting,Integer>{
+    MeetingRepository meetingRepository;
+    @Value("${admin.id}")
+    private Integer admin;
+    @Value("${advancedUser.id}")
+    private Integer advancedUser;
+    @Value("${user.id}")
+    private Integer user;
     @Autowired
     public MeetingController(MeetingRepository repo) {
         super(repo);
@@ -42,10 +41,9 @@ public class MeetingController extends GenericController<Meeting, Integer> {
     @Override
     public @ResponseBody
     List<Meeting> getAll() throws ForbiddenException {
-        if (userBean.getUser().getRoleId().equals(meetingRepository.getRoleIdByName(admin))) {
-            System.out.println("ADMIN");
-            return meetingRepository.getAllByStatus((byte) 0);
-        } else if (userBean.getUser().getRoleId().equals(meetingRepository.getRoleIdByName(advancedUser)) || userBean.getUser().getRoleId().equals(meetingRepository.getRoleIdByName(user))) {
+        if(userBean.getUser().getRoleId().equals(admin)) {
+            return meetingRepository.getAllByStatusAndCompanyId((byte) 0,userBean.getUser().getCompanyId());
+        }else if(userBean.getUser().getRoleId().equals(advancedUser) || userBean.getUser().getRoleId().equals(user)){
             return meetingRepository.getAllByParticipant(userBean.getUser().getId());
         }
         throw new ForbiddenException("Forbidden action");
@@ -56,8 +54,11 @@ public class MeetingController extends GenericController<Meeting, Integer> {
      */
     @RequestMapping(value = "/finish/", method = RequestMethod.PUT)
     public @ResponseBody
-    String finish(@RequestBody Meeting meeting) throws BadRequestException, ForbiddenException {
-        return updateStatus(meeting, (byte) 1);
+    String finish(@RequestBody Meeting meeting) throws BadRequestException,ForbiddenException {
+        if(userBean.getUser().getId().equals(meeting.getUserId()) ) {
+            return updateStatus(meeting, (byte) 1);
+        }
+        throw new ForbiddenException("Forbidden action");
     }
 
     /**
@@ -65,13 +66,18 @@ public class MeetingController extends GenericController<Meeting, Integer> {
      */
     @RequestMapping(value = "/cancel/", method = RequestMethod.PUT)
     public @ResponseBody
-    String cancel(@RequestBody Meeting meeting) throws BadRequestException, ForbiddenException {
-        Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-        Timestamp minimalCancelTime = new Timestamp(meeting.getStartTime().getTime() + meetingRepository.getCancelTimeByCompanyId(userBean.getUser().getCompanyId()).getTime());
-        if (currentTime.before(minimalCancelTime)) {
-            return updateStatus(meeting, (byte) 2);
+    String cancel(@RequestBody Meeting meeting) throws BadRequestException,ForbiddenException {
+        if(userBean.getUser().getId().equals(meeting.getUserId()) ) {
+            Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+            Timestamp minimalCancelTime = new Timestamp(meeting.getStartTime().getTime() + meetingRepository.getCancelTimeByCompanyId(userBean.getUser().getCompanyId()).getTime());
+            if (currentTime.before(minimalCancelTime)) {
+                if(meeting.getCancelationReason()!=null) {
+                    return updateStatus(meeting, (byte) 2);
+                }
+                throw new BadRequestException("Bad request");
+            }
         }
-        throw new BadRequestException("Bad request");
+        throw new ForbiddenException("Forbidden action");
     }
 
     /**
@@ -116,8 +122,8 @@ public class MeetingController extends GenericController<Meeting, Integer> {
     @ResponseStatus(HttpStatus.CREATED)
     public @ResponseBody
     Meeting insert(@RequestBody Meeting object) throws BadRequestException, ForbiddenException {
-        if (userBean.getUser().getRoleId().equals(meetingRepository.getRoleIdByName(admin)) || userBean.getUser().getRoleId().equals(meetingRepository.getRoleIdByName(advancedUser))) {
-            if (check(object, true)) {
+        if(userBean.getUser().getRoleId().equals(admin) || userBean.getUser().getRoleId().equals(advancedUser)) {
+            if(check(object,true)) {
                 return super.insert(object);
             }
             throw new BadRequestException("Bad request");
@@ -128,10 +134,13 @@ public class MeetingController extends GenericController<Meeting, Integer> {
     /**
      * pomocna metoda za provjeru sastanka
      */
-    private Boolean check(Meeting meeting, Boolean insert) {
-        if (meeting != null
-                && meeting.getEndTime() != null
-                && meeting.getStartTime() != null
+    private Boolean check(Meeting meeting, Boolean insert){
+        Timestamp currentTime=new Timestamp(System.currentTimeMillis());
+        if(meeting!=null
+                && meeting.getEndTime()!=null
+                && meeting.getStartTime()!=null
+                && meeting.getStartTime().after(currentTime)
+                && meeting.getEndTime().after(currentTime)
                 && meeting.getEndTime().after(meeting.getStartTime())
                 && meeting.getUserId() != null
                 && meeting.getRoomId() != null
