@@ -243,8 +243,8 @@ var noteView = {
             var newNote = {
                 name: form.getValues().name,
                 description: form.getValues().description,
-                userId: 1, // we need to change this when userBean is made
-                companyId: 1, // also needs change
+                userId: userData.id,
+                companyId: companyData.id,
             };
             $$("noteDT").add(newNote);
             util.dismissDialog('addNoteDialog');

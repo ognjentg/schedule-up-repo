@@ -125,13 +125,14 @@ var init = function () {
                                 companyData.deleted = 0;
                                 showApp();
                             } else {
-                                connection.reload();
+                                userData=null;
+                                showLogin();
 
                             }
                         },
                         error: function (text, data, xhr) {
-                            connection.reload();
-
+                            userData=null;
+                            showLogin();
                         }
                     });
                 }

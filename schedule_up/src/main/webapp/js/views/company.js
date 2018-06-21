@@ -191,6 +191,16 @@ var companyView = {
                     label: "Naziv",
                     invalidMessage: "Unesite naziv kompanije!",
                     required: true
+                },{
+                    view:"template",
+                    id:"companyLogo",
+                    name:"companyLogo",
+                    template:"<img src='data:image/jpg;base64,#companyLogo#'/>",
+                    required:"true",
+                    label:"Logo",
+                    invalidMessage: "Morate postaviti logo!",
+
+
                 }, {
                     id: "timeFrom",
                     invalidMessage: "Unesite početak radnog vremena!",
@@ -234,6 +244,26 @@ var companyView = {
                         name: "email",
                         label: "E-mail",
                         required: true
+                    },{
+                        view:"uploader",
+                        value:"Logo kompanije",
+                        accept:"image/jpeg, image/png",
+                        autosend:false,
+                        width:200,
+                        align:"center",
+                        multiple:false,
+                        on:{
+                            onBeforeFileAdd: function(upload){
+                                var file = upload.file;
+                                var reader = new FileReader();
+                                reader.onload = function(event) {
+                                    form.elements.companyLogo.setValue(event.target.result.split("base64,")[1]);
+
+                                };
+                                reader.readAsDataURL(file)
+                                return false;
+                            }
+                        }
                     }, {
                         margin: 5,
                         cols: [{}, {
@@ -289,7 +319,8 @@ var companyView = {
                 name: form.getValues().name,
                 timeFrom: form.getValues().timeFrom + ":00",
                 timeTo: form.getValues().timeTo + ":00",
-                email: form.getValues().email
+                email: form.getValues().email,
+                companyLogo: form.getValues().companyLogo
             };
             $$("companyDT").add(newCompany);
             util.dismissDialog('addCompanyDialog');
