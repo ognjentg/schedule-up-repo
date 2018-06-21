@@ -3,6 +3,7 @@ package ba.telegroup.schedule_up.controller;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.model.Reminder;
 import ba.telegroup.schedule_up.repository.ReminderRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Controller;
@@ -23,11 +24,19 @@ public class ReminderController extends GenericController<Reminder, Integer> {
         super(repo);
     }
 
+    private ReminderRepository reminderRepository;
+
+    @Autowired
+    public ReminderController(ReminderRepository repo) {
+        super(repo);
+        this.reminderRepository = repo;
+    }
+
     @Override
     @RequestMapping(method = RequestMethod.GET)
     public @ResponseBody
     List<Reminder> getAll() {
-        return ((ReminderRepository) repo).getAllByDeletedEquals((byte) 0);
+        return reminderRepository.getAllByDeletedEquals((byte) 0);
     }
 
     @Override
