@@ -350,7 +350,7 @@ var buildingView = {
                             address: $$("addBuildingForm").getValues().adresa,
                             latitude: lat,
                             longitude: lng,
-                            companyId: 1
+                            companyId: companyData.id
 
                         };
                         $$("buildingDT").add(newItem);
@@ -364,7 +364,7 @@ var buildingView = {
                         address: $$("addBuildingForm").getValues().adresa,
                         latitude: lat,
                         longitude: lng,
-                        companyId: 1
+                        companyId: companyData.id
 
                     };
 
@@ -648,7 +648,7 @@ var buildingView = {
                             address: $$("changeBuildingForm").getValues().adresa,
                             latitude: lat,
                             longitude: lng,
-                            companyId: 1,
+                            companyId: companyData.id,
                             deleted: 0
 
                         };
@@ -664,7 +664,7 @@ var buildingView = {
                         address: $$("changeBuildingForm").getValues().adresa,
                         latitude: lat,
                         longitude: lng,
-                        companyId: 1,
+                        companyId: companyData.id,
                         deleted: 0
 
                     };
@@ -715,7 +715,7 @@ var buildingView = {
                             address: $$("addBuildingForm").getValues().adresa,
                             latitude:lat,
                             longitude:lng,
-                            companyId: 1
+                            companyId: companyData.id
 
                         };
                         $$("buildingDT").add(newItem);
@@ -733,7 +733,7 @@ var buildingView = {
                         address: $$("addBuildingForm").getValues().adresa,
                         latitude:lat,
                         longitude:lng,
-                        companyId: 1
+                        companyId: companyData.id
 
                     };
                     $$("buildingDT").add(newItem);
