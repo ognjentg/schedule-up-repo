@@ -357,14 +357,13 @@ var noteView = {
                 description: $$("changeNoteForm").getValues().description,
                 publishedTime: new Date(),
                 deleted: 0,
-                userId: 1, // we need to change this when userBean is made
-                companyId: 1, // also needs change
+                userId: userData.id,
+                companyId: companyData.id,
             };
             connection.sendAjax("PUT", "note/" + newItem.id,
                 function (text, data, xhr) {
                     if (text) {
                         util.messages.showMessage("Oglas uspješno izmjenjen.");
-                        //$$("companyDT").detachEvent();
                         $$("noteDT").updateItem(newItem.id, newItem);
                     } else
                         util.messages.showErrorMessage("Neuspješna izmjena.");

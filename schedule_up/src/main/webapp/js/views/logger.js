@@ -23,7 +23,6 @@ var loggerView = {
                 id: "id",
                 hidden: true,
                 fillspace: true,
-
             },
                 // add user name in 1st column
                 {
@@ -70,17 +69,13 @@ var loggerView = {
                     id: "created",
                     fillspace: false,
                     editable: false,
-                    editor: "Date",
                     width: 150,
-                    format: function (value) {
-                        date = new Date(value);
-                        var hours = date.getHours();
-                        var minutes = date.getMinutes();
-
-                        minutes = minutes < 10 ? '0' + minutes : minutes;
-                        var strTime = hours + ':' + minutes;
-                        return date.getDate() + "." + (date.getMonth() + 1) + "." + date.getFullYear() + ".  " + strTime;
+                    template: function format(value) {
+                        var date = new Date(value.created);
+                        var format= webix.Date.dateToStr("%d.%m.%Y %H:%i");
+                        return format(date);
                     },
+                    sort: "date",
                     header: ["Datum", {
                         content: "textFilter"
                     }],
@@ -97,6 +92,7 @@ var loggerView = {
         $$("main").removeView(rightPanel);
         rightPanel = "loggerPanel";
         var panelCopy = webix.copy(this.panel);
+
         $$("main").addView(webix.copy(panelCopy));
         connection.attachAjaxEvents("loggerDT", "loggerUser", true);
     }
