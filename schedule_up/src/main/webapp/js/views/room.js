@@ -404,7 +404,7 @@ var roomView = {
                 pin: form.getValues().pin,
                 description: form.getValues().description,
                 buildingId: form.getValues().buildingName,
-                companyId: 1
+                companyId: companyData.id
             };
             //  $$("roomDT").add(newRoom);//jos nije kreiran roomDT
             util.dismissDialog('addRoomDialog');
@@ -598,7 +598,7 @@ var roomView = {
                 pin: form.getValues().pin,
                 description: form.getValues().description,
                 buildingId: form.getValues().buildingName,
-                companyId: 1,
+                companyId: companyData.id,
                 deleted: 0
             };
 
