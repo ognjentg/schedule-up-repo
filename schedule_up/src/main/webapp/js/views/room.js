@@ -179,7 +179,7 @@ var roomView = {
         var panelCopy = webix.copy(this.panel);
 
         $$("main").addView(webix.copy(panelCopy));
-        connection.attachAjaxEvents("roomDT", "room", true);
+        connection.attachAjaxEvents("roomDT", "room");
         $$("roomDT").detachEvent("onBeforeDelete");
 
         webix.ui({
