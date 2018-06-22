@@ -129,10 +129,12 @@ public class MeetingController extends GenericController<Meeting,Integer>{
     public @ResponseBody
     Meeting insert(@RequestBody Meeting object) throws BadRequestException, ForbiddenException {
         if(userBean.getUser().getRoleId().equals(admin) || userBean.getUser().getRoleId().equals(advancedUser)) {
-            if(check(object,true)) {
-                return super.insert(object);
+            if(object!=null && object.getCompanyId()!=null && userBean.getUser().getCompanyId().equals(object.getCompanyId())) {
+                if (check(object, true)) {
+                    return super.insert(object);
+                }
+                throw new BadRequestException("Bad request");
             }
-            throw new BadRequestException("Bad request");
         }
         throw new ForbiddenException("Forbidden action");
     }
