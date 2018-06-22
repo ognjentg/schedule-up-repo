@@ -40,10 +40,6 @@ public class MeetingController extends GenericController<Meeting,Integer>{
         this.meetingRepository = repo;
     }
 
-    /**
-     * Ova metoda vraca sve rezervacije na osnovu privilegija ukoliko je u pitanju admin on moze da vidi sve kreirane rezervacije
-     * dok se u slucaju da je u pitanju napredni korisnik ili obicni korisnik prikazuju rezervacije u kojima je on ucesnik
-     */
     @Override
     public @ResponseBody
     List<Meeting> getAll() throws ForbiddenException {
@@ -55,9 +51,6 @@ public class MeetingController extends GenericController<Meeting,Integer>{
         throw new ForbiddenException("Forbidden action");
     }
 
-    /**
-     * Ova metoda sluzi za zatvaranje sastanka
-     */
     @RequestMapping(value = "/finish/", method = RequestMethod.PUT)
     public @ResponseBody
     String finish(@RequestBody Meeting meeting) throws BadRequestException,ForbiddenException {
@@ -67,21 +60,22 @@ public class MeetingController extends GenericController<Meeting,Integer>{
         throw new ForbiddenException("Forbidden action");
     }
 
-    /**
-     * Ova metoda sluzi za otkazivanje sastanka - ostaje sporno da se vidi koji je onaj predefinisani period
-     */
     @RequestMapping(value = "/cancel/", method = RequestMethod.PUT)
     public @ResponseBody
     String cancel(@RequestBody Meeting meeting) throws BadRequestException,ForbiddenException {
-        if(userBean.getUser().getId().equals(meeting.getUserId()) ) {
-            Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-            Timestamp minimalCancelTime = new Timestamp(meeting.getStartTime().getTime() + meetingRepository.getCancelTimeByCompanyId(userBean.getUser().getCompanyId()).getTime());
-            if (currentTime.before(minimalCancelTime)) {
-                if(meeting.getCancelationReason()!=null) {
-                    return updateStatus(meeting, canceled);
+        if(meeting.getId()!=null) {
+            Meeting meetingFromDatabase = meetingRepository.getOne(meeting.getId());
+                if (userBean.getUser().getId().equals(meeting.getUserId()) &&
+                        meeting.getEndTime().equals(meetingFromDatabase.getEndTime()) && meeting.getStartTime().equals(meetingFromDatabase.getStartTime())) {
+                    Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+                    Timestamp minimalCancelTime = new Timestamp(meeting.getStartTime().getTime() + meetingRepository.getCancelTimeByCompanyId(userBean.getUser().getCompanyId()).getTime());
+                    if (currentTime.before(minimalCancelTime)) {
+                        if (meeting.getCancelationReason() != null) {
+                            return updateStatus(meeting, canceled);
+                        }
+                        throw new BadRequestException("Bad request");
+                    }
                 }
-                throw new BadRequestException("Bad request");
-            }
         }
         throw new ForbiddenException("Forbidden action");
     }
@@ -109,9 +103,7 @@ public class MeetingController extends GenericController<Meeting,Integer>{
         }
     }
 
-    /**
-     * brisanje je nemoguce
-     */
+
     @Override
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.DELETE)
     public @ResponseBody
@@ -119,9 +111,7 @@ public class MeetingController extends GenericController<Meeting,Integer>{
         throw new ForbiddenException("Forbidden action");
     }
 
-    /**
-     * kreiranje rezervacije u slucaju da smo ili admin ili napredni korisnik u suprotnom ide forbidden exception
-     */
+
     @Override
     @Transactional
     @RequestMapping(method = RequestMethod.POST)
@@ -139,9 +129,6 @@ public class MeetingController extends GenericController<Meeting,Integer>{
         throw new ForbiddenException("Forbidden action");
     }
 
-    /**
-     * pomocna metoda za provjeru sastanka
-     */
     private Boolean check(Meeting meeting, Boolean insert){
         Timestamp currentTime=new Timestamp(System.currentTimeMillis());
         if(meeting!=null
@@ -165,9 +152,6 @@ public class MeetingController extends GenericController<Meeting,Integer>{
         return false;
     }
 
-    /**
-     * pomocna metoda za azuranje statusa napravaljena zbog dupliciranja koda
-     */
     @SuppressWarnings("SameReturnValue")
     private String updateStatus(Meeting updatedObject, byte status) throws BadRequestException, ForbiddenException {
         if (status > 2) {

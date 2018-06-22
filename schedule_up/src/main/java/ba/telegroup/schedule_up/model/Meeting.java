@@ -61,7 +61,7 @@ public class Meeting {
     @Column(name = "end_time", nullable = false)
     @JsonProperty("end_date")
     @JsonFormat
-            (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm",timezone = "Europe/Belgrade")
+            (shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm",timezone="Europe/Belgrade")
     public Timestamp getEndTime() {
         return endTime;
     }
