@@ -18,7 +18,7 @@ var roomView = {
                 id: "addRoomBtn",
                 view: "button",
                 type: "iconButton",
-                label: "Sačuvajte",
+                label: "Dodajte salu",
                 icon: "plus-circle",
                 click: 'roomView.showAddDialog',
                 autowidth: true
@@ -501,7 +501,7 @@ var roomView = {
                     cols: [{}, {
                         id: "saveRoom",
                         view: "button",
-                        value: "Dodajte salu",
+                        value: "Sačuvajte",
                         type: "form",
                         click: "roomView.saveChangedRoom",
                         hotkey: "enter",
