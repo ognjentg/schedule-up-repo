@@ -203,7 +203,7 @@ var roomView = {
                     var context = this.getContext();
                     switch (id) {
                         case "1":
-
+                            roomView.showChangeRoomDialog($$("roomDT").getItem(context.id.row));
                             break;
                         case "2":
                             var delBox = (webix.copy(commonViews.brisanjePotvrda("sale", "salu")));
@@ -406,7 +406,7 @@ var roomView = {
                 buildingId: form.getValues().buildingName,
                 companyId: companyData.id
             };
-            //  $$("roomDT").add(newRoom);//jos nije kreiran roomDT
+            $$("roomDT").add(newRoom);
             util.dismissDialog('addRoomDialog');
         }
     },
@@ -606,7 +606,7 @@ var roomView = {
                 function (text, data, xhr) {
                     if (text) {
                         util.messages.showMessage("Podaci su uspješno izmijenjeni.");
-                        //$$("roomDT").updateItem(newRoom.id, newRoom);
+                        $$("roomDT").updateItem(newRoom.id, newRoom);
                     } else
                         util.messages.showErrorMessage("Podaci nisu izmijenjeni.");
                 }, function () {
