@@ -15,7 +15,6 @@ var dashboardView = {
         var panelCopy = webix.copy(this.panel);
         $$("main").addView(webix.copy(panelCopy));
         scheduler.config.xml_date = "%d-%m-%Y %H:%i";
-        scheduler.config.server_utc = true;
         scheduler.config.readonly = true;
         scheduler.init('scheduler_here', new Date(), "week");
         scheduler.attachEvent("onClick", function (id, e) {
