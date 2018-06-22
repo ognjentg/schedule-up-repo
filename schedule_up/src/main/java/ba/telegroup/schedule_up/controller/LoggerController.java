@@ -3,6 +3,7 @@ package ba.telegroup.schedule_up.controller;
 
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.model.Logger;
+import ba.telegroup.schedule_up.repository.LoggerRepository;
 import ba.telegroup.schedule_up.repository.repositoryCustom.LoggerRepositoryCustom;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,15 +19,18 @@ import java.util.List;
 @Scope("request")
 public class LoggerController extends GenericController<Logger, Integer> {
 
-    public LoggerController(JpaRepository<Logger, Integer> repo) {
-        super(repo);
+    private final LoggerRepository loggerRepository;
+
+    public LoggerController(LoggerRepository loggerRepository) {
+        super(loggerRepository);
+        this.loggerRepository = loggerRepository;
     }
 
     @Override
     @RequestMapping(method = RequestMethod.GET)
     public @ResponseBody
     List getAll() {
-        return ((LoggerRepositoryCustom) repo).getAllExtendedByCompanyId(userBean.getUser().getCompanyId());
+        return loggerRepository.getAllExtendedByCompanyId(userBean.getUser().getCompanyId());
     }
 
 }
