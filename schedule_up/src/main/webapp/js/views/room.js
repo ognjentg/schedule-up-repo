@@ -1,8 +1,5 @@
-var countries=[];
-var tabledata=[];
-var tablecentar=[];
-var lat;
-var lng;
+var tableData=[];
+var tableCentar=[];
 
 var roomView = {
 
@@ -128,12 +125,12 @@ var roomView = {
     },
 
     showMapDetailsDialog: function(latitude,longitude){
-        tablecentar[0]=latitude;
-        tablecentar[1]=longitude;
+        tableCentar[0]=latitude;
+        tableCentar[1]=longitude;
         var mapaObjekat={
-            id:1,lat:tablecentar[0],  lng:tablecentar[1]
+            id:1,lat:tableCentar[0],  lng:tableCentar[1]
         };
-        tabledata[0]=mapaObjekat;
+        tableData[0]=mapaObjekat;
         webix.ui(webix.copy(roomView.showMapDialog));
         $$("mapLabel").data.label="<span class='webix_icon fa fa-map-marker '></span> Lokacija sale";
         $$("showMapDialog").show();
@@ -168,8 +165,8 @@ var roomView = {
                 zoom:15,
                 width: 600,
                 height:500,
-                center:tablecentar,
-                data:tabledata
+                center:tableCentar,
+                data:tableData
 
             },]
         }

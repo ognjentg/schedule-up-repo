@@ -375,7 +375,7 @@ var gearView = {
                 name: $$("addGearForm").getValues().name,
                 description: $$("addGearForm").getValues().description,
                 available: 1,
-                companyId: 1,
+                companyId: userData.companyId,
                 gearId: null
             };
 
@@ -388,27 +388,14 @@ var gearView = {
                     if (obj.value == newItem.name) gearExists = true;
                 }
             );
-            //alert("vrijednost:"+gearExists);
 
             if (gearExists) {
                 connection.sendAjax("GET", "gear/" + newItem.name,
                     function (text, data, xhr) {
                         if (text) {
                             newItem.gearId = JSON.parse(text)[0].id;
-                            //alert(newItem.gearId);
-                            //alert("proslo");
                             $$("gearDT").add(newItem);
-                            // util.dismissDialog('addGearDialog');
                             util.messages.showMessage("Oprema je uspješno kreirana.");
-                            /*connection.sendAjax("POST", "gear-unit/custom/",
-                                 function (text, data, xhr) {
-                                     if (text) {
-                                         util.messages.showMessage("Oprema je uspješno kreirana.");
-                                     } else
-                                         util.messages.showErrorMessage("Oprema nije kreirana.");
-                                 }, function () {
-                                     util.messages.showErrorMessage("Oprema nije kreirana.");
-                                 }, newItem);*/
                         } else
                             util.messages.showErrorMessage("Oprema nije kreirana.");
                     }, function () {
@@ -416,24 +403,9 @@ var gearView = {
                     }, newItem);
 
                 util.dismissDialog('addGearDialog');
-
             } else {
                 $$("gearDT").add(newItem);
-                //util.dismissDialog('addGearDialog');
                 util.messages.showMessage("Oprema je uspješno kreirana.");
-                //alert("id opreme:"+newItem.gearId);
-                /*
-
-                                connection.sendAjax("POST", "gear-unit/custom/",
-                                    function (text, data, xhr) {
-                                        if (text) {
-                                            util.messages.showMessage("Oprema je uspješno kreirana.");
-                                        } else
-                                            util.messages.showErrorMessage("Oprema nije kreirana.");
-                                    }, function () {
-                                        util.messages.showErrorMessage("Oprema nije kreirana.");
-                                    }, newItem);
-                */
                 util.dismissDialog('addGearDialog');
             }
         }
