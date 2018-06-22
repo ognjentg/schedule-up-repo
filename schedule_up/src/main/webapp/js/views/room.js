@@ -18,7 +18,7 @@ var roomView = {
                 id: "addRoomBtn",
                 view: "button",
                 type: "iconButton",
-                label: "Dodajte salu",
+                label: "Sačuvajte",
                 icon: "plus-circle",
                 click: 'roomView.showAddDialog',
                 autowidth: true
@@ -319,7 +319,7 @@ var roomView = {
                     cols: [{}, {
                         id: "saveRoom",
                         view: "button",
-                        value: "Dodajte salu",
+                        value: "Sačuvajte",
                         type: "form",
                         click: "roomView.save",
                         hotkey: "enter",
@@ -547,9 +547,10 @@ var roomView = {
                         return true;
                     },
                     "pin": function (value) {
+                        console.log(value);
                         if (!value)
                             return false;
-                        if (isNaN(value) || value !== parseInt(value, 10)) {
+                        if (isNaN(value) || value != parseInt(value, 10)) {
                             $$('changeRoomForm').elements.pin.config.invalidMessage = 'PIN može da sadrži samo cifre!';
                             return false;
                         }
