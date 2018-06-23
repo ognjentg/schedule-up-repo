@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 
@@ -36,7 +37,8 @@ public class HolidayController extends GenericController<Holiday, Integer> {
     @RequestMapping(method = RequestMethod.GET)
     public @ResponseBody
     List<Holiday> getAll() {
-        return holidayRepository.getAllByDeletedEqualsAndCompanyId((byte) 0, userBean.getUser().getCompanyId());
+        /*return holidayRepository.getAllByDeletedEqualsAndCompanyId((byte) 0, userBean.getUser().getCompanyId());*/
+        return getAllByDateAfter(new java.sql.Date(Calendar.getInstance().getTimeInMillis()));
     }
 
     @Override
