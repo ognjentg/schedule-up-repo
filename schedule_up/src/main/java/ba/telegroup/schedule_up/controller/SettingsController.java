@@ -3,6 +3,7 @@ package ba.telegroup.schedule_up.controller;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.model.Settings;
 import ba.telegroup.schedule_up.repository.SettingsRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Controller;
@@ -17,50 +18,58 @@ import java.util.List;
 @Controller
 @Scope("request")
 public class SettingsController extends GenericController<Settings, Integer> {
+    protected SettingsRepository settingsRepository;
+
     public SettingsController(JpaRepository<Settings, Integer> repo) {
         super(repo);
+    }
+
+    @Autowired
+    public SettingsController(SettingsRepository repo) {
+        super(repo);
+        this.settingsRepository = repo;
     }
 
     @RequestMapping(value = "/getByCompanyId/{id}", method = RequestMethod.GET)
     public @ResponseBody
     Settings getByCompanyId(@PathVariable Integer id) {
-        return ((SettingsRepository) repo).getByCompanyId(id);
+        return settingsRepository.getByCompanyId(id);
     }
 
     @RequestMapping(value = "/getAllByReminderTimeAfter/{time}", method = RequestMethod.GET)
     public @ResponseBody
     List getAllByRemainderTimeAfter(@PathVariable java.sql.Time time) {
-        return ((SettingsRepository) repo).getAllByReminderTimeAfterAndCompanyId(time, userBean.getUser().getCompanyId());
+        return settingsRepository.getAllByReminderTimeAfterAndCompanyId(time, userBean.getUser().getCompanyId());
     }
 
     @RequestMapping(value = "/getAllByReminderTimeBefore/{time}", method = RequestMethod.GET)
     public @ResponseBody
     List getAllByRemainderTimeBefore(@PathVariable java.sql.Time time) {
-        return ((SettingsRepository) repo).getAllByReminderTimeBeforeAndCompanyId(time, userBean.getUser().getCompanyId());
+        return settingsRepository.getAllByReminderTimeBeforeAndCompanyId(time, userBean.getUser().getCompanyId());
     }
 
     @RequestMapping(value = "/getAllByReminderTimeBetween/{from}/{to}", method = RequestMethod.GET)
     public @ResponseBody
     List getAllByRemainderTimeBetween(@PathVariable java.sql.Time from, @PathVariable java.sql.Time to) {
-        return ((SettingsRepository) repo).getAllByReminderTimeBetweenAndCompanyId(from, to, userBean.getUser().getCompanyId());
+        return settingsRepository.getAllByReminderTimeBetweenAndCompanyId(from, to, userBean.getUser().getCompanyId());
     }
 
     @RequestMapping(value = "/getAllByCancelTimeAfter/{time}", method = RequestMethod.GET)
     public @ResponseBody
     List getAllByCancelTimeAfter(@PathVariable java.sql.Time time) {
-        return ((SettingsRepository) repo).getAllByCancelTimeAfterAndCompanyId(time, userBean.getUser().getCompanyId());
+        return settingsRepository.getAllByCancelTimeAfterAndCompanyId(time, userBean.getUser().getCompanyId());
     }
 
     @RequestMapping(value = "/getAllByCancelTimeBefore/{time}", method = RequestMethod.GET)
     public @ResponseBody
     List getAllByCancelTimeBefore(@PathVariable java.sql.Time time) {
-        return ((SettingsRepository) repo).getAllByCancelTimeBeforeAndCompanyId(time, userBean.getUser().getCompanyId());
+        return settingsRepository.getAllByCancelTimeBeforeAndCompanyId(time, userBean.getUser().getCompanyId());
     }
 
     @RequestMapping(value = "/getAllByCancelTimeBetween/{from}/{to}", method = RequestMethod.GET)
     public @ResponseBody
     List getAllByCancelTimeBetween(@PathVariable java.sql.Time from, @PathVariable java.sql.Time to) {
-        return ((SettingsRepository) repo).getAllByCancelTimeBetweenAndCompanyId(from, to, userBean.getUser().getCompanyId());
+        return settingsRepository.getAllByCancelTimeBetweenAndCompanyId(from, to, userBean.getUser().getCompanyId());
     }
 
 }
