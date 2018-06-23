@@ -93,7 +93,7 @@ var buildingView = {
                             content: "textFilter"
                         }
                     ]
-                },
+                }
             ],
             select: "row",
             navigation: true,
@@ -301,6 +301,27 @@ var buildingView = {
         $$("showMapDialog").show();
     },
     showChangeBuildingDialog: function (building) {
+        var url="https://maps.googleapis.com/maps/api/geocode/json?latlng="+building.latitude+","+building.longitude+"+&key=AIzaSyBExEHqJmRKJoRhWOT6Ok3fLR5QMGIZ_eg&language=hr";
+        fetch(url).then(function(result) {
+            if(result.ok) {
+                return result.json();
+            }
+            throw new Error('Neuspješno dobavljanje tačne lokacije.');
+        }).then(function(json) {
+            var place=json['results'][0];
+            if(place!=null) {
+                var filtered_array2 = place.address_components.filter(function (address_component) {
+                    return address_component.types.includes("locality");
+                });
+
+                var city = filtered_array2.length ? filtered_array2[0].long_name : "";
+            }else city="";
+            form.elements.grad.setValue(city);
+
+        }).catch(function(error) {
+            util.messages.showErrorMessage("Neuspješno dobavljanje grada.")
+        });
+
         webix.ui(webix.copy(buildingView.changeBuildingDialog));
         var form = $$("changeBuildingForm");
         console.log("Buidling id:" + building.id);
@@ -308,6 +329,7 @@ var buildingView = {
         form.elements.id.setValue(building.id);
         form.elements.name.setValue(building.name);
         form.elements.description.setValue(building.description);
+
         form.elements.adresa.setValue(building.address);
         var url = "https://restcountries.eu/rest/v2/all";
         fetch(url).then(function (result) {
@@ -572,6 +594,8 @@ var buildingView = {
             $$("adresa").setValue(adresa+" "+broj);
             $$("combo").setValue(country_long + " : " + country_short);
             $$("grad").setValue(city);
+            
+
             util.dismissDialog('showMapDialog');
 
         }).catch(function(error) {
@@ -604,7 +628,7 @@ var buildingView = {
             tablecentar[1]=json['results'][0]['geometry']['location']['lng'];
             var mapaObjekat={
                 id:1, draggable:true,lat:json['results'][0]['geometry']['location']['lat'],  lng:json['results'][0]['geometry']['location']['lng'],   label:"A", draggable:true
-            }
+            };
             lat=json['results'][0]['geometry']['location']['lat'];
             lng=json['results'][0]['geometry']['location']['lng'];
             entered=true;

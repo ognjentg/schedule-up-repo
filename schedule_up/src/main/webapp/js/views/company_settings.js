@@ -81,7 +81,7 @@ var companySettingsView = {
                             type: "time",
                             format: "%H:%i",
                             on: {
-                                onChange: function (item, oldv) {
+                                onChange: function (item) {
 
                                     if (companySettingsView.firstLoadEnd++ == 0) {
                                         return;
@@ -277,11 +277,6 @@ var companySettingsView = {
             }
             ]
         }]
-    },
-    customizeDialog: function () {
-        var form = $$("showDialogForm");
-        webix.ui(webix.copy(companySettingsView.showDialogForm)).show();
-
     },
     selectPanel: function () {
         $$("main").removeView(rightPanel);
