@@ -257,20 +257,50 @@ var companySettingsView = {
                                     type: "date",
                                     calendarDate: "%d/%m/%y"
                                 }
+                            },
+                            on:{
+                                onChange:function(item){
+                                    var date=$$("customizeForm").getValues().holiday;
+                                    console.log(date);
+                                    var formatDate=date.split(" ")[0];
+                                    console.log(formatDate);
+                                    var newHoliday={
+                                        date: formatDate,
+                                        companyId: companyData.id                                    };
+                                    connection.sendAjax("POST", "holiday/",
+                                    function (text, data, xhr) {
+                                        if (text ) {
+                                            util.messages.showMessage("Uspješno .");
+                                            $$("neradniDaniLista").setValue( formatDate);
+
+                                        } else {
+                                            util.messages.showErrorMessage("Greška pri dodavanju.");
+                                        }
+                                    }, function (text,data,xhr) {
+                                        util.messages.showErrorMessage("Greška pri dodavanju.");
+
+                                    }, newHoliday)
                             }
-                        }, {
-                            id: "t3",
-                            template: function format(obj, oldv) {
-                                if (obj.value) {
-                                    if (webix.isArray(obj.value)) {
-                                        return obj.value.map(webix.i18n.dateFormatStr).join("<br>");
-                                    }
-                                    //return obj.value.map(webix.i18n.dateFormatStr).join("<br>");
-                                    return webix.i18n.dateFormatStr(obj.value);
-                                }
-                                return "";
-                            }, height: 185
-                        }
+
+                        }}, {
+                            id: "neradniDaniLista",
+                            view:"list",
+                            height: 185,
+                            onContext: {},
+                            columns: [{
+                                id: "id",
+                                hidden: true,
+                                fillspace: true,
+
+                            }, {
+                                id: "date",
+                                editable: false,
+                                fillspace: true,
+
+
+                            }
+                        ]}
+
                         ]
                     }
                 ]
@@ -285,9 +315,21 @@ var companySettingsView = {
         var panelCopy = webix.copy(this.panel);
 
         $$("main").addView(webix.copy(panelCopy));
-        $$("t3").bind($$("holiday"), "value");
+        connection.attachAjaxEvents("neradniDaniLista", "holiday", true);
         companySettingsView.firstLoadStart = companySettingsView.firstLoadEnd =
             companySettingsView.firstLoadCancel = companySettingsView.firstLoadReminder = 0;
+        connection.sendAjax("GET", "holiday/getAllByCompanyId/"+companyData.id ,
+            function (text, data, xhr) {
+                 $$("neradniDaniLista").setValue( data.json());
+                 console.log(data.json());
+                 if(text){
+                    console.log("radi");
+                } else
+                    util.messages.showErrorMessage("Greška pri učitavanju neradnih dana.");
+            }, function () {
+                util.messages.showErrorMessage("Greška pri učitavanju neradnih dana.");
+            }, null);
+
         connection.sendAjax("GET", "settings/getByCompanyId/" + companyData.id,
             function (text, data, xhr) {
                 companySettingsView.settings = data.json();
