@@ -111,7 +111,7 @@ public class ExchangeServer {
      */
     public HashMap<Participant, Date[][]> getParticipantAvailability(List<Participant> participants, Date start, Date end) throws Exception
     {
-        List<AttendeeInfo> attendees = new ArrayList<AttendeeInfo>();
+        List<AttendeeInfo> attendees = new ArrayList<>();
         for(Participant participant : participants)
         {
             attendees.add(new AttendeeInfo(participant.getEmail()));

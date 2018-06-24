@@ -78,6 +78,6 @@ public class RoomBuilding extends Room {
     @JsonIgnore
     @Override
     public Byte getDeleted() {
-        return getDeleted();
+        return super.getDeleted();
     }
 }
