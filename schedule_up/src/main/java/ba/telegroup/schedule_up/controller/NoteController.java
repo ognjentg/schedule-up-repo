@@ -5,24 +5,20 @@ import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.model.Note;
 import ba.telegroup.schedule_up.model.modelCustom.NoteUser;
 import ba.telegroup.schedule_up.repository.NoteRepository;
-import ba.telegroup.schedule_up.repository.repositoryCustom.NoteRepositoryCustom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.List;
 
 @RequestMapping(value = "/note")
 @Controller
 @Scope("request")
 public class NoteController extends GenericController<Note, Integer> {
-    
+
     private final NoteRepository noteRepository;
 
     @Autowired

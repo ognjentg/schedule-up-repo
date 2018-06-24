@@ -20,7 +20,7 @@ import java.util.Objects;
 @RequestMapping(value = "/meeting")
 @Controller
 @Scope("request")
-public class MeetingController extends GenericController<Meeting,Integer>{
+public class MeetingController extends GenericController<Meeting, Integer> {
     private final MeetingRepository meetingRepository;
     @Value("${admin.id}")
     private Integer admin;
@@ -34,6 +34,7 @@ public class MeetingController extends GenericController<Meeting,Integer>{
     private Byte finished;
     @Value("${meetingStatus.canceled}")
     private Byte canceled;
+
     @Autowired
     public MeetingController(MeetingRepository repo) {
         super(repo);
@@ -43,9 +44,9 @@ public class MeetingController extends GenericController<Meeting,Integer>{
     @Override
     public @ResponseBody
     List<Meeting> getAll() throws ForbiddenException {
-        if(userBean.getUser().getRoleId().equals(admin)) {
-            return meetingRepository.getAllByStatusAndCompanyId(scheduled,userBean.getUser().getCompanyId());
-        }else if(userBean.getUser().getRoleId().equals(advancedUser) || userBean.getUser().getRoleId().equals(user)){
+        if (userBean.getUser().getRoleId().equals(admin)) {
+            return meetingRepository.getAllByStatusAndCompanyId(scheduled, userBean.getUser().getCompanyId());
+        } else if (userBean.getUser().getRoleId().equals(advancedUser) || userBean.getUser().getRoleId().equals(user)) {
             return meetingRepository.getAllByParticipant(userBean.getUser().getId());
         }
         throw new ForbiddenException("Forbidden action");
@@ -53,8 +54,8 @@ public class MeetingController extends GenericController<Meeting,Integer>{
 
     @RequestMapping(value = "/finish/", method = RequestMethod.PUT)
     public @ResponseBody
-    String finish(@RequestBody Meeting meeting) throws BadRequestException,ForbiddenException {
-        if(userBean.getUser().getId().equals(meeting.getUserId()) ) {
+    String finish(@RequestBody Meeting meeting) throws BadRequestException, ForbiddenException {
+        if (userBean.getUser().getId().equals(meeting.getUserId())) {
             return updateStatus(meeting, finished);
         }
         throw new ForbiddenException("Forbidden action");
@@ -62,23 +63,24 @@ public class MeetingController extends GenericController<Meeting,Integer>{
 
     @RequestMapping(value = "/cancel/", method = RequestMethod.PUT)
     public @ResponseBody
-    String cancel(@RequestBody Meeting meeting) throws BadRequestException,ForbiddenException {
-        if(meeting.getId()!=null) {
+    String cancel(@RequestBody Meeting meeting) throws BadRequestException, ForbiddenException {
+        if (meeting.getId() != null) {
             Meeting meetingFromDatabase = meetingRepository.getOne(meeting.getId());
-                if (userBean.getUser().getId().equals(meeting.getUserId()) &&
-                        meeting.getEndTime().equals(meetingFromDatabase.getEndTime()) && meeting.getStartTime().equals(meetingFromDatabase.getStartTime())) {
-                    Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-                    Timestamp minimalCancelTime = new Timestamp(meeting.getStartTime().getTime() + meetingRepository.getCancelTimeByCompanyId(userBean.getUser().getCompanyId()).getTime());
-                    if (currentTime.before(minimalCancelTime)) {
-                        if (meeting.getCancelationReason() != null) {
-                            return updateStatus(meeting, canceled);
-                        }
-                        throw new BadRequestException("Bad request");
+            if (userBean.getUser().getId().equals(meeting.getUserId()) &&
+                    meeting.getEndTime().equals(meetingFromDatabase.getEndTime()) && meeting.getStartTime().equals(meetingFromDatabase.getStartTime())) {
+                Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+                Timestamp minimalCancelTime = new Timestamp(meeting.getStartTime().getTime() + meetingRepository.getCancelTimeByCompanyId(userBean.getUser().getCompanyId()).getTime());
+                if (currentTime.before(minimalCancelTime)) {
+                    if (meeting.getCancelationReason() != null) {
+                        return updateStatus(meeting, canceled);
                     }
+                    throw new BadRequestException("Bad request");
                 }
+            }
         }
         throw new ForbiddenException("Forbidden action");
     }
+
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public @ResponseBody
@@ -114,8 +116,8 @@ public class MeetingController extends GenericController<Meeting,Integer>{
     @ResponseStatus(HttpStatus.CREATED)
     public @ResponseBody
     Meeting insert(@RequestBody Meeting object) throws BadRequestException, ForbiddenException {
-        if(userBean.getUser().getRoleId().equals(admin) || userBean.getUser().getRoleId().equals(advancedUser)) {
-            if(object!=null && object.getCompanyId()!=null && userBean.getUser().getCompanyId().equals(object.getCompanyId())) {
+        if (userBean.getUser().getRoleId().equals(admin) || userBean.getUser().getRoleId().equals(advancedUser)) {
+            if (object != null && object.getCompanyId() != null && userBean.getUser().getCompanyId().equals(object.getCompanyId())) {
                 if (check(object, true)) {
                     return super.insert(object);
                 }
@@ -125,11 +127,11 @@ public class MeetingController extends GenericController<Meeting,Integer>{
         throw new ForbiddenException("Forbidden action");
     }
 
-    private Boolean check(Meeting meeting, Boolean insert){
-        Timestamp currentTime=new Timestamp(System.currentTimeMillis());
-        if(meeting!=null
-                && meeting.getEndTime()!=null
-                && meeting.getStartTime()!=null
+    private Boolean check(Meeting meeting, Boolean insert) {
+        Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+        if (meeting != null
+                && meeting.getEndTime() != null
+                && meeting.getStartTime() != null
                 && meeting.getStartTime().after(currentTime)
                 && meeting.getEndTime().after(currentTime)
                 && meeting.getEndTime().after(meeting.getStartTime())

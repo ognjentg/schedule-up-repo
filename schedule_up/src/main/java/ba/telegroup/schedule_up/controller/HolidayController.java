@@ -3,7 +3,6 @@ package ba.telegroup.schedule_up.controller;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.model.Holiday;
 import ba.telegroup.schedule_up.repository.HolidayRepository;
-import ba.telegroup.schedule_up.repository.ReminderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,7 +20,7 @@ import java.util.Objects;
 @Controller
 @Scope("request")
 public class HolidayController extends GenericController<Holiday, Integer> {
-    protected HolidayRepository holidayRepository;
+    private HolidayRepository holidayRepository;
 
     public HolidayController(JpaRepository<Holiday, Integer> repo) {
         super(repo);

@@ -18,7 +18,7 @@ import java.util.List;
 @Controller
 @Scope("request")
 public class SettingsController extends GenericController<Settings, Integer> {
-    protected SettingsRepository settingsRepository;
+    private SettingsRepository settingsRepository;
 
     public SettingsController(JpaRepository<Settings, Integer> repo) {
         super(repo);

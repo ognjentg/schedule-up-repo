@@ -31,6 +31,7 @@ public class ParticipantController extends GenericController<Participant, Intege
     private Integer advancedUser;
     @Value("${user.id}")
     private Integer user;
+
     @Autowired
     public ParticipantController(ParticipantRepository repo) {
         super(repo);
@@ -41,8 +42,9 @@ public class ParticipantController extends GenericController<Participant, Intege
     @Transactional
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    public @ResponseBody  Participant insert(@RequestBody Participant object) throws BadRequestException, ForbiddenException {
-        if(checkPermissions()) {
+    public @ResponseBody
+    Participant insert(@RequestBody Participant object) throws BadRequestException, ForbiddenException {
+        if (checkPermissions()) {
             return super.insert(object);
         }
         throw new ForbiddenException("Forbidden action");
@@ -51,8 +53,8 @@ public class ParticipantController extends GenericController<Participant, Intege
     @Override
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.DELETE)
     public @ResponseBody
-    String delete(@PathVariable Integer id) throws ForbiddenException{
-        if(checkPermissions()) {
+    String delete(@PathVariable Integer id) throws ForbiddenException {
+        if (checkPermissions()) {
             Participant participant = participantRepository.findById(id).orElse(null);
             Objects.requireNonNull(participant).setDeleted(deleted);
             participantRepository.saveAndFlush(participant);
@@ -65,15 +67,16 @@ public class ParticipantController extends GenericController<Participant, Intege
     @RequestMapping(value = {"/getAllByMeeting/{id}"}, method = RequestMethod.GET)
     public @ResponseBody
     List<Participant> getAllByMeetingId(@PathVariable Integer id) throws ForbiddenException {
-        if(checkPermissions()) {
+        if (checkPermissions()) {
             return participantRepository.getAllByMeetingIdAndDeletedIs(id, notDeleted);
         }
         throw new ForbiddenException("Forbidden action");
     }
+
     @RequestMapping(value = {"/getAllByCompany/{id}"}, method = RequestMethod.GET)
     public @ResponseBody
     List<Participant> getAllByCompanyId(@PathVariable Integer id) throws ForbiddenException {
-        if(checkPermissions()) {
+        if (checkPermissions()) {
             return participantRepository.getAllByCompanyIdAndDeletedIs(id, notDeleted);
         }
         throw new ForbiddenException("Forbidden action");
@@ -82,7 +85,7 @@ public class ParticipantController extends GenericController<Participant, Intege
     @RequestMapping(value = {"/getAllByUserGroup/{id}"}, method = RequestMethod.GET)
     public @ResponseBody
     List<Participant> getAllByUserGroupId(@PathVariable Integer id) throws ForbiddenException {
-        if(checkPermissions()) {
+        if (checkPermissions()) {
             return participantRepository.getAllByUserGroupIdAndDeletedIs(id, notDeleted);
         }
         throw new ForbiddenException("Forbidden action");
@@ -91,7 +94,7 @@ public class ParticipantController extends GenericController<Participant, Intege
     @RequestMapping(value = {"/getAllByUser/{id}"}, method = RequestMethod.GET)
     public @ResponseBody
     List<Participant> getAllByUserId(@PathVariable Integer id) throws ForbiddenException {
-        if(checkPermissions()) {
+        if (checkPermissions()) {
             return participantRepository.getAllByUserIdAndDeletedIs(id, notDeleted);
         }
         throw new ForbiddenException("Forbidden action");
@@ -100,13 +103,13 @@ public class ParticipantController extends GenericController<Participant, Intege
     @RequestMapping(value = {"/getAllByEmail/{email}"}, method = RequestMethod.GET)
     public @ResponseBody
     List<Participant> getAllByEmail(@PathVariable String email) throws ForbiddenException {
-        if(checkPermissions()) {
+        if (checkPermissions()) {
             return participantRepository.getAllByEmailAndDeletedIs(email, notDeleted);
         }
         throw new ForbiddenException("Forbidden action");
     }
 
-    private boolean checkPermissions(){
+    private boolean checkPermissions() {
         return userBean.getUser().getRoleId().equals(admin) || userBean.getUser().getRoleId().equals(advancedUser);
     }
 

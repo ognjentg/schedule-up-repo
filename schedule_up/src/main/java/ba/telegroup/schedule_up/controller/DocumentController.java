@@ -5,7 +5,6 @@ import ba.telegroup.schedule_up.model.Document;
 import ba.telegroup.schedule_up.repository.DocumentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +16,7 @@ import java.util.List;
 @Scope("request")
 public class DocumentController extends GenericController<Document, Integer> {
 
-    private DocumentRepository documentRepository;
+    private final DocumentRepository documentRepository;
 
     @Autowired
     public DocumentController(DocumentRepository repo) {
