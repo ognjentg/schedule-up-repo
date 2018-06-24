@@ -4,7 +4,9 @@ import ba.telegroup.schedule_up.common.exceptions.BadRequestException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.model.Note;
 import ba.telegroup.schedule_up.model.modelCustom.NoteUser;
+import ba.telegroup.schedule_up.repository.NoteRepository;
 import ba.telegroup.schedule_up.repository.repositoryCustom.NoteRepositoryCustom;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
@@ -20,13 +22,13 @@ import java.util.List;
 @Controller
 @Scope("request")
 public class NoteController extends GenericController<Note, Integer> {
+    
+    private final NoteRepository noteRepository;
 
-    private static final String SQL_GET_USERNAME_BY_USER_ID = "SELECT username FROM user WHERE id=?";
-    @PersistenceContext
-    private EntityManager entityManager;
-
-    public NoteController(JpaRepository<Note, Integer> repo) {
+    @Autowired
+    public NoteController(NoteRepository repo) {
         super(repo);
+        noteRepository = repo;
     }
 
     /*
@@ -36,7 +38,7 @@ public class NoteController extends GenericController<Note, Integer> {
     @RequestMapping(method = RequestMethod.GET)
     public @ResponseBody
     List getAll() {
-        return ((NoteRepositoryCustom) repo).getAllExtended(userBean.getUser().getCompanyId());
+        return noteRepository.getAllExtended(userBean.getUser().getCompanyId());
     }
 
     /*
@@ -45,7 +47,7 @@ public class NoteController extends GenericController<Note, Integer> {
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.GET)
     public @ResponseBody
     NoteUser findById(@PathVariable Integer id) {
-        return ((NoteRepositoryCustom) repo).getAllExtendedById(userBean.getUser().getCompanyId(), id);
+        return noteRepository.getAllExtendedById(userBean.getUser().getCompanyId(), id);
     }
 
     /*
@@ -54,17 +56,23 @@ public class NoteController extends GenericController<Note, Integer> {
     @RequestMapping(value = "/getAllByUserId/{id}", method = RequestMethod.GET)
     public @ResponseBody
     List<NoteUser> getAllByUserId(@PathVariable Integer id) {
-        return ((NoteRepositoryCustom) repo).getAllExtendedByUserId(userBean.getUser().getCompanyId(), id);
+        return noteRepository.getAllExtendedByUserId(userBean.getUser().getCompanyId(), id);
 
     }
 
+    /*
+    Vraca sve custom NoteUser objekte cije ime sadrzi name
+     */
     @RequestMapping(value = "/getAllByNameContains/{name}", method = RequestMethod.GET)
     public @ResponseBody
     List getAllByNameContains(@PathVariable String name) {
-        return ((NoteRepositoryCustom) repo).getAllExtendedByNameContains(userBean.getUser().getCompanyId(), name);
+        return noteRepository.getAllExtendedByNameContains(userBean.getUser().getCompanyId(), name);
 
     }
 
+    /*
+    Vrsi insert Note objekta a vraca odgovarajuci custom NoteUser objekat
+     */
     @Transactional
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
@@ -73,19 +81,7 @@ public class NoteController extends GenericController<Note, Integer> {
     NoteUser insert(@RequestBody Note note) {
         repo.saveAndFlush(note);
         logCreateAction(note);
-        entityManager.refresh(note);
-        String username = (String) entityManager.createNativeQuery(SQL_GET_USERNAME_BY_USER_ID).setParameter(1, note.getUserId()).getSingleResult();
-
-        NoteUser noteUser = new NoteUser();
-        noteUser.setId(note.getId());
-        noteUser.setName(note.getName());
-        noteUser.setDescription(note.getDescription());
-        noteUser.setPublishTime(note.getPublishTime()/*(Timestamp)entityManager.createNativeQuery(SQL_GET_PUB_TIME).setParameter(1, note.getId()).getSingleResult()*/);
-        noteUser.setDeleted(note.getDeleted());
-        noteUser.setUserId(note.getUserId());
-        noteUser.setCompanyId(note.getCompanyId());
-        noteUser.setUsername(username);
-        return noteUser;
+        return noteRepository.insert(note);
     }
 
     @Override

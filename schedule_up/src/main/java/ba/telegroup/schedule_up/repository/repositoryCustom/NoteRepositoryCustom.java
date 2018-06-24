@@ -11,4 +11,5 @@ public interface NoteRepositoryCustom {
     NoteUser getAllExtendedById(Integer companyId, Integer noteId);
     List<NoteUser> getAllExtendedByUserId(Integer companyId, Integer userId);
     List<NoteUser> getAllExtendedByNameContains(Integer companyId, String name);
+    NoteUser insert(Note note);
 }

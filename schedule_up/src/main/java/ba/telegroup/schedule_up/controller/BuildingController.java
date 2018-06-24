@@ -4,6 +4,7 @@ import ba.telegroup.schedule_up.common.exceptions.BadRequestException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.model.Building;
 import ba.telegroup.schedule_up.repository.BuildingRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Controller;
@@ -18,29 +19,33 @@ import java.util.List;
 @Controller
 @Scope("request")
 public class BuildingController extends GenericController<Building, Integer> {
-    public BuildingController(JpaRepository<Building, Integer> repo) {
+
+    private final BuildingRepository buildingRepository;
+
+    @Autowired
+    public BuildingController(BuildingRepository repo) {
         super(repo);
+        buildingRepository = repo;
     }
 
     @Override
     @RequestMapping(method = RequestMethod.GET)
     public @ResponseBody
     List getAll() {
-        return ((BuildingRepository) repo).getAllByCompanyIdAndDeletedEquals(userBean.getUser().getCompanyId(), (byte) 0);
-
+        return buildingRepository.getAllByCompanyIdAndDeletedEquals(userBean.getUser().getCompanyId(), (byte) 0);
     }
 
     @RequestMapping(value = "/getAllByNameContains/{name}", method = RequestMethod.GET)
     public @ResponseBody
     List getAllByNameContains(@PathVariable String name) {
-        return ((BuildingRepository) repo).getAllByCompanyIdAndNameContainsIgnoreCaseAndDeletedEquals(userBean.getUser().getCompanyId(), name, (byte) 0);
+        return buildingRepository.getAllByCompanyIdAndNameContainsIgnoreCaseAndDeletedEquals(userBean.getUser().getCompanyId(), name, (byte) 0);
 
     }
 
     @RequestMapping(value = "/getAllByLongitudeAndLatitude/{longitude}/{latitude}", method = RequestMethod.GET)
     public @ResponseBody
     List getAllByLongitudeAndLatitude(@PathVariable Double longitude, @PathVariable Double latitude) {
-        return ((BuildingRepository) repo).getAllByCompanyIdAndLongitudeAndLatitudeAndDeletedEquals(userBean.getUser().getCompanyId(), longitude, latitude, (byte) 0);
+        return buildingRepository.getAllByCompanyIdAndLongitudeAndLatitudeAndDeletedEquals(userBean.getUser().getCompanyId(), longitude, latitude, (byte) 0);
 
     }
 
@@ -48,7 +53,7 @@ public class BuildingController extends GenericController<Building, Integer> {
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.DELETE)
     public @ResponseBody
     String delete(@PathVariable Integer id) throws BadRequestException {
-        Building building = repo.findById(id).orElse(null);
+        Building building = buildingRepository.findById(id).orElse(null);
         if (building != null) {
             building.setDeleted((byte) 1);
             repo.saveAndFlush(building);
