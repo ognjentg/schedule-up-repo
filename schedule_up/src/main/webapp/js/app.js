@@ -6,6 +6,7 @@ var menuState = MENU_STATES.COLLAPSED;
 
 var userData = null;
 var companyData = null;
+var userForRegistration=null;
 
 var menuActions = function (id) {
 
@@ -33,6 +34,9 @@ var menuActions = function (id) {
             break;
         case "dashboard":
             dashboardView.selectPanel();
+            break;
+        case "registration":
+            registrationView.selectPanel();
             break;
     }
 };
@@ -97,6 +101,13 @@ var menuUser = [
         id: "dashboard",
         value: "Početna",
         icon: "home"
+    }
+];
+var menuRegistration=[
+    {
+        id:"registration",
+        value:"Registracija",
+        icon:"user"
     }
 ];
 
@@ -213,6 +224,17 @@ var loginLayout = {
                                 hotkey: "enter",
                                 width: 150
                             }]
+                        },
+                        {
+                            margin: 5,
+                            cols: [{}, {
+                                id: "registerBtn",
+                                view: "button",
+                                value: "Registrujte se",
+                                type: "form",
+                                click: "register",
+                                width: 150
+                            }]
                         }
                     ]
                 }
@@ -222,7 +244,101 @@ var loginLayout = {
         }
     ]
 };
+var register = function () {
+    var register = webix.copy(registrationLayout);
+    webix.ui(register, panel);
+    panel = $$("registration");
+};
+var registrationLayout={
+    id: "registration",
+    width: "auto",
+    height: "auto",
+    rows: [
+        {
+            cols: [
 
+                {
+                    height: 60,
+                    align:"center",
+                    view: "label",
+                    label: "Schedule Up",
+                    css: "appNameLabel"
+                }
+            ]
+
+        },
+        {
+            cols: [
+                {},
+                {
+                    view: "form",
+                    id: "tokenForm",
+                    width: 400,
+                    elementsConfig: {
+                        labelWidth: 60,
+                        bottomPadding: 18
+                    },
+                    elements: [
+                        {
+                            id: "token",
+                            name: "token",
+                            //  align:"center",
+                            view: "text",
+                            label: "Token",
+                            invalidMessage: "Token je obavezan!",
+                            required: true
+                        },
+                        {
+                            margin: 5,
+                            cols: [{}, {
+                                id: "registerBtn",
+                                view: "button",
+                                align:"center",
+                                value: "Potvrdi",
+                                type: "form",
+                                click: "tokenConfirm",
+                                width: 150
+                            },{}]
+                        }]},{}]}]
+};
+var tokenConfirm = function () {
+    var token=($$("tokenForm")).getValues().token;
+    var url="http://127.0.0.1:8020/user/registration/"+token;
+    webix.ajax().get("user/registration/"+token, {
+        success: function (text, data, xhr) {
+            var jsonData = data.json();
+            userForRegistration=jsonData;
+            if(userForRegistration==null){
+                util.messages.showErrorMessage("Neispravan ili istekao token.")
+
+            }else{
+                webix.ajax().get("company/" + userForRegistration.companyId, {
+                    success: function (text, data, xhr) {
+                        var company = data.json();
+                        if (company != null) {
+                            companyData = company;
+                            companyData.deleted = 0;
+                            showApp();
+                            $$("logoutBtn").hide();
+                        } else {
+                            userForRegistration=null;
+                            showLogin();
+
+                        }
+                    },
+                    error: function (text, data, xhr) {
+                        userData = null;
+                        showLogin();
+                    }
+                });
+            }
+        },
+        error: function (text, data, xhr) {
+            util.messages.showErrorMessage("Neispravan ili istekao token!");
+        }
+    });
+
+};
 var login = function () {
 
     console.log($$("loginForm").getValues());
@@ -358,6 +474,8 @@ var showApp = function () {
     if (companyData != null)
         document.getElementById("appLogo").src = "data:image/jpg;base64," + companyData.companyLogo;
     var localMenuData = null;
+    if(userData!=null)
+    {
     switch (userData.roleId) {
         case 1:
             localMenuData = webix.copy(menuSuperAdmin);
@@ -371,8 +489,8 @@ var showApp = function () {
         case 4:
             localMenuData = webix.copy(menuUser);
             break;
-    }
-
+    }}
+    else if(userForRegistration!=null) localMenuData = webix.copy(menuRegistration);
     webix.ui({
         id: "menu-collapse",
         view: "template",
@@ -401,12 +519,19 @@ var showApp = function () {
     $$("mainMenu").define("on", menuEvents);
 
     rightPanel = "emptyRightPanel";
+    if(userData!=null)
+    {
     if (userData.roleId === 1) {
         companyView.selectPanel();
         $$("mainMenu").select("company");
     } else {
         dashboardView.selectPanel();
         $$("mainMenu").select("dashboard");
+    }
+    }
+    else if(userForRegistration!=null){
+        registrationView.selectPanel();
+        $$("mainMenu").select("registration");
     }
 };
 
