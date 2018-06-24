@@ -91,7 +91,7 @@ public class Meeting {
     }
 
     @Basic
-    @Column(name = "description", nullable = true, length = 500)
+    @Column(name = "description", length = 500)
     public String getDescription() {
         return description;
     }
@@ -101,7 +101,7 @@ public class Meeting {
     }
 
     @Basic
-    @Column(name = "cancelation_reason", nullable = true, length = 500)
+    @Column(name = "cancelation_reason", length = 500)
     public String getCancelationReason() {
         return cancelationReason;
     }

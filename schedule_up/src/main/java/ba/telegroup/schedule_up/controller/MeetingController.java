@@ -21,7 +21,7 @@ import java.util.Objects;
 @Controller
 @Scope("request")
 public class MeetingController extends GenericController<Meeting,Integer>{
-    MeetingRepository meetingRepository;
+    private final MeetingRepository meetingRepository;
     @Value("${admin.id}")
     private Integer admin;
     @Value("${advancedUser.id}")
@@ -79,10 +79,6 @@ public class MeetingController extends GenericController<Meeting,Integer>{
         }
         throw new ForbiddenException("Forbidden action");
     }
-
-    /**
-     * metoda za azuriranje odnosno izmjenu rezervacije moguca je samo u slucaju da je radi onaj koju je i kreirao
-     */
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public @ResponseBody

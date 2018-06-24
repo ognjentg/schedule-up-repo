@@ -15,6 +15,7 @@ public interface MeetingRepository extends JpaRepository<Meeting,Integer>{
     List<Meeting> getAllByParticipant(Integer participantId);
     @Query(value ="SELECT id from meeting  where room_id=?3 AND (start_time BETWEEN ?1 AND ?2 OR end_time BETWEEN ?1 AND ?2) and status=0",nativeQuery = true)
     List<Integer> getIdsOfMeetingsBetween(Timestamp start,Timestamp end,Integer roomId);
+    @SuppressWarnings("SpringDataRepositoryMethodReturnTypeInspection")
     @Query(value="SELECT cancel_time from settings where company_id=?1",nativeQuery = true)
     Date getCancelTimeByCompanyId(Integer companyId);
 

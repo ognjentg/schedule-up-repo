@@ -107,10 +107,7 @@ public class ParticipantController extends GenericController<Participant, Intege
     }
 
     private boolean checkPermissions(){
-        if(userBean.getUser().getRoleId().equals(admin) || userBean.getUser().getRoleId().equals(advancedUser)){
-            return true;
-        }
-        return false;
+        return userBean.getUser().getRoleId().equals(admin) || userBean.getUser().getRoleId().equals(advancedUser);
     }
 
 }
