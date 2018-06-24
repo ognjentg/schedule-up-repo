@@ -35,7 +35,7 @@ public class Meeting {
 
     @Basic
     @Column(name = "topic", nullable = false, length = 500)
-    @JsonProperty("topic")
+    @JsonProperty("text")
     public String getTopic() {
         return topic;
     }
