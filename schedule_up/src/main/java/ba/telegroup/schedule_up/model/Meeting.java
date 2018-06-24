@@ -35,7 +35,7 @@ public class Meeting {
 
     @Basic
     @Column(name = "topic", nullable = false, length = 500)
-    @JsonProperty("text")
+    @JsonProperty("topic")
     public String getTopic() {
         return topic;
     }
@@ -162,5 +162,22 @@ public class Meeting {
     public int hashCode() {
 
         return Objects.hash(id, topic, startTime, endTime, participantsNumber, status, description, cancelationReason, roomId, userId, companyId);
+    }
+
+    @Override
+    public String toString() {
+        return "Meeting{" +
+                "id=" + id +
+                ", topic='" + topic + '\'' +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
+                ", participantsNumber=" + participantsNumber +
+                ", status=" + status +
+                ", description='" + description + '\'' +
+                ", cancelationReason='" + cancelationReason + '\'' +
+                ", roomId=" + roomId +
+                ", userId=" + userId +
+                ", companyId=" + companyId +
+                '}';
     }
 }

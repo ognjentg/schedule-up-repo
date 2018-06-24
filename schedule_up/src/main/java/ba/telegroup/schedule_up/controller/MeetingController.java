@@ -5,6 +5,7 @@ import ba.telegroup.schedule_up.common.exceptions.ForbiddenException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.model.Meeting;
 import ba.telegroup.schedule_up.repository.MeetingRepository;
+import ba.telegroup.schedule_up.repository.SettingsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
@@ -22,6 +23,7 @@ import java.util.Objects;
 @Scope("request")
 public class MeetingController extends GenericController<Meeting, Integer> {
     private final MeetingRepository meetingRepository;
+    private final SettingsRepository settingsRepository;
     @Value("${admin.id}")
     private Integer admin;
     @Value("${advancedUser.id}")
@@ -36,9 +38,10 @@ public class MeetingController extends GenericController<Meeting, Integer> {
     private Byte canceled;
 
     @Autowired
-    public MeetingController(MeetingRepository repo) {
-        super(repo);
-        this.meetingRepository = repo;
+    public MeetingController(MeetingRepository meetingRepository, SettingsRepository settingsRepository) {
+        super(meetingRepository);
+        this.meetingRepository = meetingRepository;
+        this.settingsRepository=settingsRepository;
     }
 
     @Override
@@ -64,19 +67,21 @@ public class MeetingController extends GenericController<Meeting, Integer> {
     @RequestMapping(value = "/cancel/", method = RequestMethod.PUT)
     public @ResponseBody
     String cancel(@RequestBody Meeting meeting) throws BadRequestException, ForbiddenException {
-        if (meeting.getId() != null) {
-            Meeting meetingFromDatabase = meetingRepository.getOne(meeting.getId());
-            if (userBean.getUser().getId().equals(meeting.getUserId()) &&
-                    meeting.getEndTime().equals(meetingFromDatabase.getEndTime()) && meeting.getStartTime().equals(meetingFromDatabase.getStartTime())) {
-                Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-                Timestamp minimalCancelTime = new Timestamp(meeting.getStartTime().getTime() + meetingRepository.getCancelTimeByCompanyId(userBean.getUser().getCompanyId()).getTime());
-                if (currentTime.before(minimalCancelTime)) {
-                    if (meeting.getCancelationReason() != null) {
-                        return updateStatus(meeting, canceled);
-                    }
-                    throw new BadRequestException("Bad request");
-                }
-            }
+        Meeting dbMeeting=meetingRepository.findById(meeting.getId()).orElse(null);
+        if (userBean.getUser().getId().equals(meeting.getUserId())
+                && dbMeeting!=null
+                && dbMeeting.getStartTime()!=null
+                && dbMeeting.getEndTime()!=null
+                && dbMeeting.getStartTime().equals(meeting.getStartTime())
+                && dbMeeting.getEndTime().equals(meeting.getEndTime())
+                && dbMeeting.getStatus().equals(meeting.getStatus())
+                && meeting.getStatus().equals(scheduled)
+                && meeting.getUserId().equals(dbMeeting.getUserId())) {
+            Timestamp currentTime=new Timestamp(System.currentTimeMillis());
+            Timestamp minimalCancelTime=new Timestamp(meeting.getStartTime().getTime()+ settingsRepository.getByCompanyId(meeting.getCompanyId()).getCancelTime().getTime());
+            if(meeting.getCancelationReason()!=null && currentTime.before(minimalCancelTime))
+             return updateStatus(meeting, canceled);
+            throw new BadRequestException("Bad request");
         }
         throw new ForbiddenException("Forbidden action");
     }
@@ -86,7 +91,7 @@ public class MeetingController extends GenericController<Meeting, Integer> {
     public @ResponseBody
     String update(@PathVariable Integer id, @RequestBody Meeting object) throws BadRequestException, ForbiddenException {
         Meeting oldObject = cloner.deepClone(meetingRepository.findById(id).orElse(null));
-        if (oldObject != null && object.getUserId() == null || Objects.requireNonNull(oldObject).getUserId() == null || object.getCancelationReason() == null) {
+        if (oldObject != null && object.getUserId() == null || Objects.requireNonNull(oldObject).getUserId() == null ) {
             throw new BadRequestException("user id cannot be null");
         } else {
             if (oldObject.getUserId().equals(object.getUserId()) && oldObject.getUserId().equals(userBean.getUser().getId())) {
@@ -132,8 +137,6 @@ public class MeetingController extends GenericController<Meeting, Integer> {
         if (meeting != null
                 && meeting.getEndTime() != null
                 && meeting.getStartTime() != null
-                && meeting.getStartTime().after(currentTime)
-                && meeting.getEndTime().after(currentTime)
                 && meeting.getEndTime().after(meeting.getStartTime())
                 && meeting.getUserId() != null
                 && meeting.getRoomId() != null
@@ -141,7 +144,8 @@ public class MeetingController extends GenericController<Meeting, Integer> {
                 && meeting.getStatus() != null
                 && meeting.getTopic() != null) {
             List<Integer> ids = meetingRepository.getIdsOfMeetingsBetween(meeting.getStartTime(), meeting.getEndTime(), meeting.getRoomId());
-            if (insert) {
+            if (insert && meeting.getStartTime().after(currentTime)
+                    && meeting.getEndTime().after(currentTime)) {
                 return ids.size() <= 0;
             } else {
                 return meeting.getId() != null && ids.size() == 1 && ids.get(0).equals(meeting.getId());
@@ -160,7 +164,7 @@ public class MeetingController extends GenericController<Meeting, Integer> {
             throw new BadRequestException("user id cannot be null");
         } else {
             if (oldObject.getUserId().equals(userBean.getUser().getId())) {
-                updatedObject.setStatus(status);
+                Objects.requireNonNull(updatedObject).setStatus(status);
                 if (check(updatedObject, false)) {
                     meetingRepository.saveAndFlush(updatedObject);
                     logUpdateAction(updatedObject, oldObject);
