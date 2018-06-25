@@ -5,8 +5,8 @@ import ba.telegroup.schedule_up.common.exceptions.ForbiddenException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.model.UserGroup;
 import ba.telegroup.schedule_up.repository.UserGroupRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,15 +19,19 @@ import java.util.Objects;
 @Controller
 @Scope("request")
 public class UserGroupController extends GenericController<UserGroup, Integer> {
-    public UserGroupController(JpaRepository<UserGroup, Integer> repo) {
+    private final UserGroupRepository usergroupRepository;
+
+    @Autowired
+    public UserGroupController(UserGroupRepository repo) {
         super(repo);
+        this.usergroupRepository = repo;
     }
 
     @Override
     @RequestMapping(method = RequestMethod.GET)
     public @ResponseBody
     List<UserGroup> getAll() {
-        return ((UserGroupRepository) repo).getAllByCompanyIdAndDeletedEquals(userBean.getUser().getCompanyId(), (byte) 0);
+        return usergroupRepository.getAllByCompanyIdAndDeletedEquals(userBean.getUser().getCompanyId(), (byte) 0);
     }
 
 

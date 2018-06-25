@@ -7,7 +7,6 @@ import java.util.List;
 
 public interface DocumentRepository extends JpaRepository<Document, Integer> {
 
-    Document getById(Integer id);
     List<Document> getAllByIdIsAfter(Integer id);
     List<Document> getAllByIdIsBefore(Integer id);
     List<Document> getAllByNameContains(String name);
