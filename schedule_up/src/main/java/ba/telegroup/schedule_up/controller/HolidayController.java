@@ -22,10 +22,6 @@ import java.util.Objects;
 public class HolidayController extends GenericController<Holiday, Integer> {
     private HolidayRepository holidayRepository;
 
-    public HolidayController(JpaRepository<Holiday, Integer> repo) {
-        super(repo);
-    }
-
     @Autowired
     public HolidayController(HolidayRepository repo) {
         super(repo);

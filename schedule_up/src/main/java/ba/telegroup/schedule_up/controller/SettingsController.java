@@ -19,11 +19,7 @@ import java.util.List;
 @Scope("request")
 public class SettingsController extends GenericController<Settings, Integer> {
     private SettingsRepository settingsRepository;
-
-    public SettingsController(JpaRepository<Settings, Integer> repo) {
-        super(repo);
-    }
-
+    
     @Autowired
     public SettingsController(SettingsRepository repo) {
         super(repo);
