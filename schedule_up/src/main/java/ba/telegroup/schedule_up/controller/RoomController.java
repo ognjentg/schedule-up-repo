@@ -3,7 +3,13 @@ package ba.telegroup.schedule_up.controller;
 import ba.telegroup.schedule_up.common.exceptions.BadRequestException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.model.Room;
+import ba.telegroup.schedule_up.model.GearUnit;
+import ba.telegroup.schedule_up.model.RoomHasGearUnit;
+import ba.telegroup.schedule_up.model.RoomHasGearUnitPK;
+import ba.telegroup.schedule_up.repository.GearUnitRepository;
+import ba.telegroup.schedule_up.repository.RoomHasGearUnitRepository;
 import ba.telegroup.schedule_up.repository.RoomRepository;
+import ba.telegroup.schedule_up.repository.repositoryCustom.GearUnitRepositoryCustom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -20,11 +26,15 @@ import java.util.List;
 public class RoomController extends GenericController<Room, Integer> {
 
     private final RoomRepository roomRepository;
+    private final RoomHasGearUnitRepository roomHasGearUnitRepository;
+    private final GearUnitRepository gearUnitRepository;
 
     @Autowired
-    public RoomController(RoomRepository roomRepository) {
+    public RoomController(RoomRepository roomRepository, RoomHasGearUnitRepository roomHasGearUnitRepository, GearUnitRepository gearUnitRepository) {
         super(roomRepository);
         this.roomRepository = roomRepository;
+        this.roomHasGearUnitRepository = roomHasGearUnitRepository;
+        this.gearUnitRepository = gearUnitRepository;
     }
 
     @Override
@@ -46,5 +56,48 @@ public class RoomController extends GenericController<Room, Integer> {
     public @ResponseBody
     List getAll() {
         return roomRepository.getAllExtendedByCompanyId(userBean.getUser().getCompanyId());
+    }
+
+    @RequestMapping(value = "/addGearUnit/{roomId}/{gearUnitId}", method = RequestMethod.GET)
+    public @ResponseBody
+    String addGearUnit(@PathVariable Integer roomId, @PathVariable Integer gearUnitId)throws BadRequestException {
+        Room room = roomRepository.getOne(roomId);
+        Room oldRoom = cloner.deepClone(room);
+        GearUnit gearUnit = gearUnitRepository.getOne(gearUnitId);
+        //GearUnit oldGearUnit = cloner.deepClone(gearUnit);
+        if((room.getCapacity() != 0) && (gearUnit.getAvailable() == (byte) 1)){
+            room.setCapacity(room.getCapacity()-1);
+            gearUnit.setAvailable((byte) 0);
+            RoomHasGearUnit connection = new RoomHasGearUnit();
+            connection.setRoomId(roomId);
+            connection.setGearUnitId(gearUnitId);
+            connection.setCurrently((byte) 1);
+            roomHasGearUnitRepository.saveAndFlush(connection);
+            gearUnitRepository.saveAndFlush(gearUnit);
+            if (roomRepository.saveAndFlush(room) != null) logUpdateAction(room, oldRoom);
+            return "Success";
+        }
+        throw new BadRequestException("Bad request");
+    }
+
+    @RequestMapping(value = "/addGearUnit/{roomId}/{gearUnitId}", method = RequestMethod.GET)
+    public @ResponseBody
+    String removeGearUnit(@PathVariable Integer roomId, @PathVariable Integer gearUnitId)throws BadRequestException {
+        Room room = roomRepository.getOne(roomId);
+        Room oldRoom = cloner.deepClone(room);
+        GearUnit gearUnit = gearUnitRepository.getOne(gearUnitId);
+        RoomHasGearUnitPK pk = new RoomHasGearUnitPK();
+        pk.setRoomId(roomId);
+        pk.setGearUnitId(gearUnitId);
+        RoomHasGearUnit connection = roomHasGearUnitRepository.getOne(pk);
+        if((gearUnit.getAvailable() == (byte) 0)){
+            room.setCapacity(room.getCapacity()+1);
+            gearUnit.setAvailable((byte) 1);
+            roomHasGearUnitRepository.delete(connection);
+            gearUnitRepository.saveAndFlush(gearUnit);
+            if (roomRepository.saveAndFlush(room) != null) logUpdateAction(room, oldRoom);
+            return "Success";
+        }
+        throw new BadRequestException("Bad request");
     }
 }
