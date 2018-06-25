@@ -8,7 +8,12 @@ import java.util.List;
 public interface UserRepository extends JpaRepository<User, Integer> {
 
     User getByCompanyIdAndRoleIdAndActiveAndDeleted(Integer companyId, Integer roleId, byte active, byte deleted);
+
     User getByUsername(String username);
+
     User getByToken(String token);
+
     List<User> getAllByCompanyId(Integer companyId);
+
+    User getById(Integer id);
 }
