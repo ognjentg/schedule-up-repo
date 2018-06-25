@@ -141,6 +141,88 @@ var dashboardView = {
         form.elements.roomName.setValue(event.roomName);
         $$("creatorNameLbl").data.label = "Autor: " + event.creatorUsername;
         $$("eventDialog").show();
+    },
+
+    noteDialog: {
+        view: "popup",
+        id: "noteDialog",
+        modal: true,
+        position: "center",
+        body: {
+            id: "noteInside",
+            rows: [{
+                view: "toolbar",
+                cols: [{
+                    view: "label",
+                    label: "<span class='webix_icon fa-sticky-note'></span> Oglas",
+                    width: 400
+                }, {}, {
+                    view: "icon",
+                    icon: "close",
+                    align: "right",
+                    click: "util.dismissDialog('noteDialog');"
+                }]
+            },
+                {
+                    view: "form",
+                    id: "noteDialogForm",
+                    width: 250,
+                    elementsConfig: {
+                        labelWidth: 120,
+                        bottomPadding: 8
+                    },
+                    elements: [{
+                        view: "text",
+                        id: "name",
+                        name: "name",
+                        label: "Naslov",
+                        readonly: true
+                    }, {
+                        view: "text",
+                        id: "publishTime",
+                        name: "publishTime",
+                        label: "Datum objave",
+                        readonly: true
+                    },
+                        {
+                            view: "text",
+                            id: "username",
+                            name: "username",
+                            label: "Korisnik",
+                            readonly: true
+                        },
+                        {
+                            view: "textarea",
+                            id: "description",
+                            name: "description",
+                            label: "Opis",
+                            readonly: true,
+                            height: 100
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+
+    showNotePopup: function (note) {
+        webix.ui(webix.copy(dashboardView.noteDialog));
+        var form = $$("noteDialogForm");
+
+        //formatiranje
+        var date = new Date(note.publishTime);
+        var hours = date.getHours();
+        var minutes = date.getMinutes();
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        var strTime = hours + ':' + minutes;
+        var formattedTime =  date.getDate() + "." + (date.getMonth() + 1) + "." + date.getFullYear() + ". " + strTime;
+
+        form.elements.name.setValue(note.name);
+        form.elements.publishTime.setValue(formattedTime);
+        form.elements.username.setValue(note.username);
+        form.elements.description.setValue(note.description);
+
+        $$("noteDialog").show();
     }
 
 
