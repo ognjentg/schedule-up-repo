@@ -23,9 +23,8 @@ var companySettingsView = {
             id: "customizeForm",
             adjust: true,
             elementsConfig: {
-                labelWidth: 290,
                 bottomPadding: 18,
-                width: 400
+                width: 430
             },
             elements: [{
                 margin: 5, cols: [
@@ -35,6 +34,7 @@ var companySettingsView = {
                             id: "timeFrom",
                             name: "timeFrom",
                             view: "datepicker",
+                            labelWidth:290,
                             stringResult: true,
                             width: 400,
                             label: "Početak radnog vremena:",
@@ -73,6 +73,7 @@ var companySettingsView = {
                         }, {
                             id: "timeTo",
                             width: 400,
+                            labelWidth:290,
                             name: "timeTo",
                             view: "datepicker",
                             stringResult: true,
@@ -113,6 +114,7 @@ var companySettingsView = {
                         }, {
                             id: "reminderTime",
                             view: "combo",
+                            labelWidth:290,
                             width: 400,
                             value: "One",
                             options: ["0 minuta", "5 minuta", "15 minuta", "30 minuta", "1 sat", "12 sati", "1 dan"],
@@ -179,6 +181,7 @@ var companySettingsView = {
                             {
                                 view: "combo",
                                 id: "cancelTime",
+                                labelWidth:290,
                                 label: "Minimalno vrijeme za otkazivanje sastanka:",
                                 width: 400,
                                 options: ["15 minuta", "30 minuta", "1 sat", "12 sati", "1 dan"],
@@ -240,14 +243,30 @@ var companySettingsView = {
 
                             }
                         ]
-                    }, {
+                    },{
                         rows: [{
+                            view:"label",
+                            label: "Unesite neradni dan",
+                            inputWidth:100,
+                            align:"left"
+
+                        },{
+                            view:"text",
+                            label: "Naziv:",
+                            id:"naziv",
+                            name:"naziv",
+                            value:"proba",
+                            inputWidth:400,
+                            align:"left"
+                        },
+
+                            {
                             id: "holiday",
-                            width: 600,
+                            width: 400,
                             name: "holiday",
                             view: "datepicker",
                             stringResult: true,
-                            label: "Neradni dani:",
+                            label: "Datum:",
                             timepicker: false,
                             type: "date",
                             format: "%d/%m/%y",
@@ -257,56 +276,102 @@ var companySettingsView = {
                                     type: "date",
                                     calendarDate: "%d/%m/%y"
                                 }
-                            },
-                            on:{
-                                onChange:function(item){
-                                    var date=$$("customizeForm").getValues().holiday;
-                                    console.log(date);
-                                    var formatDate=date.split(" ")[0];
-                                    console.log(formatDate);
-                                    var newHoliday={
-                                        date: formatDate,
-                                        companyId: companyData.id                                    };
-                                    connection.sendAjax("POST", "holiday/",
-                                    function (text, data, xhr) {
-                                        if (text ) {
-                                            util.messages.showMessage("Uspješno .");
-                                            $$("neradniDaniLista").setValue( formatDate);
-
-                                        } else {
-                                            util.messages.showErrorMessage("Greška pri dodavanju.");
-                                        }
-                                    }, function (text,data,xhr) {
-                                        util.messages.showErrorMessage("Greška pri dodavanju.");
-
-                                    }, newHoliday)
+                            }},{
+                                id: "addHolidayBtn",
+                                view: "button",
+                                type: "iconButton",
+                                label: "Dodajte",
+                                icon: "plus-circle",
+                                click: 'companySettingsView.save',
+                                autowidth: true
                             }
-
-                        }}, {
-                            id: "neradniDaniLista",
-                            view:"list",
-                            height: 185,
-                            onContext: {},
-                            columns: [{
-                                id: "id",
-                                hidden: true,
-                                fillspace: true,
-
-                            }, {
-                                id: "date",
-                                editable: false,
-                                fillspace: true,
-
-
-                            }
-                        ]}
 
                         ]
+                    },{
+                        view: "datatable",
+                        css: "webixDatatable",
+                        width:555,
+                        multiselect: false,
+                        id: "holidayDT",
+                        resizeColumn: true,
+                        resizeRow: true,
+                        onContext: {},
+                        columns: [{
+                            id: "name",
+                            editable: false,
+                            fillspace: true,
+                            editor: "text",
+                            sort: "string",
+                            header: [
+                                "Naziv", {
+                                    content: "textFilter"
+                                }
+                            ]
+                        },{id:"companyId",
+                        hidden:true
+                        },{id:"company_id",
+                            hidden:true
+                        },
+                           {
+                                id: "date",
+                                fillspace: true,
+                                editable: false,
+                                editor: "text",
+                                sort: "text",
+                                header: [
+                                    "Datum", {
+                                        content: "textFilter"
+                                    }
+                                ]
+                            }
+                        ],
+                        select: "row",
+                        navigation: true,
+                        editable: false,
+                        url: "holiday",
+                        on: {
+
+                            onAfterContextMenu: function (item) {
+                                this.select(item.row);
+                            }
+                        }
                     }
                 ]
             }
             ]
         }]
+    },
+    save:function(){
+        var date=$$("customizeForm").getValues().holiday;
+        if(date==""){
+            util.messages.showErrorMessage("Potrebno je unijeti datum.");
+            return;
+        }
+        var naziv=$$("customizeForm").getValues().naziv;
+        console.log(naziv);
+        var formatDate=date.split(" ")[0];
+        var newHoliday={
+            date: formatDate,
+            name:naziv,
+            companyId: companyData.id};
+        connection.sendAjax("POST", "holiday/",
+            function (text, data, xhr) {
+                if (text ) {
+                    util.messages.showMessage("Uspješno .");
+                } else {
+                    util.messages.showErrorMessage("Greška pri dodavanju.");
+                }
+            }, function (text,data,xhr) {
+                util.messages.showErrorMessage("Greška pri dodavanju.");
+
+            }, newHoliday);
+        console.log(newHoliday);
+        $$("naziv").setValue("");
+        $$("holiday").setValue("");
+       $$("holidayDT").add(newHoliday);
+        webix.dp( $$("holidayDT") ).attachEvent("onAfterUpdate", function(id, response){
+            if (response.error) console.log(response.error);
+        })
     },
     selectPanel: function () {
         $$("main").removeView(rightPanel);
@@ -315,20 +380,47 @@ var companySettingsView = {
         var panelCopy = webix.copy(this.panel);
 
         $$("main").addView(webix.copy(panelCopy));
-        connection.attachAjaxEvents("neradniDaniLista", "holiday", true);
+        connection.attachAjaxEvents("holidayDT", "holiday", false);
+
+        webix.ui({
+            view: "contextmenu",
+            id: "holidayContextMenu",
+            width: 200,
+            data: [ {
+                id: "1",
+                value: "Obrišite",
+                icon: "trash"
+            }],
+            master: $$("holidayDT"),
+            on: {
+                onItemClick: function (id) {
+                    var context = this.getContext();
+                    switch (id) {
+                        case "1":
+                            var delBox = (webix.copy(commonViews.deleteConfirm("company")));
+                            delBox.callback = function (result) {
+                                if (result == 1) {
+                                    var item = $$("holidayDT").getItem(context.id.row);
+                                    $$("holidayDT").detachEvent("onBeforeDelete");
+                                    connection.sendAjax("DELETE", "/holiday/" + item.id, function (text, data, xhr) {
+                                        if (text) {
+                                            console.log(item);
+                                            $$("holidayDT").remove(context.id.row);
+                                            util.messages.showMessage("Uspjesno uklanjanje");
+                                        }
+                                    }, function (text, data, xhr) {
+                                        util.messages.showErrorMessage("Neuspjesno uklanjanje");
+                                    }, item);
+                                }
+                            };
+                            webix.confirm(delBox);
+                            break;
+                    }
+                }
+            }
+        })
         companySettingsView.firstLoadStart = companySettingsView.firstLoadEnd =
             companySettingsView.firstLoadCancel = companySettingsView.firstLoadReminder = 0;
-        connection.sendAjax("GET", "holiday/getAllByCompanyId/"+companyData.id ,
-            function (text, data, xhr) {
-                 $$("neradniDaniLista").setValue( data.json());
-                 console.log(data.json());
-                 if(text){
-                    console.log("radi");
-                } else
-                    util.messages.showErrorMessage("Greška pri učitavanju neradnih dana.");
-            }, function () {
-                util.messages.showErrorMessage("Greška pri učitavanju neradnih dana.");
-            }, null);
 
         connection.sendAjax("GET", "settings/getByCompanyId/" + companyData.id,
             function (text, data, xhr) {

@@ -390,9 +390,6 @@ var buildingView = {
 
                     };
 
-
-                    console.log("aj");
-                    console.log("building id:" + newItem.id);
                     connection.sendAjax("PUT", "building/" + newItem.id,
                         function (text, data, xhr) {
                             if (text) {
