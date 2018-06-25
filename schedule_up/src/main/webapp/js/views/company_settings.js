@@ -397,7 +397,7 @@ var companySettingsView = {
                     var context = this.getContext();
                     switch (id) {
                         case "1":
-                            var delBox = (webix.copy(commonViews.deleteConfirm("company")));
+                            var delBox = (webix.copy(commonViews.brisanjePotvrda("neradnog dana","neradni dan")));
                             delBox.callback = function (result) {
                                 if (result == 1) {
                                     var item = $$("holidayDT").getItem(context.id.row);
