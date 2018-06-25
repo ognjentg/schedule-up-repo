@@ -80,7 +80,7 @@ public class RoomController extends GenericController<Room, Integer> {
         throw new BadRequestException("Bad request");
     }
 
-    @RequestMapping(value = "/addGearUnit/{roomId}/{gearUnitId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/removeGearUnit/{roomId}/{gearUnitId}", method = RequestMethod.GET)
     public @ResponseBody
     String removeGearUnit(@PathVariable Integer roomId, @PathVariable Integer gearUnitId)throws BadRequestException {
         Room room = roomRepository.getOne(roomId);
