@@ -379,35 +379,10 @@ var gearView = {
                 gearId: null
             };
 
+            $$("gearDT").add(newItem);
+            util.messages.showMessage("Oprema je uspješno kreirana.");
+            util.dismissDialog('addGearDialog');
 
-            //provjera da li oprema  vec postoji
-            var gearExists = false;
-            var allGearNames = $$("gearSuggest").getList().data;
-            allGearNames.each(
-                function (obj) {
-                    if (obj.value == newItem.name) gearExists = true;
-                }
-            );
-
-            if (gearExists) {
-                connection.sendAjax("GET", "gear/" + newItem.name,
-                    function (text, data, xhr) {
-                        if (text) {
-                            newItem.gearId = JSON.parse(text)[0].id;
-                            $$("gearDT").add(newItem);
-                            util.messages.showMessage("Oprema je uspješno kreirana.");
-                        } else
-                            util.messages.showErrorMessage("Oprema nije kreirana.");
-                    }, function () {
-                        util.messages.showErrorMessage("Oprema nije kreirana.");
-                    }, newItem);
-
-                util.dismissDialog('addGearDialog');
-            } else {
-                $$("gearDT").add(newItem);
-                util.messages.showMessage("Oprema je uspješno kreirana.");
-                util.dismissDialog('addGearDialog');
-            }
         }
     }
 };
