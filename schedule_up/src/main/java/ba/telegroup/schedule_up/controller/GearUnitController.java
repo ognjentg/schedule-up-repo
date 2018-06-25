@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Objects;
 
-@RequestMapping(value = "/gear-unit")
+    @RequestMapping(value = "/gear-unit")
 @Controller
 @Scope("request")
 public class GearUnitController extends GenericController<GearUnit, Integer> {

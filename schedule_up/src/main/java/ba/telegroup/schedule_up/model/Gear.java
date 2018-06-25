@@ -4,10 +4,25 @@ import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
+@SqlResultSetMapping(
+        name = "GearMapping",
+        classes = @ConstructorResult(
+                targetClass = Gear.class,
+                columns = {
+                        @ColumnResult(name = "id"),
+                        @ColumnResult(name = "name")
+                }
+        )
+)
 public class Gear {
     private Integer id;
     private String name;
 
+    public Gear(){}
+    public Gear(Integer id, String name){
+        setId(id);
+        setName(name);
+    }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
