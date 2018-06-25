@@ -354,18 +354,6 @@ var companySettingsView = {
             date: formatDate,
             name:naziv,
             companyId: companyData.id};
-        connection.sendAjax("POST", "holiday/",
-            function (text, data, xhr) {
-                if (text ) {
-                    util.messages.showMessage("Uspješno .");
-                } else {
-                    util.messages.showErrorMessage("Greška pri dodavanju.");
-                }
-            }, function (text,data,xhr) {
-                util.messages.showErrorMessage("Greška pri dodavanju.");
-
-            }, newHoliday);
-        console.log(newHoliday);
         $$("naziv").setValue("");
         $$("holiday").setValue("");
        $$("holidayDT").add(newHoliday);
