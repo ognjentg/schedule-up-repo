@@ -64,6 +64,20 @@ public class MeetingController extends GenericController<Meeting, Integer> {
         throw new ForbiddenException("Forbidden action");
     }
 
+    @RequestMapping(value = "/getByRoom/{id}", method = RequestMethod.GET)
+    public @ResponseBody
+    List<Meeting> getByRoom(@PathVariable Integer id) throws BadRequestException, ForbiddenException {
+        if(id!=null) {
+            if (userBean.getUser().getRoleId().equals(admin)) {
+                return meetingRepository.getAllByStatusAndRoomIdAndCompanyId(scheduled, id,userBean.getUser().getCompanyId());
+            } else if (userBean.getUser().getRoleId().equals(advancedUser) || userBean.getUser().getRoleId().equals(user)) {
+                return meetingRepository.getAllByParticipantAndRoomId(userBean.getUser().getId(),id);
+            }
+            throw new ForbiddenException("Forbidden action");
+        }
+        throw new BadRequestException("Bad request");
+    }
+
     @RequestMapping(value = "/cancel/", method = RequestMethod.PUT)
     public @ResponseBody
     String cancel(@RequestBody Meeting meeting) throws BadRequestException, ForbiddenException {
