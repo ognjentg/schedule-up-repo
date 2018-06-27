@@ -3,7 +3,9 @@ package ba.telegroup.schedule_up.controller;
 import ba.telegroup.schedule_up.common.exceptions.BadRequestException;
 import ba.telegroup.schedule_up.common.exceptions.ForbiddenException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
+import ba.telegroup.schedule_up.model.Meeting;
 import ba.telegroup.schedule_up.model.Participant;
+import ba.telegroup.schedule_up.repository.MeetingRepository;
 import ba.telegroup.schedule_up.repository.ParticipantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +23,7 @@ import java.util.Objects;
 @Scope("request")
 public class ParticipantController extends GenericController<Participant, Integer> {
     private final ParticipantRepository participantRepository;
+    private final MeetingRepository meetingRepository;
     @Value("${status.deleted.true}")
     private Byte deleted;
     @Value("${status.deleted.false}")
@@ -33,9 +36,10 @@ public class ParticipantController extends GenericController<Participant, Intege
     private Integer user;
 
     @Autowired
-    public ParticipantController(ParticipantRepository repo) {
-        super(repo);
-        this.participantRepository = repo;
+    public ParticipantController(ParticipantRepository participantRepository, MeetingRepository meetingRepository) {
+        super(participantRepository);
+        this.participantRepository = participantRepository;
+        this.meetingRepository = meetingRepository;
     }
 
     @Override
@@ -44,22 +48,32 @@ public class ParticipantController extends GenericController<Participant, Intege
     @ResponseStatus(HttpStatus.CREATED)
     public @ResponseBody
     Participant insert(@RequestBody Participant object) throws BadRequestException, ForbiddenException {
-        if (checkPermissions()) {
-            return super.insert(object);
+        if (object.getMeetingId() != null) {
+            Meeting meeting = meetingRepository.findById(object.getMeetingId()).orElse(null);
+            if (checkPermissions() && meeting != null && meeting.getUserId().equals(userBean.getUser().getId())) {
+                return super.insert(object);
+            }
+            throw new ForbiddenException("Forbidden action");
         }
-        throw new ForbiddenException("Forbidden action");
+        throw new BadRequestException("Bad request");
     }
 
     @Override
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.DELETE)
     public @ResponseBody
-    String delete(@PathVariable Integer id) throws ForbiddenException {
+    String delete(@PathVariable Integer id) throws ForbiddenException, BadRequestException {
         if (checkPermissions()) {
             Participant participant = participantRepository.findById(id).orElse(null);
-            Objects.requireNonNull(participant).setDeleted(deleted);
-            participantRepository.saveAndFlush(participant);
-            logDeleteAction(participant);
-            return "Success";
+            if (participant != null) {
+                Meeting meeting = meetingRepository.findById(participant.getMeetingId()).orElse(null);
+                if (meeting != null && meeting.getUserId().equals(userBean.getUser().getId())) {
+                    Objects.requireNonNull(participant).setDeleted(deleted);
+                    participantRepository.saveAndFlush(participant);
+                    logDeleteAction(participant);
+                    return "Success";
+                }
+            }
+            throw new BadRequestException("Bad request");
         }
         throw new ForbiddenException("Forbidden action");
     }
@@ -113,4 +127,8 @@ public class ParticipantController extends GenericController<Participant, Intege
         return userBean.getUser().getRoleId().equals(admin) || userBean.getUser().getRoleId().equals(advancedUser);
     }
 
+    @Override
+    public String update(Integer integer, Participant object) throws ForbiddenException {
+        throw new ForbiddenException("Forbidden exception");
+    }
 }
