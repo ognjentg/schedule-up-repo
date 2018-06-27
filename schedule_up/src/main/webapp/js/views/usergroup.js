@@ -279,8 +279,8 @@ var usergroupView = {
                 }, function () {
                     util.messages.showErrorMessage("Podaci nisu dodati.");
                 }, newUsergroup);
-            }
-            util.dismissDialog('addUsergroupDialog');
+        }
+        util.dismissDialog('addUsergroupDialog');
 
     }
 }
