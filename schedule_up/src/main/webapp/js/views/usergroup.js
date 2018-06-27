@@ -262,6 +262,7 @@ var usergroupView = {
             connection.sendAjax("POST", "user-group",
                 function (text, data, xhr) {
                     if (text) {
+                        $$("usergroupDT").load("user-group");
                         var usergroupId = Number(JSON.parse(text).id);
                         var i;
                         for (i = 0; i < userIds.length; i++) {
