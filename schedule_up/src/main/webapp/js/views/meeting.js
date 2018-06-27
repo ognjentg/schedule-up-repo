@@ -57,6 +57,7 @@ var meetingView = {
                         format:"%d-%m-%Y %H:%i",
                         value: new Date(2012, 6, 8),
                         timepicker: true,
+
                         id: "startTime",
                         name: "startTime",
                         label: "Vrijeme početka:",
@@ -84,6 +85,19 @@ var meetingView = {
                         id:"uploader_1",
                         value:"Dodajte dokument",
                         link:"mylist",
+                        on:{
+                            onBeforeFileAdd: function(upload){
+                                var file = upload.file;
+                                var reader = new FileReader();
+                                reader.onload = function(event) {
+                                    var form = $$("addMeetingForm");
+                                   // form.elements.uploader_1.setValue(event.target.result.split("base64,")[1]);
+
+                                };
+                                reader.readAsDataURL(file);
+                                return false;
+                            }
+                        }
 
                     },{
                         view:"list",  id:"mylist", type:"uploader",
@@ -188,20 +202,37 @@ var meetingView = {
     },
     saveMeeting:function(){
         var form = $$("addMeetingForm");
+        var formatter=webix.Date.dateToStr("%d-%m-%Y %H:%i");
+        console.log(formatter(form.getValues().startTime));
         if (form.validate()) {
             var newMeeting = {
-                startTime: form.getValues().startTime + ":00",
-                endTime: form.getValues().endTime + ":00",
+                start_date:formatter(form.getValues().startTime),
+                end_date: formatter(form.getValues().endTime),
                 description:form.getValues().description,
-                topic:form.getValues().topic,
+                text:form.getValues().topic,
                 participantsNumber:0,
                 status:0,
                 companyId:companyData.id,
                 userId:userData.id,
-                roomId:meetingView.roomId
+                roomId:meetingView.roomId.id
 
             };
-            util.messages.showErrorMessage("maja");
+            var pro=webix.ajax().headers({
+                "Content-type":"application/json"
+            }).post("meeting",newMeeting).then(function(realData){
+                util.messages.showMessage( realData.text());
+
+            });
+            pro.fail(function(err){
+                console.log(err);
+                util.messages.showErrorMessage(err.message)});
+            webix.ajax("someA.php").then(function(realdataA){
+                return webix.ajax("someB.php");
+            }).then(function(realdataB){
+                return webix.ajax("someC.php")
+            }).then(function(realdataC){
+
+            });
             util.dismissDialog('addMeetingDialog');
         }
     }
