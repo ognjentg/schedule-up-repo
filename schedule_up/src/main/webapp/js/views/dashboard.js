@@ -31,6 +31,7 @@ var dashboardView = {
 
         scheduler.config.xml_date="%d-%m-%Y %H:%i";
         scheduler.config.readonly=true;
+        scheduler.config.first_hour=parseInt(companyData.timeFrom.substr(0,2));
         scheduler.init("scheduler_here",new Date(),"week");
         scheduler.clearAll();
 
@@ -45,6 +46,11 @@ var dashboardView = {
             );
         });
         schedulerEvents.push(onClick);
+        schedulerEvents.push(scheduler.attachEvent("onEventLoading", function(ev){
+            if (ev.status!==0)
+                ev.color="#bdd5ff";
+            return true;
+        }));
         scheduler.load("meeting/", "json");
 
 

@@ -54,9 +54,9 @@ public class MeetingController extends GenericController<Meeting, Integer> {
     public @ResponseBody
     List<Meeting> getAll() throws ForbiddenException {
         if (userBean.getUser().getRoleId().equals(admin)) {
-            return meetingRepository.getAllByStatusAndCompanyId(scheduled, userBean.getUser().getCompanyId());
+            return meetingRepository.getAllByStatusInAndCompanyId(new Byte[]{scheduled, finished}, userBean.getUser().getCompanyId());
         } else if (userBean.getUser().getRoleId().equals(advancedUser) || userBean.getUser().getRoleId().equals(user)) {
-            return meetingRepository.getAllByParticipant(userBean.getUser().getId());
+            return meetingRepository.getAllByStatusInParticipant(new Byte[]{scheduled, finished},userBean.getUser().getId());
         }
         throw new ForbiddenException("Forbidden action");
     }
@@ -75,9 +75,9 @@ public class MeetingController extends GenericController<Meeting, Integer> {
     List<Meeting> getByRoom(@PathVariable Integer id) throws BadRequestException, ForbiddenException {
         if(id!=null) {
             if (userBean.getUser().getRoleId().equals(admin)) {
-                return meetingRepository.getAllByStatusAndRoomIdAndCompanyId(scheduled, id,userBean.getUser().getCompanyId());
+                return meetingRepository.getAllByStatusInAndRoomIdAndCompanyId(new Byte[]{scheduled, finished}, id,userBean.getUser().getCompanyId());
             } else if (userBean.getUser().getRoleId().equals(advancedUser) || userBean.getUser().getRoleId().equals(user)) {
-                return meetingRepository.getAllByParticipantAndRoomId(userBean.getUser().getId(),id);
+                return meetingRepository.getAllByStatusInParticipantAndRoomId(new Byte[]{scheduled, finished},userBean.getUser().getId(),id);
             }
             throw new ForbiddenException("Forbidden action");
         }
