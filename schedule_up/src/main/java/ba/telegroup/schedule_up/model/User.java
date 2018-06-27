@@ -1,11 +1,12 @@
 package ba.telegroup.schedule_up.model;
 
 import ba.telegroup.schedule_up.model.modelCustom.CompanyUser;
+import org.joda.time.DateTime;
 
 import javax.persistence.*;
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Objects;
 
 @SqlResultSetMapping(
@@ -25,7 +26,9 @@ import java.util.Objects;
                         @ColumnResult(name="deactivation_reason"),
                         @ColumnResult(name="token"),
                         @ColumnResult(name="company_id"),
-                        @ColumnResult(name="role_id")
+                        @ColumnResult(name="role_id"),
+                        @ColumnResult(name="token_time", type = Date.class),
+                        @ColumnResult(name="deleted", type = Byte.class)
                 }
         )
 )
@@ -52,7 +55,7 @@ public class User {
     }
     public User(Integer id, String email, String username, String password, byte[] pin, String first_name, String last_name,
                 byte[] photo, Byte active, String deactivation_reason, String token,
-                Integer company_id, Integer role_id)
+                Integer company_id, Integer role_id, Date token_time, Byte deleted)
     {
         this.id = id;
         this.email = email;
@@ -67,6 +70,8 @@ public class User {
         this.token = token;
         this.companyId = company_id;
         this.roleId = role_id;
+        this.deleted = deleted;
+        setTokenTime(token_time==null ? null:new Timestamp(token_time.getTime()));
     }
 
     @Id
