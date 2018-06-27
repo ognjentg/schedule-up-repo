@@ -40,6 +40,9 @@ var menuActions = function (id) {
             break;
         case "user":
             userView.selectPanel();
+        case "usergroup":
+            usergroupView.selectPanel();
+            break;
     }
 };
 
@@ -86,10 +89,14 @@ var menuAdmin = [
         id: "logger",
         value: "Logovi",
         icon: "history"
-    },{
-        id : "user",
+    }, {
+        id: "user",
         value: "Korisnici",
         icon: "user"
+    },{
+        id: "usergroup",
+        value: "Korisničke grupe",
+        icon: "users"
     }
 ];
 
