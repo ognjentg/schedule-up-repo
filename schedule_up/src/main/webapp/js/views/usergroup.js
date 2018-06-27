@@ -119,7 +119,7 @@ var usergroupView = {
         var panelCopy = webix.copy(this.panel);
 
         $$("main").addView(webix.copy(panelCopy));
-        connection.attachAjaxEvents("usergroupDT", "user-group", true);
+        connection.attachAjaxEvents("usergroupDT", "user-group");
 
 
         /*webix.ui({
@@ -167,5 +167,120 @@ var usergroupView = {
                 }
             }
         })*/
+    },
+
+
+    addDialog: {
+        view: "popup",
+        id: "addUsergroupDialog",
+        modal: true,
+        position: "center",
+        body: {
+            id: "addUsergroupInside",
+            rows: [{
+                view: "toolbar",
+                cols: [{
+                    view: "label",
+                    label: "<span class='webix_icon fa-users'></span> Dodavanje korisničke grupe",
+                    width: 400
+                }, {}, {
+                    hotkey: 'esc',
+                    view: "icon",
+                    icon: "close",
+                    align: "right",
+                    click: "util.dismissDialog('addUsergroupDialog');"
+                }]
+            }, {
+                view: "form",
+                id: "addUsergroupForm",
+                width: 600,
+                elementsConfig: {
+                    labelWidth: 200,
+                    bottomPadding: 18
+                },
+                elements: [{
+                    view: "text",
+                    id: "name",
+                    name: "name",
+                    label: "Naziv korisničke grupe",
+                    invalidMessage: "Unesite naziv korisničke grupe!",
+                    required: true
+                }, {
+                    view: "multicombo",
+                    id: "users",
+                    name: "users",
+                    label: "Korisnici",
+                    suggest: {
+                        /*filter: function (item, value) {
+                            if (item.name.toString().toLowerCase().indexOf(value.toLowerCase()) === 0)
+                                return true;
+                            return false;
+                        },*/
+                        body: {
+                            template: "#firstName# #lastName#",
+                            url: "user"
+                        }
+                    }
+                }, {
+                    margin: 5,
+                    cols: [{}, {
+                        id: "saveUsergroup",
+                        view: "button",
+                        value: "Sačuvajte",
+                        type: "form",
+                        click: "usergroupView.save",
+                        hotkey: "enter",
+                        width: 150
+                    }]
+                }],
+                rules: {
+                    "name": function (value) {
+                        if (!value)
+                            return false;
+                        if (value.length > 100) {
+                            $$('addUsergroupForm').elements.name.config.invalidMessage = 'Maksimalan broj karaktera je 100!';
+                            return false;
+                        }
+                        return true;
+                    }
+
+                }
+            }]
+        }
+    },
+
+    showAddDialog: function () {
+        webix.ui(webix.copy(usergroupView.addDialog)).show();
+        webix.UIManager.setFocus("name");
+    },
+
+    save: function () {
+        var form = $$("addUsergroupForm");
+        if (form.validate()) {
+            var newUsergroup = {
+                name: form.getValues().name,
+                companyId: companyData.id
+            };
+            $$("usergroupDT").add(newUsergroup);
+                //dohvatiti id novog objekta, ne moze preko add
+            var userIdsStr = form.getValues().users;
+            if(userIdsStr != "") {
+                var userIds = userIdsStr.split(",");
+                var i;
+                for(i = 0; i < userIds.length; i++) {
+                    var newUserGroupHasUser = {
+                        userGroupId: 10,//radi testiranja, zamijeniti sa dohvacenim id
+                        userId: Number(userIds[i])
+                    }
+                    connection.sendAjax("POST", "user-group-has-user",
+                        function (text, data, xhr) {
+                        }, function () {
+                            util.messages.showErrorMessage("Podaci nisu dodati.");
+                        }, newUserGroupHasUser);
+                }
+            }
+            util.dismissDialog('addUsergroupDialog');
+
+        }
     }
 }
