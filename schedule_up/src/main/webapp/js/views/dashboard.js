@@ -8,56 +8,6 @@ var detachAllEvents=function () {
 }
 var dashboardView = {
 
-    addDialog: {
-        view: "popup",
-        id: "addMeetingDialog",
-        modal: true,
-        position: "center",
-        body: {
-            id: "addMeetingInside",
-            rows: [{
-                view: "toolbar",
-                cols: [{
-                    view: "label",
-                    label: "<span class='webix_icon fa fa-calendar_alt'></span> Rezervacija sale",
-                    width: 400
-                }, {}, {
-                    hotkey: 'esc',
-                    view: "icon",
-                    icon: "close",
-                    align: "right",
-                    click: "util.dismissDialog('addMeetingDialog');"
-                }]
-            }, {
-                view: "form",
-                id: "addMeetingForm",
-                width: 600,
-                elementsConfig: {
-                    labelWidth: 200,
-                    bottomPadding: 18
-                },
-                elements: [
-
-                    {
-                        view: "text",
-                        id: "tema",
-                        name: "tema",
-                        label: "Tema:",
-                        invalidMessage: "Unesite temu!",
-                        required: true
-                    },
-                    {
-                        view: "text",
-                        id: "opis",
-                        name: "opis",
-                        label: "Opis:",
-                        invalidMessage: "Unesite opis!",
-                        required: true
-                    }]
-                    }]
-            }
-        },
-
     panel: {
         id: "dashboardPanel",
         adjust: true,
