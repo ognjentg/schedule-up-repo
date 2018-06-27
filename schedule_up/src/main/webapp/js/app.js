@@ -40,6 +40,7 @@ var menuActions = function (id) {
             break;
         case "user":
             userView.selectPanel();
+            break;
         case "usergroup":
             usergroupView.selectPanel();
             break;
