@@ -153,6 +153,23 @@ var meetingView = {
 
     selectPanel: function (room) {
         detachAllEvents();
+
+        scheduler.attachEvent("onContextMenu", function(event_id, native_event_object) {
+            if (event_id) {
+                var posx = 0;
+                var posy = 0;
+                if (native_event_object.pageX || native_event_object.pageY) {
+                    posx = native_event_object.pageX;
+                    posy = native_event_object.pageY;
+                } else if (native_event_object.clientX || native_event_object.clientY) {
+                    posx = native_event_object.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+                    posy = native_event_object.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+                }
+                menu.showContextMenu(posx, posy);
+                return false; // prevent default action and propagation
+            }
+            return true;
+        });
         webix.protoUI({
             name:"activeList"
         },webix.ui.list,webix.ActiveContent);
@@ -187,9 +204,7 @@ var meetingView = {
         var form = $$("addMeetingForm");
         var formatter=webix.Date.dateToStr("%d-%m-%Y %H:%i");
         var today=new Date();
-        console.log(form.getValues().startTime.getMilliseconds()<Date.now());
-        if(form.getValues().startTime.getMilliseconds()<Date.now()) {
-            console.log("poruka");
+        if(Date.parse(form.getValues().startTime)<Date.now()) {
             util.messages.showErrorMessage("Nije moguće napraviti odabrati datum koji je prošao.");
             return;
         }
