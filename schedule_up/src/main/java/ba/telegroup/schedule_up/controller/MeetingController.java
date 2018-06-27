@@ -4,7 +4,9 @@ import ba.telegroup.schedule_up.common.exceptions.BadRequestException;
 import ba.telegroup.schedule_up.common.exceptions.ForbiddenException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.model.Meeting;
+import ba.telegroup.schedule_up.model.Participant;
 import ba.telegroup.schedule_up.repository.MeetingRepository;
+import ba.telegroup.schedule_up.repository.ParticipantRepository;
 import ba.telegroup.schedule_up.repository.SettingsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +26,7 @@ import java.util.Objects;
 public class MeetingController extends GenericController<Meeting, Integer> {
     private final MeetingRepository meetingRepository;
     private final SettingsRepository settingsRepository;
+    private final ParticipantRepository participantRepository;
     @Value("${admin.id}")
     private Integer admin;
     @Value("${advancedUser.id}")
@@ -38,11 +41,14 @@ public class MeetingController extends GenericController<Meeting, Integer> {
     private Byte canceled;
 
     @Autowired
-    public MeetingController(MeetingRepository meetingRepository, SettingsRepository settingsRepository) {
+    public MeetingController(MeetingRepository meetingRepository, SettingsRepository settingsRepository,ParticipantRepository participantRepository) {
         super(meetingRepository);
         this.meetingRepository = meetingRepository;
         this.settingsRepository=settingsRepository;
+        this.participantRepository=participantRepository;
     }
+
+
 
     @Override
     public @ResponseBody
@@ -138,7 +144,16 @@ public class MeetingController extends GenericController<Meeting, Integer> {
         if (userBean.getUser().getRoleId().equals(admin) || userBean.getUser().getRoleId().equals(advancedUser)) {
             if (object != null && object.getCompanyId() != null && userBean.getUser().getCompanyId().equals(object.getCompanyId())) {
                 if (check(object, true)) {
-                    return super.insert(object);
+                    if ((object=meetingRepository.saveAndFlush(object)) !=null) {
+                        Participant creator = new Participant();
+                        creator.setMeetingId(object.getId());
+                        creator.setUserId(object.getUserId());
+                        creator.setCompanyId(object.getCompanyId());
+                        creator.setDeleted((byte)0);
+                        if (participantRepository.saveAndFlush(creator)!=null){
+                            return object;
+                        }
+                    }
                 }
                 throw new BadRequestException("Bad request");
             }
