@@ -47,17 +47,8 @@ var meetingView = {
                         required: true
                     },{
                         view:"datepicker",
-                        suggest: {
-                            type: "calendar",
-                            body: {
-                                type: "time",
-                                calendarTime: "%H:%i"
-                            }
-                        },
                         format:"%d-%m-%Y %H:%i",
-                        value: new Date(2012, 6, 8),
                         timepicker: true,
-
                         id: "startTime",
                         name: "startTime",
                         label: "Vrijeme početka:",
@@ -66,15 +57,7 @@ var meetingView = {
                     },
                     {
                         view: "datepicker",
-                        suggest: {
-                            type: "calendar",
-                            body: {
-                                type: "time",
-                                calendarTime: "%H:%i"
-                            }
-                        },
                         format:"%d-%m-%Y %H:%i",
-
                         timepicker: true,
                         id: "endTime",
                         name: "endTime",
@@ -203,6 +186,13 @@ var meetingView = {
     saveMeeting:function(){
         var form = $$("addMeetingForm");
         var formatter=webix.Date.dateToStr("%d-%m-%Y %H:%i");
+        var today=new Date();
+        console.log(form.getValues().startTime.getMilliseconds()<Date.now());
+        if(form.getValues().startTime.getMilliseconds()<Date.now()) {
+            console.log("poruka");
+            util.messages.showErrorMessage("Nije moguće napraviti odabrati datum koji je prošao.");
+            return;
+        }
         console.log(formatter(form.getValues().startTime));
         if (form.validate()) {
             var newMeeting = {
