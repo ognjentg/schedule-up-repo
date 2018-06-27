@@ -130,6 +130,8 @@ var rightPanel = null;
 
 var init = function () {
     if (!webix.env.touch && webix.ui.scrollSize) webix.CustomScroll.init();
+    webix.i18n.setLocale("sr-SP");
+    webix.Date.startOnMonday = true;
     webix.ui(panel);
     panel = $$("empty");
     webix.ajax("user/state", {

@@ -1,13 +1,13 @@
-webix.i18n.locales["en-US"]={
+webix.i18n.locales["sr-SP"]={
 	groupDelimiter:",",
 	groupSize:3,
 	decimalDelimiter:".",
 	decimalSize:2,
 
-	dateFormat:"%m/%d/%Y",
-	timeFormat:"%h:%i %A",
+	dateFormat:"%d.%m.%Y.",
+	timeFormat:"%H:%i",
 	longDateFormat:"%d %F %Y",
-	fullDateFormat:"%m/%d/%Y %h:%i %A",
+	fullDateFormat:"%d-%m-%Y %H:%i",
 	am:["am","AM"],
 	pm:["pm","PM"],
 
@@ -21,15 +21,15 @@ webix.i18n.locales["en-US"]={
 	fileSize: ["b","Kb","Mb","Gb","Tb","Pb","Eb"],
 	
 	calendar: {
-		monthFull:["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-		monthShort:["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-		dayFull:["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-    	dayShort:["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-		hours: "Hours",
-		minutes: "Minutes",
-		done:"Done",
-		clear: "Clear",
-		today: "Today"
+		monthFull:["Januar", "Februar", "Mart", "April", "Maj", "Jun", "Jul", "Avgust", "Septembar", "Oktobar", "Novembar", "Decembar"],
+		monthShort:["Jan", "Feb", "Mar", "Apr", "Maj", "Jun", "Jul", "Avg", "Sep", "Okt", "Nov", "Dec"],
+		dayFull:["Nedjelja", "Ponedjeljak", "Utorak", "Srijeda", "Četvrtak", "Petak", "Subota"],
+    	dayShort:["Ned", "Pon", "Uto", "Sri", "Čet", "Pet", "Sub"],
+		hours: "Sati",
+		minutes: "Minuta",
+		done:"Gotovo",
+		clear: "Poništite",
+		today: "Danas"
     },
 
     controls:{

@@ -2,7 +2,7 @@ var scriptsToLoad = [
     {
         "section": "webix",
         "path": "webix/codebase/",
-        "files": ["webix","dhtmlxscheduler"]
+        "files": ["webix","dhtmlxscheduler","i18n/sr","locale/locale_sr"]
     },
     {
         "section": "extensions",
