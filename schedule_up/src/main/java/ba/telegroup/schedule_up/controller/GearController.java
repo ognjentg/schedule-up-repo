@@ -5,6 +5,7 @@ import ba.telegroup.schedule_up.common.exceptions.ForbiddenException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.model.Gear;
 import ba.telegroup.schedule_up.repository.GearRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
@@ -19,20 +20,24 @@ import java.util.List;
 @Scope("request")
 public class GearController extends GenericController<Gear, Integer> {
 
-    public GearController(JpaRepository<Gear, Integer> repo) {
+    private GearRepository gearRepository;
+
+    @Autowired
+    public GearController(GearRepository repo) {
         super(repo);
+        this.gearRepository = repo;
     }
 
     @RequestMapping(value = "/{name}", method = RequestMethod.GET)
     @ResponseBody
     public List<Gear> getAllByNameContainsIgnoreCase(@PathVariable String name) {
-        return ((GearRepository) repo).getAllByNameContainsIgnoreCase(name);
+        return gearRepository.getAllByNameContainsIgnoreCase(name);
     }
 
     @RequestMapping(value = "/getAllNames", method = RequestMethod.GET)
     @ResponseBody
     public List<String> getAllNames() {
-        return ((GearRepository) repo).getAllNames();
+        return gearRepository.getAllNames();
     }
 
     @Override
@@ -47,7 +52,7 @@ public class GearController extends GenericController<Gear, Integer> {
     @ResponseStatus(HttpStatus.CREATED)
     public @ResponseBody
     Gear insert(@RequestBody Gear object) throws ForbiddenException, BadRequestException {
-        List<Gear> gears = ((GearRepository) repo).getAllByNameContainsIgnoreCase(object.getName());
+        List<Gear> gears = gearRepository.getAllByNameContainsIgnoreCase(object.getName());
         if (gears == null || gears.size() == 0) {
             if (Integer.valueOf(2).equals(userBean.getUser().getRoleId()) || Integer.valueOf(3).equals(userBean.getUser().getRoleId())) {
                 if (object.getName() != null) {
@@ -72,7 +77,7 @@ public class GearController extends GenericController<Gear, Integer> {
 
     @Override
     public String update(Integer integer, Gear object) throws ForbiddenException, BadRequestException {
-        List<Gear> gears = ((GearRepository) repo).getAllByNameContainsIgnoreCase(object.getName());
+        List<Gear> gears = gearRepository.getAllByNameContainsIgnoreCase(object.getName());
         if (gears == null || gears.size() != 1)
             throw new BadRequestException("Bad request");
         Gear oldObj = gears.get(0);

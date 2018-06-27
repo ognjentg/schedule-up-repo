@@ -3,7 +3,11 @@ package ba.telegroup.schedule_up.controller;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.model.GearUnit;
 import ba.telegroup.schedule_up.model.modelCustom.GearUnitGear;
+import ba.telegroup.schedule_up.repository.GearRepository;
+import ba.telegroup.schedule_up.repository.GearUnitRepository;
 import ba.telegroup.schedule_up.repository.repositoryCustom.GearUnitRepositoryCustom;
+import ba.telegroup.schedule_up.repository.repositoryCustom.repositoryImpl.GearUnitRepositoryImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
@@ -14,26 +18,32 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Objects;
 
-    @RequestMapping(value = "/gear-unit")
+@RequestMapping(value = "/gear-unit")
 @Controller
 @Scope("request")
 public class GearUnitController extends GenericController<GearUnit, Integer> {
 
-    public GearUnitController(JpaRepository<GearUnit, Integer> repo) {
+    private GearUnitRepository gearUnitRepository;
+    private GearRepository gearRepository;
+
+    @Autowired
+    public GearUnitController(GearUnitRepository repo, GearRepository gearRepository) {
         super(repo);
+        this.gearUnitRepository = repo;
+        this.gearRepository = gearRepository;
     }
 
     @Override
     @RequestMapping(method = RequestMethod.GET)
     public @ResponseBody
     List getAll() {
-        return ((GearUnitRepositoryCustom) repo).getAllExtendedByCompanyId(userBean.getUser().getCompanyId());
+        return gearUnitRepository.getAllExtendedByCompanyId(userBean.getUser().getCompanyId());
     }
 
     @RequestMapping(value = "/custom/{id}", method = RequestMethod.GET)
     public @ResponseBody
     List<GearUnitGear> getAllExtendedById(@PathVariable Integer id) {
-        return ((GearUnitRepositoryCustom) repo).getAllExtendedById(id);
+        return gearUnitRepository.getAllExtendedById(id);
     }
 
     @Transactional
@@ -41,14 +51,14 @@ public class GearUnitController extends GenericController<GearUnit, Integer> {
     @ResponseStatus(HttpStatus.CREATED)
     public @ResponseBody
     GearUnitGear insertExtended(@RequestBody GearUnitGear gearUnitGear) {
-        return ((GearUnitRepositoryCustom) repo).insertExtended(gearUnitGear);
+        return gearUnitRepository.insertExtended(gearUnitGear);
     }
 
     @Transactional
     @RequestMapping(value = "/custom/", method = RequestMethod.PUT)
     public @ResponseBody
     GearUnitGear updateExtended(@RequestBody GearUnitGear gearUnitGear) {
-        return ((GearUnitRepositoryCustom) repo).updateExtended(gearUnitGear);
+        return gearUnitRepository.updateExtended(gearUnitGear);
     }
 
     @Override
