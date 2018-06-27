@@ -196,7 +196,15 @@ var roomView = {
                 id: "2",
                 value: "Obrišite",
                 icon: "trash"
-            }],
+            }, {
+                $template: "Separator"
+            },
+                {
+                id: "3",
+                value: "Prikaz rezervacija",
+                icon: "calendar"
+            }
+            ],
             master: $$("roomDT"),
             on: {
                 onItemClick: function (id) {
@@ -226,6 +234,10 @@ var roomView = {
                             };
                             webix.confirm(delBox);
                             break;
+                        case "3":
+                            meetingView.selectPanel($$("roomDT").getItem(context.id.row));
+                            break;
+
                     }
                 }
             }
