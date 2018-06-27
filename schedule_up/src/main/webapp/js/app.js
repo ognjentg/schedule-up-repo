@@ -38,6 +38,8 @@ var menuActions = function (id) {
         case "registration":
             registrationView.selectPanel();
             break;
+        case "user":
+            userView.selectPanel();
     }
 };
 
@@ -84,6 +86,10 @@ var menuAdmin = [
         id: "logger",
         value: "Logovi",
         icon: "history"
+    },{
+        id : "user",
+        value: "Korisnici",
+        icon: "user"
     }
 ];
 
