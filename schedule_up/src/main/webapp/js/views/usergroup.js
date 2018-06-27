@@ -211,11 +211,6 @@ var usergroupView = {
                     name: "users",
                     label: "Korisnici",
                     suggest: {
-                        /*filter: function (item, value) {
-                            if (item.name.toString().toLowerCase().indexOf(value.toLowerCase()) === 0)
-                                return true;
-                            return false;
-                        },*/
                         body: {
                             template: "#firstName# #lastName#",
                             url: "user"
@@ -261,26 +256,31 @@ var usergroupView = {
                 name: form.getValues().name,
                 companyId: companyData.id
             };
-            $$("usergroupDT").add(newUsergroup);
-                //dohvatiti id novog objekta, ne moze preko add
-            var userIdsStr = form.getValues().users;
-            if(userIdsStr != "") {
+            var userIdsStr = form.getValues().users;//format: v1,v2,...,v3
+            if(userIdsStr != "")
                 var userIds = userIdsStr.split(",");
-                var i;
-                for(i = 0; i < userIds.length; i++) {
-                    var newUserGroupHasUser = {
-                        userGroupId: 10,//radi testiranja, zamijeniti sa dohvacenim id
-                        userId: Number(userIds[i])
+            connection.sendAjax("POST", "user-group",
+                function (text, data, xhr) {
+                    if (text) {
+                        var usergroupId = Number(JSON.parse(text).id);
+                        var i;
+                        for (i = 0; i < userIds.length; i++) {
+                            var newUserGroupHasUser = {
+                                userGroupId: usergroupId,
+                                userId: Number(userIds[i])
+                            }
+                            connection.sendAjax("POST", "user-group-has-user",
+                                function (text, data, xhr) {
+                                }, function () {
+                                    util.messages.showErrorMessage("Podaci nisu dodati.");
+                                }, newUserGroupHasUser);
+                        }
                     }
-                    connection.sendAjax("POST", "user-group-has-user",
-                        function (text, data, xhr) {
-                        }, function () {
-                            util.messages.showErrorMessage("Podaci nisu dodati.");
-                        }, newUserGroupHasUser);
-                }
+                }, function () {
+                    util.messages.showErrorMessage("Podaci nisu dodati.");
+                }, newUsergroup);
             }
             util.dismissDialog('addUsergroupDialog');
 
-        }
     }
 }
