@@ -10,12 +10,18 @@ var meetingView = {
     },
 
     selectPanel: function (room) {
+        detachAllEvents();
         $$("main").removeView(rightPanel);
         rightPanel = "meetingPanel";
         var panelCopy = webix.copy(this.panel);
         $$("main").addView(webix.copy(panelCopy));
 
         scheduler.clearAll();
+        var event=scheduler.attachEvent("onEmptyClick",function(date,e){
+            webix.ui(webix.copy(dashboardView.addDialog)).show();
+
+        });
+        schedulerEvents.push(event);
         scheduler.config.xml_date = "%d-%m-%Y %H:%i";
         scheduler.config.readonly = true;
         scheduler.init('scheduler_there', new Date(), "week");

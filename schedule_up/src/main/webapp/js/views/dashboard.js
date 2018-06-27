@@ -1,4 +1,63 @@
+var schedulerEvents=[];
+
+var detachAllEvents=function () {
+    for(var i=0;i<schedulerEvents.length;i++){
+        scheduler.detachEvent(schedulerEvents[i]);
+    }
+    schedulerEvents=[];
+}
 var dashboardView = {
+
+    addDialog: {
+        view: "popup",
+        id: "addMeetingDialog",
+        modal: true,
+        position: "center",
+        body: {
+            id: "addMeetingInside",
+            rows: [{
+                view: "toolbar",
+                cols: [{
+                    view: "label",
+                    label: "<span class='webix_icon fa fa-calendar_alt'></span> Rezervacija sale",
+                    width: 400
+                }, {}, {
+                    hotkey: 'esc',
+                    view: "icon",
+                    icon: "close",
+                    align: "right",
+                    click: "util.dismissDialog('addMeetingDialog');"
+                }]
+            }, {
+                view: "form",
+                id: "addMeetingForm",
+                width: 600,
+                elementsConfig: {
+                    labelWidth: 200,
+                    bottomPadding: 18
+                },
+                elements: [
+
+                    {
+                        view: "text",
+                        id: "tema",
+                        name: "tema",
+                        label: "Tema:",
+                        invalidMessage: "Unesite temu!",
+                        required: true
+                    },
+                    {
+                        view: "text",
+                        id: "opis",
+                        name: "opis",
+                        label: "Opis:",
+                        invalidMessage: "Unesite opis!",
+                        required: true
+                    }]
+                    }]
+            }
+        },
+
     panel: {
         id: "dashboardPanel",
         adjust: true,
@@ -14,6 +73,7 @@ var dashboardView = {
     },
 
     selectPanel: function () {
+        detachAllEvents();
         $$("main").removeView(rightPanel);
         rightPanel = "dashboardPanel";
         var panelCopy = webix.copy(this.panel);
@@ -22,12 +82,9 @@ var dashboardView = {
         scheduler.config.xml_date="%d-%m-%Y %H:%i";
         scheduler.config.readonly=true;
         scheduler.init("scheduler_here",new Date(),"week");
+        scheduler.clearAll();
 
-        scheduler.attachEvent("onEmptyClick",function(date,e){
-
-        });
-
-        scheduler.attachEvent("onClick", function (id, e) {
+       var onClick=scheduler.attachEvent("onClick", function (id, e) {
             var event = scheduler.getEvent(id);
             webix.promise.all([webix.ajax("user/" + event.userId), webix.ajax("room/" + event.roomId)]).then(
                 function (results) {
@@ -37,6 +94,7 @@ var dashboardView = {
                 }
             );
         });
+        schedulerEvents.push(onClick);
         scheduler.load("meeting/", "json");
 
 
