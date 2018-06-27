@@ -4,7 +4,11 @@ var dashboardView = {
         adjust: true,
         rows: [{
             view: "template",
-            template: "<div id='scheduler_here' class='dhx_cal_container' style='width:100%; height:100%;'><div class='dhx_cal_navline'><div class='dhx_cal_prev_button'>&nbsp;</div><div class='dhx_cal_next_button'>&nbsp;</div><div class='dhx_cal_today_button'></div><div class='dhx_cal_date'></div></div><div class='dhx_cal_header'></div><div class='dhx_cal_data'></div></div>",
+            template: "<div id='scheduler_here' class='dhx_cal_container' " +
+            "style='width:100%; height:100%;'><div class='dhx_cal_navline'>" +
+            "<div class='dhx_cal_prev_button'>&nbsp;</div><div class='dhx_cal_next_button'>" +
+            "&nbsp;</div><div class='dhx_cal_today_button'></div><div class='dhx_cal_date'></div></div><div" +
+            " class='dhx_cal_header'></div><div class='dhx_cal_data'></div></div>",
         }
         ]
     },
@@ -14,9 +18,15 @@ var dashboardView = {
         rightPanel = "dashboardPanel";
         var panelCopy = webix.copy(this.panel);
         $$("main").addView(webix.copy(panelCopy));
-        scheduler.config.xml_date = "%d-%m-%Y %H:%i";
-        scheduler.config.readonly = true;
-        scheduler.init('scheduler_here', new Date(), "week");
+
+        scheduler.config.xml_date="%d-%m-%Y %H:%i";
+        scheduler.config.readonly=true;
+        scheduler.init("scheduler_here",new Date(),"week");
+
+        scheduler.attachEvent("onEmptyClick",function(date,e){
+
+        });
+
         scheduler.attachEvent("onClick", function (id, e) {
             var event = scheduler.getEvent(id);
             webix.promise.all([webix.ajax("user/" + event.userId), webix.ajax("room/" + event.roomId)]).then(
@@ -28,6 +38,7 @@ var dashboardView = {
             );
         });
         scheduler.load("meeting/", "json");
+
 
     },
     eventDialog: {
