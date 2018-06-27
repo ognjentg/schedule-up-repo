@@ -1,10 +1,34 @@
 package ba.telegroup.schedule_up.model;
 
+import ba.telegroup.schedule_up.model.modelCustom.CompanyUser;
+
 import javax.persistence.*;
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Objects;
 
+@SqlResultSetMapping(
+        name = "UserMapping",
+        classes = @ConstructorResult(
+                targetClass = User.class,
+                columns = {
+                        @ColumnResult(name="id"),
+                        @ColumnResult(name="email"),
+                        @ColumnResult(name="username"),
+                        @ColumnResult(name="password"),
+                        @ColumnResult(name="pin"),
+                        @ColumnResult(name="first_name"),
+                        @ColumnResult(name="last_name"),
+                        @ColumnResult(name="photo"),
+                        @ColumnResult(name="active"),
+                        @ColumnResult(name="deactivation_reason"),
+                        @ColumnResult(name="token"),
+                        @ColumnResult(name="company_id"),
+                        @ColumnResult(name="role_id")
+                }
+        )
+)
 @Entity
 public class User {
     private Integer id;
@@ -22,6 +46,28 @@ public class User {
     private Timestamp tokenTime;
     private Integer companyId;
     private Integer roleId;
+    public User()
+    {
+
+    }
+    public User(Integer id, String email, String username, String password, byte[] pin, String first_name, String last_name,
+                byte[] photo, Byte active, String deactivation_reason, String token,
+                Integer company_id, Integer role_id)
+    {
+        this.id = id;
+        this.email = email;
+        this.username = username;
+        this.password = password;
+        this.pin = pin;
+        this.firstName = first_name;
+        this.lastName = last_name;
+        this.photo = photo;
+        this.active = active;
+        this.deactivationReason = deactivation_reason;
+        this.token = token;
+        this.companyId = company_id;
+        this.roleId = role_id;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

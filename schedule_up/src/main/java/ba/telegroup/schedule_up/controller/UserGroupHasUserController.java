@@ -5,13 +5,15 @@ import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.model.UserGroupHasUser;
 import ba.telegroup.schedule_up.model.UserGroupHasUserPK;
 import ba.telegroup.schedule_up.repository.UserGroupHasUserRepository;
+import ba.telegroup.schedule_up.repository.UserRepository;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.List;
 
 @RequestMapping(value = "/user-group-has-user")
 @Controller
@@ -20,7 +22,7 @@ public class UserGroupHasUserController extends GenericController<UserGroupHasUs
 
     private final UserGroupHasUserRepository userGroupHasUserRepository;
 
-    public UserGroupHasUserController(UserGroupHasUserRepository repo) {
+    public UserGroupHasUserController(UserGroupHasUserRepository repo, UserRepository userRepository) {
         super(repo);
         this.userGroupHasUserRepository = repo;
     }
@@ -40,5 +42,13 @@ public class UserGroupHasUserController extends GenericController<UserGroupHasUs
         }
         throw new BadRequestException("Bad Request");
     }
+
+    @RequestMapping(value={"/custom/{groupId}"}, method =  RequestMethod.GET)
+    public @ResponseBody
+    List getAllExtendedUsersByUserGroupId(@PathVariable Integer groupId)
+    {
+        return userGroupHasUserRepository.getAllExtendedUsersByUserGroupId(groupId);
+    }
+
 
 }
