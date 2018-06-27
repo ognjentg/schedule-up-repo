@@ -174,8 +174,14 @@ var meetingView = {
         schedulerEvents.push(event);
         scheduler.config.xml_date = "%d-%m-%Y %H:%i";
         scheduler.config.readonly = true;
-        scheduler.init('scheduler_there', new Date(), "week");
+        scheduler.config.first_hour=parseInt(companyData.timeFrom.substr(0,2));
 
+        scheduler.init('scheduler_there', new Date(), "week");
+        schedulerEvents.push(scheduler.attachEvent("onEventLoading", function(ev){
+            if (ev.status!==0)
+                ev.color="#bdd5ff";
+            return true;
+        }));
         //alert(room.id);
         scheduler.load("meeting/getByRoom/"+room.id, "json");
 
