@@ -96,7 +96,7 @@ var meetingView = {
                                             name:file['name'],
                                             content:event.target.result.split("base64,")[1],
                                             report:0,
-                                            meeting_id:1
+                                            meetingId:1
                                         };
                                         meetingView.files.push(newFileObject);
                                         };
@@ -532,12 +532,15 @@ var meetingView = {
 
     },
     saveMeeting:function(){
+        var file=meetingView.files[0];
+
         var participants=[];
-        var form=$$("addMeetingForm");
-        if(Date.parse(form.getValues().startTime)<Date.now()) {
+        var documents=[];
+        var userMails=[];
+        /*if(Date.parse(form.getValues().startTime)<Date.now()) {
             util.messages.showErrorMessage("Nije moguće odabrati datum koji je prošao.");
             return;
-        }
+        }*/
         $$("userList").data.each(function(obj){
                 if(obj.markCheckbox==1) {
                     var participant={
@@ -564,17 +567,20 @@ var meetingView = {
 
             }
         );
+        $$("userEmailList").data.each(function(obj){
+
+                var participantOutside={
+                    email:obj.name,
+                    deleted:0,
+                    companyId:companyData.id,
+                    meetingId:1
+                };
+                participants.push(participantOutside);
+
+
+            }
+        );
         var form = $$("addMeetingForm");
-        var userEmail=form.getValues().email;
-        if(userEmail!=""){
-            var participantOutside={
-                email:userEmail,
-                deleted:0,
-                companyId:companyData.id,
-                meetingId:1
-            };
-            participants.push(participantOutside);
-        }
 
         var formatter=webix.Date.dateToStr("%d-%m-%Y %H:%i");
         var today=new Date();
@@ -603,7 +609,28 @@ var meetingView = {
                     function (text, data, xhr) {
 
                         if (data) {
-                            util.messages.showMessage("Uspješno kreirana rezervacija.");
+                            for(var j=0;j<meetingView.files.length;j++){
+                                var file=meetingView.files[j];
+                                var doc={
+                                    name:file['name'],
+                                    content:file['content'],
+                                    report:file['report'],
+                                    meetingId:realData.json().id
+                                };
+                                documents.push(doc);
+                            }
+                            connection.sendAjax("POST", "document/list/",
+                                function (text, data, xhr) {
+
+                                    if (data) {
+
+                                        util.messages.showMessage("Uspješno kreirana rezervacija.");
+
+                                    } else
+                                        util.messages.showErrorMessage("Neuspješno kreiranje rezervacije.");
+                                }, function () {
+                                    util.messages.showErrorMessage("Neuspješno kreiranje rezervacije.");
+                                }, documents);
 
                         } else
                             util.messages.showErrorMessage("Neuspješno kreiranje rezervacije.");
