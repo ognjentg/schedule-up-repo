@@ -210,7 +210,7 @@ userView = {
         var panelCopy = webix.copy(this.panel);
 
         $$("main").addView(webix.copy(panelCopy));
-        connection.attachAjaxEvents("userDT", "user", true);
+        connection.attachAjaxEvents("userDT", "user");
 
     },
 
@@ -226,7 +226,8 @@ userView = {
                 username: $$("addUserForm").getValues().name,
                 email: $$("addUserForm").getValues().email,
                 roleId: $$("role").getValue(),
-                companyId: userData.companyId
+                companyId: userData.companyId,
+                active: 1
             };
             $$("userDT").add(newUser);
             util.dismissDialog('addUserDialog');
