@@ -428,7 +428,21 @@ var meetingView = {
         form.elements.startTime.setValue(element.start_date);
         form.elements.endTime.setValue(element.end_date);
         form.elements.description.setValue(element.description);
+        //popunjavanje dokumenta
+        connection.sendAjax("GET", "document/getAllByMeetingId/" + eventId,
+            function (text, data, xhr) {
+                if (text ) {
+                    meetingView.files=data.json();
+                    $$("fileList").parse(data.json());
 
+                } else {
+                    util.messages.showErrorMessage("Greška pri učitavanju dokumenata.");
+                }
+            }, function (text,data,xhr) {
+                util.messages.showErrorMessage("Greška pri učitavanju dokumenata.");
+
+            }
+            , null);
 
     },
 
