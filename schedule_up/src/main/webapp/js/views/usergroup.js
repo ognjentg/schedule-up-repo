@@ -124,7 +124,7 @@ var usergroupView = {
 
         /*webix.ui({
             view: "contextmenu",
-            id: "companyContextMenu",
+            id: "userGroupContextMenu",
             width: 200,
             data: [{
                 id: "1",
@@ -137,13 +137,13 @@ var usergroupView = {
                 value: "Obrišite",
                 icon: "trash"
             }],
-            master: $$("companyDT"),
+            master: $$("usergroupDT"),
             on: {
                 onItemClick: function (id) {
                     var context = this.getContext();
                     switch (id) {
                         case "1":
-                            companyView.showChangeCompanyDialog($$("companyDT").getItem(context.id.row));
+                            usergroupView.showChangeUserGroupDialog($$("usergroupDT").getItem(context.id.row));
                             break;
                         case "2":
                             var delBox = (webix.copy(commonViews.deleteConfirm("company")));
@@ -283,5 +283,14 @@ var usergroupView = {
         }
         util.dismissDialog('addUsergroupDialog');
 
+    },
+
+    showChangeUserGroupDialog: function (usergroup) {
+        //to be continued
+    },
+
+    changeUsergroupDialog: {
+        view: "popup",
+        id: "changeUsergroupDialog"
     }
 }
