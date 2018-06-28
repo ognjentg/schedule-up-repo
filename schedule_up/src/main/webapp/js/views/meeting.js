@@ -66,7 +66,21 @@ var meetingView = {
                                 label: "Vrijeme završetka:",
                                 invalidMessage: "Unesite vrijeme završetka!",
                                 required: true
-                            },{cols:[{  view:"uploader",
+                            },{cols:[ { view: "text",
+                                    id: "email",
+                                    name:"email",
+                                    label: "E-mail nezaposlenih:"
+                                },{
+                                    id: "addEmail",
+                                    view: "button",
+                                    type: "iconButton",
+                                    click: "meetingView.addEmail",
+                                    icon:"plus-circle",
+                                    width:35,
+                                    height:0
+                                }]},
+
+                            {cols:[{  view:"uploader",
                                 id:"uploader_1",
                                 value:"Dodajte dokument",
                                 on:{
@@ -94,12 +108,6 @@ var meetingView = {
                                     type: "form",
                                     click: "meetingView.showFile",
                                     }] },
-
-                            { view: "text",
-                                id: "email",
-                                name:"email",
-                                label: "E-mail nezaposlenih u kompaniji:",
-                            },
                             {
                                 margin: 5,
                                 cols: [{}, {
@@ -117,12 +125,12 @@ var meetingView = {
                             view: "label",
                             align:"center",
                             label: "<span class='webix_icon fa fa-user'></span> Učesnici",
-                            width: 300
+                            width: 200
 
                         },{
                             view: "list",
                             id:"userList",
-                            width: 300,
+                            width: 200,
                             type: {
                                 markCheckbox: function (obj) {
                                     return "<span class='check webix_icon fa-" + (obj.markCheckbox ? "check-" : "") + "square-o'></span>";
@@ -160,6 +168,30 @@ var meetingView = {
                                 }
                             },
 
+                            template: "#name#  {common.markCheckbox()}"}] }
+                            ,{rows:[{
+                            view: "label",
+                            align:"center",
+                            label: "<span class='webix_icon fa fa-envelope'></span> E-mail adrese nezaposlenih",
+                            width: 200
+
+                        },{
+                            view: "list",
+                            id:"userEmailList",
+                            width: 200,
+                            type: {
+                                markCheckbox: function (obj) {
+                                    return "<span class='check webix_icon fa-" + (obj.markCheckbox ? "check-" : "") + "square-o'></span>";
+                                }
+                            },
+                            onClick: {
+                                "check": function (e, id) {
+                                    var item = this.getItem(id);
+                                    item.markCheckbox = item.markCheckbox ? 0 : 1;
+                                    this.updateItem(id, item);
+                                }
+                            },
+
                             template: "#name#  {common.markCheckbox()}"}] }]
             }]
         }
@@ -173,8 +205,17 @@ var meetingView = {
         }
         ]
     },
+    addEmail:function(){
+        var form = $$("addMeetingForm");
+        var userEmail=form.getValues().email;
+        var newObject={name:userEmail};
+        $$("userEmailList").add(newObject);
+
+    },
 
     contextMenuEventId:null,
+
+
 
     selectPanel: function (room) {
         detachAllEvents();
