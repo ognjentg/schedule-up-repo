@@ -12,9 +12,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 @RequestMapping(value = "/document")
@@ -37,10 +36,10 @@ public class DocumentController extends GenericController<Document, Integer> {
     public @ResponseBody
     List<Document> insertDocuments(@RequestBody List<Document> documents) throws BadRequestException {
         List<Document> retDocuments = new ArrayList<>();
-        if(documents == null || documents.size() == 0) {
+        if (documents == null || documents.size() == 0) {
             throw new BadRequestException("Bad request");
         } else {
-            for(Document document: documents) {
+            for (Document document : documents) {
                 retDocuments.add(documentRepository.saveAndFlush(document));
             }
             return retDocuments;
@@ -69,8 +68,26 @@ public class DocumentController extends GenericController<Document, Integer> {
 
     @RequestMapping(value = "/getAllByMeetingId/{id}", method = RequestMethod.GET)
     public @ResponseBody
-    List getAllByUserId(@PathVariable Integer id) {
+    List getAllByMeetingId(@PathVariable Integer id) {
         List<Document> documents = documentRepository.getAllByMeetingId(id);
         return new ArrayList<>(documents);
+    }
+
+    @Transactional
+    @RequestMapping(value = "/updateAll/{id}", method = RequestMethod.PUT)
+    public @ResponseBody
+    List<Document> updateDocuments(@RequestBody List<Document> documents, @PathVariable Integer id) throws ForbiddenException, BadRequestException {
+        List<Document> currentDocuments = getAllByMeetingId(id);
+        for (Iterator<Document> it = currentDocuments.iterator(); it.hasNext(); ) {
+            Document document = it.next();
+            if (!documents.contains(document)) {
+                delete(document.getId());
+                it.remove();
+            }
+        }
+        documents.removeAll(currentDocuments);
+        documents = insertDocuments(documents);
+        documents.addAll(currentDocuments);
+        return documents;
     }
 }

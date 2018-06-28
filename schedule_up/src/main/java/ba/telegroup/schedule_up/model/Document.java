@@ -68,11 +68,7 @@ public class Document {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Document document = (Document) o;
-        return Objects.equals(id, document.id) &&
-                Objects.equals(name, document.name) &&
-                Arrays.equals(content, document.content) &&
-                Objects.equals(report, document.report) &&
-                Objects.equals(meetingId, document.meetingId);
+        return Objects.equals(id, document.id);
     }
 
     @Override

@@ -4,8 +4,10 @@ import ba.telegroup.schedule_up.common.exceptions.BadRequestException;
 import ba.telegroup.schedule_up.common.exceptions.ForbiddenException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.interaction.Notification;
+import ba.telegroup.schedule_up.model.Participant;
 import ba.telegroup.schedule_up.model.User;
 import ba.telegroup.schedule_up.repository.CompanyRepository;
+import ba.telegroup.schedule_up.repository.ParticipantRepository;
 import ba.telegroup.schedule_up.repository.UserRepository;
 import ba.telegroup.schedule_up.util.LoginInformation;
 import ba.telegroup.schedule_up.util.Util;
@@ -13,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
@@ -22,6 +25,7 @@ import javax.servlet.http.HttpSession;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @RequestMapping(value = "/user")
 @Controller
@@ -30,6 +34,7 @@ public class UserController extends GenericController<User, Integer> {
 
     private final UserRepository userRepository;
     private final CompanyRepository companyRepository;
+    private final ParticipantRepository participantRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -38,10 +43,11 @@ public class UserController extends GenericController<User, Integer> {
     private Integer randomStringLength;
 
     @Autowired
-    public UserController(UserRepository repo, CompanyRepository companyRepository) {
+    public UserController(UserRepository repo, CompanyRepository companyRepository, ParticipantRepository participantRepository) {
         super(repo);
         this.userRepository = repo;
         this.companyRepository = companyRepository;
+        this.participantRepository = participantRepository;
     }
 
     @Override
@@ -187,5 +193,14 @@ public class UserController extends GenericController<User, Integer> {
             return userBean.getUser();
         } else
             throw new ForbiddenException("Forbidden");
+    }
+
+    @Transactional
+    @RequestMapping(value = {"/nonParticipantsFor/{meetingId}"}, method = RequestMethod.GET)
+    public @ResponseBody
+    List<User> getNonParticipants(@PathVariable Integer meetingId) {
+        List<User> retValue = getAll();
+        retValue.removeAll(userRepository.findAllById(participantRepository.getAllByMeetingIdAndDeletedIs(meetingId, (byte) 0).stream().map(Participant::getUserId).collect(Collectors.toList())));
+        return retValue;
     }
 }

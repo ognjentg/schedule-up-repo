@@ -52,8 +52,8 @@ public class ParticipantController extends GenericController<Participant, Intege
         if (object.getMeetingId() != null) {
             Meeting meeting = meetingRepository.findById(object.getMeetingId()).orElse(null);
             if (checkPermissions() && meeting != null && meeting.getUserId().equals(userBean.getUser().getId())) {
-                List<Participant> participants=participantRepository.getAllByMeetingIdAndDeletedIs(meeting.getId(),notDeleted);
-                if(participants.stream().filter(participant ->participant.equalsIgnorePrimaryKey(object)).count()==0)
+                List<Participant> participants = participantRepository.getAllByMeetingIdAndDeletedIs(meeting.getId(), notDeleted);
+                if (participants.stream().filter(participant -> participant.equalsIgnorePrimaryKey(object)).count() == 0)
                     return super.insert(object);
                 throw new BadRequestException("Bad request");
             }
@@ -135,16 +135,20 @@ public class ParticipantController extends GenericController<Participant, Intege
     public String update(Integer integer, Participant object) throws ForbiddenException {
         throw new ForbiddenException("Forbidden exception");
     }
+
     @Transactional
-    @RequestMapping(value={"/insertAll"},method = RequestMethod.POST)
-    public @ResponseBody List<Participant> insertAll(@RequestBody List<Participant> participants) throws BadRequestException, ForbiddenException {
-        List<Participant> insertedParticipants=new ArrayList<>();
-        if(participants!=null) {
+    @RequestMapping(value = {"/insertAll"}, method = RequestMethod.POST)
+    public @ResponseBody
+    List<Participant> insertAll(@RequestBody List<Participant> participants) throws BadRequestException, ForbiddenException {
+        List<Participant> insertedParticipants = new ArrayList<>();
+        if (participants != null) {
             for (Participant participant : participants) {
                 insertedParticipants.add(insert(participant));
             }
             return insertedParticipants;
         }
-        throw  new BadRequestException("Bad request");
+        throw new BadRequestException("Bad request");
     }
+
+
 }
