@@ -21,88 +21,6 @@ var meetingView = {
                     align: "right",
                     click: "util.dismissDialog('addMeetingDialog');"
                 }]
-<<<<<<< HEAD
-            }, {
-                view: "form",
-                id: "addMeetingForm",
-                width: 600,
-                elementsConfig: {
-                    labelWidth: 200,
-                    bottomPadding: 18
-                },
-                elements: [
-
-                    {
-                        view: "text",
-                        id: "topic",
-                        name: "topic",
-                        label: "Tema:",
-                        invalidMessage: "Unesite temu!",
-                        required: true
-                    },{
-                        view: "text",
-                        id: "description",
-                        name: "description",
-                        label: "Opis:",
-                        invalidMessage: "Unesite opis!",
-                        required: true
-                    },{
-                        view:"datepicker",
-                        format:"%d-%m-%Y %H:%i",
-                        timepicker: true,
-                        id: "startTime",
-                        name: "startTime",
-                        label: "Vrijeme početka:",
-                        invalidMessage: "Unesite vrijeme početka!",
-                        required: true
-                    },
-                    {
-                        view: "datepicker",
-                        format:"%d-%m-%Y %H:%i",
-                        timepicker: true,
-                        id: "endTime",
-                        name: "endTime",
-                        label: "Vrijeme završetka:",
-                        invalidMessage: "Unesite vrijeme završetka!",
-                        required: true
-                    },{ view:"uploader",
-                        id:"uploader_1",
-                        value:"Dodajte dokument",
-                        link:"mylist",
-                        on:{
-                            onBeforeFileAdd: function(upload){
-                                var file = upload.file;
-                                var reader = new FileReader();
-                                reader.onload = function(event) {
-                                    var form = $$("addMeetingForm");
-                                   // form.elements.uploader_1.setValue(event.target.result.split("base64,")[1]);
-
-                                };
-                                reader.readAsDataURL(file);
-                                return false;
-                            }
-                        }
-
-                    },{
-                        view:"list",  id:"mylist", type:"uploader",
-                        autoheight:true, borderless:true
-                    },
-                      
-                    
-                    {
-                        margin: 5,
-                        cols: [{}, {
-                            id: "saveMeeting",
-                            view: "button",
-                            value: "Dodajte sastanak",
-                            type: "form",
-                            click: "meetingView.saveMeeting",
-                            hotkey: "enter",
-                            width: 150
-                        }]
-                    }
-                ]
-=======
             }, { cols:[
                     { view: "form",
                         id: "addMeetingForm",
@@ -241,7 +159,6 @@ var meetingView = {
                             },
 
                             template: "#name#  {common.markCheckbox()}"}] }]
->>>>>>> 646b0d98309acc3915ee1027a6b3ea99a901826f
             }]
         }
     },
@@ -257,7 +174,9 @@ var meetingView = {
 
     selectPanel: function (room) {
         detachAllEvents();
-
+        webix.protoUI({
+            name:"activeList"
+        },webix.ui.list,webix.ActiveContent);
         $$("main").removeView(rightPanel);
         meetingView.roomId=room;
         rightPanel = "meetingPanel";
@@ -285,7 +204,6 @@ var meetingView = {
             });
 
         });
-
         schedulerEvents.push(event);
         scheduler.config.xml_date = "%d-%m-%Y %H:%i";
         scheduler.config.readonly = true;
@@ -342,11 +260,6 @@ var meetingView = {
 
         var formatter=webix.Date.dateToStr("%d-%m-%Y %H:%i");
         var today=new Date();
-
-        if(Date.parse(form.getValues().startTime)<Date.now()) {
-            util.messages.showErrorMessage("Nije moguće odabrati datum koji je prošao.");
-            return;
-        }
 
         if (form.validate()) {
             var newMeeting = {
