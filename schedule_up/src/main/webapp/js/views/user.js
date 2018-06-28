@@ -106,6 +106,103 @@ userView = {
         }]
     },
 
+    addDialog: {
+        view: "popup",
+        id: "addUserDialog",
+        modal: true,
+        position: "center",
+        body: {
+            id: "addUserInside",
+            rows: [{
+                view: "toolbar",
+                cols: [{
+                    view: "label",
+                    label: "<span class='webix_icon fa-briefcase'></span> Dodavanje korisnika",
+                    width: 400
+                }, {}, {
+                    hotkey: 'esc',
+                    view: "icon",
+                    icon: "close",
+                    align: "right",
+                    click: "util.dismissDialog('addUserDialog');"
+                }]
+            }, {
+                view: "form",
+                id: "addUserForm",
+                width: 600,
+                elementsConfig: {
+                    labelWidth: 200,
+                    bottomPadding: 18
+                },
+                elements: [{
+                    view: "text",
+                    id: "username",
+                    name: "name",
+                    label: "Ime naloga",
+                    invalidMessage: "Unesite ime naloga!",
+                    required: true
+                },
+                    {
+                        view: "text",
+                        id: "email",
+                        name: "email",
+                        label: "E-mail",
+                        required: true,
+                        invalidMessage: "Unesite odgovarajuću email adresu"
+                    },{
+                        view: "richselect",
+                        id: "role",
+                        name: "role",
+                        label: "uloga",
+                        value: 4,
+                        options: [
+                            {id:4, "value":"korisnik"},
+                            {id: 3, "value":"napredni korisnik"},
+                            {id:2 , "value":"administrator"}]
+                    },
+                    {
+                        margin: 5,
+                        cols: [{}, {
+                            id: "saveUser",
+                            view: "button",
+                            value: "Dodajte korisnika",
+                            type: "form",
+                            click: "userView.save",
+                            hotkey: "enter",
+                            width: 150
+                        }]
+                    }],
+                rules: {
+                    "name": function (value) {
+                        if (!value)
+                            return false;
+                        if (value.length > 15) {
+                            $$('addUserForm').elements.name.config.invalidMessage = 'Maksimalan broj karaktera je 15!';
+                            return false;
+                        }
+                        return true;
+                    },
+                    "email": function (value) {
+                        if (!value) {
+                            $$('addUserForm').elements.email.config.invalidMessage = 'Unesite E-mail!';
+                            return false;
+                        }
+                        if (value.length > 100) {
+                            $$('addUserForm').elements.email.config.invalidMessage = 'Maksimalan broj karaktera je 100';
+                            return false;
+                        }
+                        if (!webix.rules.isEmail(value)) {
+                            $$('addUserForm').elements.email.config.invalidMessage = 'E-mail nije u validnom formatu.';
+                            return false;
+                        }
+
+                        return true;
+                    }
+                }
+            }]
+        }
+    },
+
     selectPanel: function () {
         $$("main").removeView(rightPanel);
         rightPanel = "userPanel";
@@ -115,5 +212,24 @@ userView = {
         $$("main").addView(webix.copy(panelCopy));
         connection.attachAjaxEvents("userDT", "user", true);
 
+    },
+
+    showAddDialog: function () {
+        webix.ui(webix.copy(userView.addDialog)).show();
+        webix.UIManager.setFocus("name");
+    },
+
+    save: function () {
+        var form = $$("addUserForm");
+        if (form.validate()) {
+            var newUser = {
+                username: $$("addUserForm").getValues().name,
+                email: $$("addUserForm").getValues().email,
+                roleId: $$("role").getValue(),
+                companyId: userData.companyId
+            };
+            $$("userDT").add(newUser);
+            util.dismissDialog('addUserDialog');
+        }
     }
 }
