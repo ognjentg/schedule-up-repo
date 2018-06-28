@@ -56,7 +56,7 @@ public class MeetingController extends GenericController<Meeting, Integer> {
         if (userBean.getUser().getRoleId().equals(admin)) {
             return meetingRepository.getAllByStatusInAndCompanyId(new Byte[]{scheduled, finished}, userBean.getUser().getCompanyId());
         } else if (userBean.getUser().getRoleId().equals(advancedUser) || userBean.getUser().getRoleId().equals(user)) {
-            return meetingRepository.getAllByStatusInParticipant(new Byte[]{scheduled, finished},userBean.getUser().getId());
+            return meetingRepository.getAllByStatusInParticipant(userBean.getUser().getId());
         }
         throw new ForbiddenException("Forbidden action");
     }

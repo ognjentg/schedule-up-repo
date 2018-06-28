@@ -98,6 +98,15 @@ public class Participant {
                 Objects.equals(deleted, that.deleted);
     }
 
+    public boolean equalsIgnorePrimaryKey(Participant that){
+        return Objects.equals(email, that.email) &&
+                Objects.equals(meetingId, that.meetingId) &&
+                Objects.equals(userGroupId, that.userGroupId) &&
+                Objects.equals(userId, that.userId) &&
+                Objects.equals(companyId, that.companyId) &&
+                Objects.equals(deleted, that.deleted);
+
+    }
     @Override
     public int hashCode() {
 
