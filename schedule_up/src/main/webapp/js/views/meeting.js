@@ -1,3 +1,5 @@
+var contextMenu;
+
 var meetingView = {
     roomId:null,
     files:[],
@@ -167,10 +169,12 @@ var meetingView = {
         adjust: true,
         rows: [{
             view: "template",
-            template: "<div id='scheduler_there' class='dhx_cal_container' style='width:100%; height:100%;'><div class='dhx_cal_navline'><div class='dhx_cal_prev_button'>&nbsp;</div><div class='dhx_cal_next_button'>&nbsp;</div><div class='dhx_cal_today_button'></div><div class='dhx_cal_date'></div></div><div class='dhx_cal_header'></div><div class='dhx_cal_data'></div></div>",
+            template: "<div id='scheduler_there' class='dhx_cal_container' style='width:100%; height:100%;'><div class='dhx_cal_navline'><div class='dhx_cal_prev_button'>&nbsp;</div><div class='dhx_cal_next_button'>&nbsp;</div><div class='dhx_cal_today_button'></div><div class='dhx_cal_date'></div></div><div class='dhx_cal_header'></div><div id='scheduler_data' class='dhx_cal_data'></div></div>",
         }
         ]
     },
+
+    contextMenuEventId:null,
 
     selectPanel: function (room) {
         detachAllEvents();
@@ -216,6 +220,59 @@ var meetingView = {
             return true;
         }));
         scheduler.load("meeting/getByRoom/"+room.id, "json");
+
+        schedulerEvents.push(scheduler.attachEvent("onContextMenu", function (id, e){
+            if (id!=null) {
+                meetingView.contextMenuEventId=id;
+                var posx = 0;
+                var posy = 0;
+                if (e.pageX || e.pageY) {
+                    posx = e.pageX;
+                    posy = e.pageY;
+                } else if (e.clientX || e.clientY) {
+                    posx = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+                    posy = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+                }
+                if (contextMenu==null) {
+
+                    contextMenu = webix.ui({
+                        view: "contextmenu",
+                        data: [
+                            {
+                                id:1,value:"Izmijenite"
+                            },
+                            { id:2, value: "Otkažite"}
+                        ],
+                        on: {
+                            onItemClick: function (id) {
+                                // Property meetingView.contextMenuEventId je id eventa na koji smo kliknuli.
+                                switch (id) {
+                                    case "1":
+
+                                        break;
+                                    case "2":
+                                        break;
+                                }
+                            }
+                        }
+                    });
+                    contextMenu.show({
+                        x:posx,
+                        y:posy
+                    });
+                }else{
+                    contextMenu.show({
+                        x:posx,
+                        y:posy
+                    });
+                }
+
+            }else{
+                if (contextMenu!=null)
+                    contextMenu.hide();
+            }
+            return false;
+        }));
 
     },
     saveMeeting:function(){
