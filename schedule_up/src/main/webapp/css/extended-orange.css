@@ -15,3 +15,15 @@
 .webixDatatable .webix_cell:nth-child(odd) {
     background: #f1f1f1;
 }*/
+
+.noteName {
+    font-size: 30px !important;
+    padding-left: 20px !important;
+    padding-top: 10px !important;
+}
+
+.notePublishTime {
+    padding-top: 10px !important;
+    float: right !important;
+    padding-right: 20px !important;
+}

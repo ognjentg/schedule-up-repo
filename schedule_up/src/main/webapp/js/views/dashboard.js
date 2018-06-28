@@ -27,56 +27,35 @@ var dashboardView = {
                     { header:"<span class='fa fa-sticky-note'></span> Oglasi",
                         width:400,
                         body:{
-                                view: "datatable",
-                                css: "webixDatatable",
+                                view: "list",
                                 multiselect: false,
-                                id: "notesDT",
-                                resizeColumn: true,
-                                resizeRow: true,
+                                id: "noteList",
                                 onContext: {},
-                                columns: [{
-                                    id: "id",
-                                    hidden: true,
-                                    fillspace: true
-                                }, {
-                                    id: "publishTime",
-                                    editable: false,
-                                    fillspace: false,
-                                    width: 150,
-                                    editor: "date",
-                                    header: ["Datum objave", {
-                                        content: "textFilter"
-                                    }],
-                                    format: function (value) {
-                                        date = new Date(value);
-                                        var hours = date.getHours();
-                                        var minutes = date.getMinutes();
-                                        minutes = minutes < 10 ? '0' + minutes : minutes;
-                                        var strTime = hours + ':' + minutes + "h";
-                                        return date.getDate() + "." + (date.getMonth() + 1) + "." + date.getFullYear() + ".  " + strTime;
-                                    }
-                                }, {
-                                    id: "name",
-                                    editable: false,
-                                    fillspace: false, width: 250,
-                                    editor: "text",
-                                    header: ["Naziv", {
-                                        content: "textFilter"
-                                    }]
-                                }] ,
                                 select: "row",
                                 navigation: true,
                                 editable: false,
+                                type: {
+                                    height: "auto",
+                                    template: function (value) {
+                                        var name = value.name;
+                                        var date = new Date(value.publishTime);
+                                        var hours = date.getHours();
+                                        var minutes = date.getMinutes();
+
+                                        minutes = minutes < 10 ? '0' + minutes : minutes;
+                                        var strTime = hours + ':' + minutes + "h";
+                                        var formattedTime =  date.getDate() + "." + (date.getMonth() + 1) + "." + date.getFullYear() + ".  " + strTime;
+                                        return "<div class='noteName'>" + name + "</div>" +
+                                            "<div class='notePublishTime'>"+ formattedTime + "</div>";
+                                    }
+                                },
                                 url: "note/",
                                 on: {
-                                    onAfterContextMenu: function (item) {
-                                        this.select(item.row);
+                                    onItemClick: function(id) {
+                                        dashboardView.showNotePopup(this.getItem(id));
                                     }
                                 }
                             }
-
-
-
                     },
                 ]
             },
@@ -313,3 +292,4 @@ var dashboardView = {
 
 
 };
+
