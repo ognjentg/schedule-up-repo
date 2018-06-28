@@ -270,7 +270,7 @@ var meetingView = {
         scheduler.load("meeting/getByRoom/"+room.id, "json");
 
         schedulerEvents.push(scheduler.attachEvent("onContextMenu", function (id, e){
-            if (id!=null) {
+            if (id!=null && scheduler.getEvent(id).status===0) {
                 meetingView.contextMenuEventId=id;
                 var posx = 0;
                 var posy = 0;
