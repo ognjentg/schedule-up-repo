@@ -21,123 +21,137 @@ var meetingView = {
                     align: "right",
                     click: "util.dismissDialog('addMeetingDialog');"
                 }]
-            }, {
-                view: "form",
-                id: "addMeetingForm",
-                width: 600,
-                elementsConfig: {
-                    labelWidth: 200,
-                    bottomPadding: 18
-                },
-                elements: [
+            }, { cols:[
+                    { view: "form",
+                        id: "addMeetingForm",
+                        width: 600,
+                        elementsConfig: {
+                            labelWidth: 200,
+                            bottomPadding: 18
+                        },
+                        elements: [
 
-                    {
-                        view: "text",
-                        id: "topic",
-                        name: "topic",
-                        label: "Tema:",
-                        invalidMessage: "Unesite temu!",
-                        required: true
-                    },{
-                        view: "text",
-                        id: "description",
-                        name: "description",
-                        label: "Opis:",
-                        invalidMessage: "Unesite opis!",
-                        required: true
-                    },{
-                        view:"datepicker",
-                        format:"%d-%m-%Y %H:%i",
-                        timepicker: true,
-                        id: "startTime",
-                        name: "startTime",
-                        label: "Vrijeme početka:",
-                        invalidMessage: "Unesite vrijeme početka!",
-                        required: true
-                    },
-                    {
-                        view: "datepicker",
-                        format:"%d-%m-%Y %H:%i",
-                        timepicker: true,
-                        id: "endTime",
-                        name: "endTime",
-                        label: "Vrijeme završetka:",
-                        invalidMessage: "Unesite vrijeme završetka!",
-                        required: true
-                    },{ view:"uploader",
-                        id:"uploader_1",
-                        value:"Dodajte dokument",
-                        link:"mylist",
-                        on:{
-                            onBeforeFileAdd: function(upload){
-                                var file = upload.file;
-                                var reader = new FileReader();
-                                reader.onload = function(event) {
-                                    var form = $$("addMeetingForm");
-                                   // form.elements.uploader_1.setValue(event.target.result.split("base64,")[1]);
+                            {
+                                view: "text",
+                                id: "topic",
+                                name: "topic",
+                                label: "Tema:",
+                                invalidMessage: "Unesite temu!",
+                                required: true
+                            },{
+                                view: "text",
+                                id: "description",
+                                name: "description",
+                                label: "Opis:",
+                                invalidMessage: "Unesite opis!",
+                                required: true
+                            },{
+                                view:"datepicker",
+                                format:"%d-%m-%Y %H:%i",
+                                timepicker: true,
+                                id: "startTime",
+                                name: "startTime",
+                                label: "Vrijeme početka:",
+                                invalidMessage: "Unesite vrijeme početka!",
+                                required: true
+                            },
+                            {
+                                view: "datepicker",
+                                format:"%d-%m-%Y %H:%i",
+                                timepicker: true,
+                                id: "endTime",
+                                name: "endTime",
+                                label: "Vrijeme završetka:",
+                                invalidMessage: "Unesite vrijeme završetka!",
+                                required: true
+                            },{ view:"uploader",
+                                id:"uploader_1",
+                                value:"Dodajte dokument",
+                                link:"mylist",
+                                on:{
+                                    onBeforeFileAdd: function(upload){
+                                        var file = upload.file;
+                                        var reader = new FileReader();
+                                        reader.onload = function(event) {
+                                            var form = $$("addMeetingForm");
+                                            // form.elements.uploader_1.setValue(event.target.result.split("base64,")[1]);
 
-                                };
-                                reader.readAsDataURL(file);
-                                return false;
-                            }
-                        }
-
-                    },{
-                        view:"list",  id:"mylist", type:"uploader",
-                        autoheight:true, borderless:true
-                    },
-                    { view: "label",
-                        id: "label",
-                        label: "Dodajte učesnike:"},
-
-                    { view: "text",
-                        id: "email",
-                        name:"email",
-                        label: "E-mail nezaposlenih u kompaniji:",
-                    },
-                    {view: "activeList",
-                        id:"mylist",
-                        container:"testA",
-                        width:650,
-                        autoheight:true,
-                        select:true,
-                        scroll:"x",
-                        data:[
-                            { id:1, title:"The Shawshank Redemption", year:1994, rank:1, markCheckbox:1},
-                            { id:2, title:"The Godfather", year:1972,  rank:2, markCheckbox:0},
-                            { id:3, title:"The Godfather: Part II", year:1974, rank:3},
-                            { id:4, title:"The Good, the Bad and the Ugly", year:1966, rank:4, markCheckbox:1},
-                            { id:5, title:"My Fair Lady", year:1964, rank:5, markCheckbox:1},
-                            { id:6, title:"12 Angry Men", year:1957, rank:6, markCheckbox:0}
-                        ],
-                        activeContent:{
-
-                            markCheckbox:{
-                                view:"checkbox",
-                                width:50,
-                                on:{ /*checkbox onChange handler*/
-                                    'onChange':function(newv, oldv){
-                                        var item_id = this.config.$masterId;
-                                        var state = this.getValue()?"Check ":"Uncheck ";
-                                        webix.message(state+item_id);
+                                        };
+                                        reader.readAsDataURL(file);
+                                        return false;
                                     }
                                 }
+
+                            } ,{
+                                view:"list",  id:"mylist", type:"uploader",
+                                autoheight:true, borderless:true
+                            },
+
+                            { view: "text",
+                                id: "email",
+                                name:"email",
+                                label: "E-mail nezaposlenih u kompaniji:",
+                            },
+                            {
+                                margin: 5,
+                                cols: [{}, {
+                                    id: "saveMeeting",
+                                    view: "button",
+                                    value: "Dodajte sastanak",
+                                    type: "form",
+                                    click: "meetingView.saveMeeting",
+                                    hotkey: "enter",
+                                    width: 150
+                                }]
                             }
-                        }
-                        },
-                    {
-                        margin: 5,
-                        cols: [{}, {
-                            id: "saveMeeting",
-                            view: "button",
-                            value: "Dodajte sastanak",
-                            type: "form",
-                            click: "meetingView.saveMeeting",
-                            hotkey: "enter",
-                            width: 150
-                        }]
-                    }
-                ]
+                        ]
+                    },{rows:[{
+                            view: "label",
+                            align:"center",
+                            label: "<span class='webix_icon fa fa-user'></span> Učesnici",
+                            width: 300
+
+                        },{
+                            view: "list",
+                            id:"userList",
+                            width: 300,
+                            type: {
+                                markCheckbox: function (obj) {
+                                    return "<span class='check webix_icon fa-" + (obj.markCheckbox ? "check-" : "") + "square-o'></span>";
+                                }
+                            },
+                            onClick: {
+                                "check": function (e, id) {
+                                    var item = this.getItem(id);
+                                    item.markCheckbox = item.markCheckbox ? 0 : 1;
+                                    this.updateItem(id, item);
+                                }
+                            },
+                            template: "#firstName# #lastName#  {common.markCheckbox()}",
+
+                        } ]},{rows:[{
+                            view: "label",
+                            align:"center",
+                            label: "<span class='webix_icon fa fa-users'></span> Korisničke grupe",
+                            width: 200
+
+                        },{
+                            view: "list",
+                            id:"userGroupList",
+                            width: 200,
+                            type: {
+                                markCheckbox: function (obj) {
+                                    return "<span class='check webix_icon fa-" + (obj.markCheckbox ? "check-" : "") + "square-o'></span>";
+                                }
+                            },
+                            onClick: {
+                                "check": function (e, id) {
+                                    var item = this.getItem(id);
+                                    item.markCheckbox = item.markCheckbox ? 0 : 1;
+                                    this.updateItem(id, item);
+                                }
+                            },
+                            template: "#name#  {common.markCheckbox()}"}] }]
             }]
         }
     },
@@ -161,11 +175,26 @@ var meetingView = {
         rightPanel = "meetingPanel";
         var panelCopy = webix.copy(this.panel);
         $$("main").addView(webix.copy(panelCopy));
-
         scheduler.clearAll();
         var event=scheduler.attachEvent("onEmptyClick",function(date,e){
             webix.ui(webix.copy(meetingView.addMeetingDialog)).show();
             $$("startTime").setValue(date);
+            $$("userList").load("user");
+            $$("userGroupList").load("user-group");
+
+            $$("userList").attachEvent("onAfterLoad", function(){
+
+                $$("userList").filter(function(obj){
+                    return (obj.firstName!=null && obj.id!=userData.id);
+                });
+            });
+
+            $$("userGroupList").attachEvent("onAfterLoad", function(){
+
+                $$("userGroupList").filter(function(obj){
+                    return obj.name!=null;
+                });
+            });
 
         });
         schedulerEvents.push(event);
@@ -179,21 +208,41 @@ var meetingView = {
                 ev.color="#bdd5ff";
             return true;
         }));
-        //alert(room.id);
         scheduler.load("meeting/getByRoom/"+room.id, "json");
 
     },
     saveMeeting:function(){
+        var participants=[];
+        $$("userList").data.each(function(obj){
+                if(obj.markCheckbox==1) {
+                    var participant={
+                        userId:obj.id,
+                        deleted:0,
+                        companyId:companyData.id,
+                        meetingId:1
+                    };
+                    participants.push(participant);
+                }
+
+            }
+        );
+        $$("userGroupList").data.each(function(obj){
+                if(obj.markCheckbox==1) {
+                    var group={
+                        userGroupId:obj.id,
+                        deleted:0,
+                        companyId:companyData.id,
+                        meetingId:1
+                    };
+                    participants.push(group);
+                }
+
+            }
+        );
         var form = $$("addMeetingForm");
         var formatter=webix.Date.dateToStr("%d-%m-%Y %H:%i");
         var today=new Date();
-        console.log(form.getValues().startTime.getMilliseconds()<Date.now());
-        if(form.getValues().startTime.getMilliseconds()<Date.now()) {
-            console.log("poruka");
-            util.messages.showErrorMessage("Nije moguće napraviti odabrati datum koji je prošao.");
-            return;
-        }
-        console.log(formatter(form.getValues().startTime));
+
         if (form.validate()) {
             var newMeeting = {
                 start_date:formatter(form.getValues().startTime),
@@ -211,19 +260,28 @@ var meetingView = {
                 "Content-type":"application/json"
             }).post("meeting",newMeeting).then(function(realData){
                 util.messages.showMessage( realData.text());
+                for(var i=0;i<participants.length;i++){
+                    var pom2=realData.json();
+                    participants[i].meetingId=realData.json().id;
+                }
+
+                connection.sendAjax("POST", "participant/insertAll",
+                    function (text, data, xhr) {
+
+                        if (data) {
+                            util.messages.showMessage("Uspješno kreirana rezervacija.");
+
+                        } else
+                            util.messages.showErrorMessage("Neuspješno kreiranje rezervacije.");
+                    }, function () {
+                        util.messages.showErrorMessage("Neuspješno kreiranje rezervacije.");
+                    }, participants);
 
             });
             pro.fail(function(err){
-                console.log(err);
-                util.messages.showErrorMessage(err.message)});
-            webix.ajax("someA.php").then(function(realdataA){
-                return webix.ajax("someB.php");
-            }).then(function(realdataB){
-                return webix.ajax("someC.php")
-            }).then(function(realdataC){
+                util.messages.showErrorMessage("Neuspješno kreiranje rezervacije.");});
+            util.dismissDialog('addMeetingDialog')
 
-            });
-            util.dismissDialog('addMeetingDialog');
         }
     }
 
