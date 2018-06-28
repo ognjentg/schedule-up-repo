@@ -69,7 +69,10 @@ var meetingView = {
                             },{cols:[ { view: "text",
                                     id: "email",
                                     name:"email",
-                                    label: "E-mail nezaposlenih:"
+                                    label: "E-mail nezaposlenih:",
+                                    rules:{
+                                        "email":webix.rules.isEmail
+                                    }
                                 },{
                                     id: "addEmail",
                                     view: "button",
@@ -205,13 +208,17 @@ var meetingView = {
         }
         ]
     },
-    addEmail:function(){
+    addEmail:function() {
         var form = $$("addMeetingForm");
-        var userEmail=form.getValues().email;
-        var newObject={name:userEmail};
-        $$("userEmailList").add(newObject);
-
-    },
+        var userEmail = form.getValues().email;
+        if (webix.rules.isEmail(userEmail)) {
+            var newObject = {name: userEmail};
+            $$("userEmailList").add(newObject);
+        }
+        else
+            util.messages.showErrorMessage("Neispravan format e-mail adrese.");
+    }
+    ,
 
     contextMenuEventId:null,
 
@@ -318,6 +325,10 @@ var meetingView = {
     },
     saveMeeting:function(){
         var participants=[];
+        if(Date.parse(form.getValues().startTime)<Date.now()) {
+            util.messages.showErrorMessage("Nije moguće odabrati datum koji je prošao.");
+            return;
+        }
         $$("userList").data.each(function(obj){
                 if(obj.markCheckbox==1) {
                     var participant={
