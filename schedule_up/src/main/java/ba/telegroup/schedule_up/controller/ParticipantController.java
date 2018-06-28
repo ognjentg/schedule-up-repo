@@ -15,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -51,7 +52,10 @@ public class ParticipantController extends GenericController<Participant, Intege
         if (object.getMeetingId() != null) {
             Meeting meeting = meetingRepository.findById(object.getMeetingId()).orElse(null);
             if (checkPermissions() && meeting != null && meeting.getUserId().equals(userBean.getUser().getId())) {
-                return super.insert(object);
+                List<Participant> participants=participantRepository.getAllByMeetingIdAndDeletedIs(meeting.getId(),notDeleted);
+                if(participants.stream().filter(participant ->participant.equalsIgnorePrimaryKey(object)).count()==0)
+                    return super.insert(object);
+                throw new BadRequestException("Bad request");
             }
             throw new ForbiddenException("Forbidden action");
         }
@@ -130,5 +134,17 @@ public class ParticipantController extends GenericController<Participant, Intege
     @Override
     public String update(Integer integer, Participant object) throws ForbiddenException {
         throw new ForbiddenException("Forbidden exception");
+    }
+    @Transactional
+    @RequestMapping(value={"/insertAll"},method = RequestMethod.POST)
+    public @ResponseBody List<Participant> insertAll(@RequestBody List<Participant> participants) throws BadRequestException, ForbiddenException {
+        List<Participant> insertedParticipants=new ArrayList<>();
+        if(participants!=null) {
+            for (Participant participant : participants) {
+                insertedParticipants.add(insert(participant));
+            }
+            return insertedParticipants;
+        }
+        throw  new BadRequestException("Bad request");
     }
 }
