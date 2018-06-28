@@ -18,71 +18,69 @@ var dashboardView = {
             "<div class='dhx_cal_prev_button'>&nbsp;</div><div class='dhx_cal_next_button'>" +
             "&nbsp;</div><div class='dhx_cal_today_button'></div><div class='dhx_cal_date'></div></div><div" +
             " class='dhx_cal_header'></div><div class='dhx_cal_data'></div></div>",
-            gravity: 1.3
-            }, {
-            gravity: 0.1
             },
             {
-            rows: [{
-                view: "toolbar",
-                padding: 8,
-                css: "panelToolbar",
-                cols: [{
-                    view: "label",
-                    width: 400,
-                    template: "<span class='fa fa-sticky-note'></span> Oglasi"
-                }]
-            }, {
-                view: "datatable",
-                css: "webixDatatable",
-                multiselect: false,
-                id: "notesDT",
-                resizeColumn: true,
-                resizeRow: true,
-                onContext: {},
-                columns: [{
-                    id: "id",
-                    hidden: true,
-                    fillspace: true
-                }, {
-                    id: "publishTime",
-                    editable: false,
-                    fillspace: false,
-                    width: 150,
-                    editor: "date",
-                    header: ["Datum objave", {
-                        content: "textFilter"
-                    }],
-                    format: function (value) {
-                        date = new Date(value);
-                        var hours = date.getHours();
-                        var minutes = date.getMinutes();
-                        minutes = minutes < 10 ? '0' + minutes : minutes;
-                        var strTime = hours + ':' + minutes + "h";
-                        return date.getDate() + "." + (date.getMonth() + 1) + "." + date.getFullYear() + ".  " + strTime;
-                    }
-                }, {
-                    id: "name",
-                    editable: false,
-                    fillspace: false, width: 400,
-                    editor: "text",
-                    header: ["Naziv", {
-                        content: "textFilter"
-                    }]
-                }] ,
-                select: "row",
-                navigation: true,
-                editable: false,
-                url: "note/",
-                on: {
-                    onAfterContextMenu: function (item) {
-                        this.select(item.row);
-                    }
-                }
-            }
+                view:"accordion",
+                collapsed:true,
+                multi:true,
+                cols:[ //or rows
+                    { header:"<span class='fa fa-sticky-note'></span> Oglasi",
+                        width:400,
+                        body:{
+                                view: "datatable",
+                                css: "webixDatatable",
+                                multiselect: false,
+                                id: "notesDT",
+                                resizeColumn: true,
+                                resizeRow: true,
+                                onContext: {},
+                                columns: [{
+                                    id: "id",
+                                    hidden: true,
+                                    fillspace: true
+                                }, {
+                                    id: "publishTime",
+                                    editable: false,
+                                    fillspace: false,
+                                    width: 150,
+                                    editor: "date",
+                                    header: ["Datum objave", {
+                                        content: "textFilter"
+                                    }],
+                                    format: function (value) {
+                                        date = new Date(value);
+                                        var hours = date.getHours();
+                                        var minutes = date.getMinutes();
+                                        minutes = minutes < 10 ? '0' + minutes : minutes;
+                                        var strTime = hours + ':' + minutes + "h";
+                                        return date.getDate() + "." + (date.getMonth() + 1) + "." + date.getFullYear() + ".  " + strTime;
+                                    }
+                                }, {
+                                    id: "name",
+                                    editable: false,
+                                    fillspace: false, width: 250,
+                                    editor: "text",
+                                    header: ["Naziv", {
+                                        content: "textFilter"
+                                    }]
+                                }] ,
+                                select: "row",
+                                navigation: true,
+                                editable: false,
+                                url: "note/",
+                                on: {
+                                    onAfterContextMenu: function (item) {
+                                        this.select(item.row);
+                                    }
+                                }
+                            }
 
+
+
+                    },
+                ]
+            },
             ]
-        }]
     },
 
     selectPanel: function () {
