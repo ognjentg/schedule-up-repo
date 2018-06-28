@@ -1,6 +1,6 @@
 var meetingView = {
     roomId:null,
-
+    files:[],
     addMeetingDialog: {
         view: "popup",
         id: "addMeetingDialog",
@@ -64,28 +64,34 @@ var meetingView = {
                                 label: "Vrijeme završetka:",
                                 invalidMessage: "Unesite vrijeme završetka!",
                                 required: true
-                            },{ view:"uploader",
+                            },{cols:[{  view:"uploader",
                                 id:"uploader_1",
                                 value:"Dodajte dokument",
-                                link:"mylist",
                                 on:{
                                     onBeforeFileAdd: function(upload){
                                         var file = upload.file;
                                         var reader = new FileReader();
                                         reader.onload = function(event) {
-                                            var form = $$("addMeetingForm");
-                                            // form.elements.uploader_1.setValue(event.target.result.split("base64,")[1]);
 
+                                        var newFileObject={
+                                            name:file['name'],
+                                            content:event.target.result.split("base64,")[1],
+                                            report:0,
+                                            meeting_id:1
+                                        };
+                                        meetingView.files.push(newFileObject);
                                         };
                                         reader.readAsDataURL(file);
                                         return false;
                                     }
                                 }
 
-                            } ,{
-                                view:"list",  id:"mylist", type:"uploader",
-                                autoheight:true, borderless:true
-                            },
+                            },{id: "showFile",
+                                    view: "button",
+                                    value: "Pregled dokumenata",
+                                    type: "form",
+                                    click: "meetingView.showFile",
+                                    }] },
 
                             { view: "text",
                                 id: "email",
@@ -151,6 +157,7 @@ var meetingView = {
                                     this.updateItem(id, item);
                                 }
                             },
+
                             template: "#name#  {common.markCheckbox()}"}] }]
             }]
         }
@@ -240,6 +247,17 @@ var meetingView = {
             }
         );
         var form = $$("addMeetingForm");
+        var userEmail=form.getValues().email;
+        if(userEmail!=""){
+            var participantOutside={
+                email:userEmail,
+                deleted:0,
+                companyId:companyData.id,
+                meetingId:1
+            };
+            participants.push(participantOutside);
+        }
+
         var formatter=webix.Date.dateToStr("%d-%m-%Y %H:%i");
         var today=new Date();
 
@@ -259,9 +277,7 @@ var meetingView = {
             var pro=webix.ajax().headers({
                 "Content-type":"application/json"
             }).post("meeting",newMeeting).then(function(realData){
-                util.messages.showMessage( realData.text());
                 for(var i=0;i<participants.length;i++){
-                    var pom2=realData.json();
                     participants[i].meetingId=realData.json().id;
                 }
 
@@ -283,6 +299,60 @@ var meetingView = {
             util.dismissDialog('addMeetingDialog')
 
         }
-    }
+    },hide:function(){
+        $$("tmpFile").hide();
+    },
+    showFile: function () {
+        var help=meetingView.files[0];
+        $$("tmpFile").show();
+        $$("fileList").parse(meetingView.files);
+
+    },
+
 
 };
+webix.ui({
+    view:"popup",
+    id:"tmpFile",
+    position:"center",
+    close:true,
+    body: {
+        rows: [{
+            view: "toolbar",
+            cols: [{
+                view: "label",
+                label: "<span class='webix_icon fa fa-file'></span> Dodani dokumenti",
+                width: 400
+            }, {}, {
+                hotkey: 'esc',
+                view: "icon",
+                icon: "close",
+                align: "right",
+                click: "meetingView.hide",
+            }]
+        },{
+            view: "list",
+            id:"fileList",
+            width: 300,
+            height:300,
+            margin:20,
+            template: "#!name#  {common.markX()}",
+            data:meetingView.files,
+
+            type: {
+                markX: function (obj) {
+                    return "   <span class='check webix_icon fa fa-window-close'></span>";
+                }
+            },
+            onClick: {
+                "check": function (e, id) {
+                    var item = this.getItem(id);
+                    meetingView.files.pop(item);
+                    $$("fileList").remove(item.id);
+
+
+                }
+
+        }}]
+    }
+})
