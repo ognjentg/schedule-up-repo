@@ -899,6 +899,33 @@ var meetingView = {
         cancel: "Ne",
         width: 500,
         text: "Da li ste sigurni da želite da zatvorite sastanak?"
+    },
+    addReportDialog:{
+        view:"popup",
+        id: "addReportDialog",
+        modal: true,
+        position: "center",
+        body:{
+            rows:[
+                {
+                    view:"toolbar",
+                    cols:[
+                        {
+                            view:"label",
+                            width:200,
+                            label:"<span class='webix icon_delete fa-file'/> Dodavanje izvještaja"
+                        },
+                        {},
+                        {
+                            view:"icon",
+                            icon:"close",
+                            align:"right",
+                            click:"util.dismissDialog('addReportDialog');"
+                        }
+                    ]
+                }
+            ]
+        }
     }
 
 

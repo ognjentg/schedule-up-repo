@@ -201,6 +201,12 @@ public class UserController extends GenericController<User, Integer> {
     List<User> getNonParticipants(@PathVariable Integer meetingId) {
         List<User> retValue = getAll();
         retValue.removeAll(userRepository.findAllById(participantRepository.getAllByMeetingIdAndDeletedIs(meetingId, (byte) 0).stream().map(Participant::getUserId).collect(Collectors.toList())));
-        return retValue;
+        return retValue.stream().map(user -> {
+            User newUser=new User();
+            newUser.setId(user.getId());
+            newUser.setFirstName(user.getFirstName());
+            newUser.setLastName(user.getLastName());
+            return newUser;
+        }).collect(Collectors.toList());
     }
 }
