@@ -314,7 +314,7 @@ var meetingView = {
                                     view: "button",
                                     value: "Izmjenite sastanak",
                                     type: "form",
-                                    click: "meetingView.editMeeting",
+                                    click: "meetingView.updateMeeting",
                                     hotkey: "enter",
                                     width: 150
                                 }]
@@ -422,12 +422,17 @@ var meetingView = {
         webix.ui(webix.copy(meetingView.editMeetingDialog)).show();
         var element = scheduler.getEvent(eventId);
         var form = $$("editMeetingForm");
-        console.log(eventId);
+        console.log("eventId:"+eventId);
         console.log(element.text);
         form.elements.topic.setValue(element.text);
         form.elements.startTime.setValue(element.start_date);
         form.elements.endTime.setValue(element.end_date);
         form.elements.description.setValue(element.description);
+
+        $$("userList").load("user");
+        $$("userGroupList").load("user-group");
+
+
         //popunjavanje dokumenta
         connection.sendAjax("GET", "document/getAllByMeetingId/" + eventId,
             function (text, data, xhr) {
@@ -440,6 +445,27 @@ var meetingView = {
                 }
             }, function (text,data,xhr) {
                 util.messages.showErrorMessage("Greška pri učitavanju dokumenata.");
+
+            }
+            , null);
+        //popunjavanje korisnika
+        connection.sendAjax("GET", "participant/getAllByMeeting/" + eventId,
+            function (text, data, xhr) {
+                if (text ) {
+                    meetingView.files=data.json();
+                    $$("userList").load(data.json());
+                    console.log(data.json());
+                    $$("userList").data.each(function(obj){
+                            obj.markCheckbox.setValue(1);
+
+                        }
+                    );
+
+                } else {
+                    util.messages.showErrorMessage("Greška pri učitavanju učesnika.");
+                }
+            }, function (text,data,xhr) {
+                util.messages.showErrorMessage("Greška pri učitavanju učesnika.");
 
             }
             , null);
@@ -544,6 +570,84 @@ var meetingView = {
             return false;
         }));
 
+    }, updateMeeting:function(){
+        var file=meetingView.files[0];
+        var participants=[];
+        var documents=[];
+        var userMails=[];
+        var form=$$("editMeetingForm")
+        if(Date.parse(form.getValues().startTime)<Date.now()) {
+            util.messages.showErrorMessage("Nije moguće odabrati datum koji je prošao.");
+            return;
+        };
+        $$("userList").data.each(function(obj){
+                if(obj.markCheckbox==1) {
+                    var participant={
+                        userId:obj.id,
+                        deleted:0,
+                        companyId:companyData.id,
+                        meetingId:1
+                    };
+                    participants.push(participant);
+                }
+
+            }
+        );
+        $$("userGroupList").data.each(function(obj){
+                if(obj.markCheckbox==1) {
+                    var group={
+                        userGroupId:obj.id,
+                        deleted:0,
+                        companyId:companyData.id,
+                        meetingId:1
+                    };
+                    participants.push(group);
+                }
+
+            }
+        );
+        $$("userEmailList").data.each(function(obj){
+
+                var participantOutside={
+                    email:obj.name,
+                    deleted:0,
+                    companyId:companyData.id,
+                    meetingId:1
+                };
+                participants.push(participantOutside);
+
+
+            }
+        );
+        var form = $$("editMeetingForm");
+
+        var formatter=webix.Date.dateToStr("%d-%m-%Y %H:%i");
+        var today=new Date();
+
+        if (form.validate()) {
+            var newMeeting = {
+                start_date:formatter(form.getValues().startTime),
+                end_date: formatter(form.getValues().endTime),
+                description:form.getValues().description,
+                text:form.getValues().topic,
+                participantsNumber:0,
+                status:0,
+                companyId:companyData.id,
+                userId:userData.id,
+                roomId:meetingView.roomId.id
+
+            };
+            var pro=webix.ajax().headers({
+                "Content-type":"application/json"
+            }).put("meeting",newMeeting).then(function(realData){
+                util.messages.showMessage("Uspjesna izmjena rezervacije.");
+                //nije gotovo
+            });
+            pro.fail(function(err){
+                util.messages.showErrorMessage("Neuspješna izmjena rezervacije."+err);});
+            util.dismissDialog('editMeetingDialog')
+
+        }
     },
     saveMeeting:function(){
         var file=meetingView.files[0];
@@ -551,10 +655,11 @@ var meetingView = {
         var participants=[];
         var documents=[];
         var userMails=[];
-        /*if(Date.parse(form.getValues().startTime)<Date.now()) {
+        var form=$$("addMeetingForm")
+        if(Date.parse(form.getValues().startTime)<Date.now()) {
             util.messages.showErrorMessage("Nije moguće odabrati datum koji je prošao.");
             return;
-        }*/
+        };
         $$("userList").data.each(function(obj){
                 if(obj.markCheckbox==1) {
                     var participant={
