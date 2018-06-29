@@ -655,11 +655,10 @@ var meetingView = {
         var participants=[];
         var documents=[];
         var userMails=[];
-        var form=$$("addMeetingForm")
-        if(Date.parse(form.getValues().startTime)<Date.now()) {
+        /*if(Date.parse(form.getValues().startTime)<Date.now()) {
             util.messages.showErrorMessage("Nije moguće odabrati datum koji je prošao.");
             return;
-        };
+        }*/
         $$("userList").data.each(function(obj){
                 if(obj.markCheckbox==1) {
                     var participant={
@@ -699,69 +698,79 @@ var meetingView = {
 
             }
         );
-        var form = $$("addMeetingForm");
+        if(participants.length==0){
+            util.messages.showErrorMessage("Morate odabrati bar jednog učesnika.");
 
-        var formatter=webix.Date.dateToStr("%d-%m-%Y %H:%i");
-        var today=new Date();
+        }
+        else {
+            var form = $$("addMeetingForm");
 
-        if (form.validate()) {
-            var newMeeting = {
-                start_date:formatter(form.getValues().startTime),
-                end_date: formatter(form.getValues().endTime),
-                description:form.getValues().description,
-                text:form.getValues().topic,
-                participantsNumber:0,
-                status:0,
-                companyId:companyData.id,
-                userId:userData.id,
-                roomId:meetingView.roomId.id
+            var formatter=webix.Date.dateToStr("%d-%m-%Y %H:%i");
+            var today=new Date();
 
-            };
-            var pro=webix.ajax().headers({
-                "Content-type":"application/json"
-            }).post("meeting",newMeeting).then(function(realData){
-                for(var i=0;i<participants.length;i++){
-                    participants[i].meetingId=realData.json().id;
-                }
+            if (form.validate()) {
+                var newMeeting = {
+                    start_date: formatter(form.getValues().startTime),
+                    end_date: formatter(form.getValues().endTime),
+                    description: form.getValues().description,
+                    text: form.getValues().topic,
+                    participantsNumber: 0,
+                    status: 0,
+                    companyId: companyData.id,
+                    userId: userData.id,
+                    roomId: meetingView.roomId.id
 
-                connection.sendAjax("POST", "participant/insertAll",
-                    function (text, data, xhr) {
+                };
+                var pro = webix.ajax().headers({
+                    "Content-type": "application/json"
+                }).post("meeting", newMeeting).then(function (realData) {
+                    for (var i = 0; i < participants.length; i++) {
+                        participants[i].meetingId = realData.json().id;
+                    }
 
-                        if (data) {
-                            for(var j=0;j<meetingView.files.length;j++){
-                                var file=meetingView.files[j];
-                                var doc={
-                                    name:file['name'],
-                                    content:file['content'],
-                                    report:file['report'],
-                                    meetingId:realData.json().id
-                                };
-                                documents.push(doc);
-                            }
-                            connection.sendAjax("POST", "document/list/",
-                                function (text, data, xhr) {
+                    connection.sendAjax("POST", "participant/insertAll",
+                        function (text, data, xhr) {
 
-                                    if (data) {
+                            if (data) {
+                                if(meetingView.files.length>0) {
+                                    for (var j = 0; j < meetingView.files.length; j++) {
+                                        var file = meetingView.files[j];
+                                        var doc = {
+                                            name: file['name'],
+                                            content: file['content'],
+                                            report: file['report'],
+                                            meetingId: realData.json().id
+                                        };
+                                        documents.push(doc);
+                                    }
+                                    connection.sendAjax("POST", "document/list/",
+                                        function (text, data, xhr) {
 
-                                        util.messages.showMessage("Uspješno kreirana rezervacija.");
+                                            if (data) {
+                                                meetingView.files=[];
+                                                $$("fileList").clearAll();
+                                                util.messages.showMessage("Uspješno kreirana rezervacija.");
 
-                                    } else
-                                        util.messages.showErrorMessage("Neuspješno kreiranje rezervacije.");
-                                }, function () {
-                                    util.messages.showErrorMessage("Neuspješno kreiranje rezervacije.");
-                                }, documents);
-
-                        } else
+                                            } else
+                                                util.messages.showErrorMessage("Neuspješno kreiranje rezervacije.");
+                                        }, function () {
+                                            util.messages.showErrorMessage("Neuspješno kreiranje rezervacije.");
+                                        }, documents);
+                                } else{
+                                    util.messages.showMessage("Uspješno kreirana rezervacija.");
+                                }
+                            } else
+                                util.messages.showErrorMessage("Neuspješno kreiranje rezervacije.");
+                        }, function () {
                             util.messages.showErrorMessage("Neuspješno kreiranje rezervacije.");
-                    }, function () {
-                        util.messages.showErrorMessage("Neuspješno kreiranje rezervacije.");
-                    }, participants);
+                        }, participants);
 
-            });
-            pro.fail(function(err){
-                util.messages.showErrorMessage("Neuspješno kreiranje rezervacije.");});
-            util.dismissDialog('addMeetingDialog')
-
+                });
+                pro.fail(function (err) {
+                    util.messages.showErrorMessage("Neuspješno kreiranje rezervacije.");
+                });
+                util.dismissDialog('addMeetingDialog')
+            }
         }
     },hide:function(){
         $$("tmpFile").hide();
