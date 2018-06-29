@@ -1,8 +1,14 @@
 var contextMenu;
 var formatter = webix.Date.dateToStr("%d-%m-%Y %H:%i");
 var meetingView = {
+<<<<<<< HEAD
     roomId: null,
     files: [],
+=======
+    roomId:null,
+    newEventId:null,
+    files:[],
+>>>>>>> Uradjena validacija za izmjenu dogadaja. Prikaz korisnika i korisnickih grupa. Ostalo rijesiti dodavanje u bazu.
     addMeetingDialog: {
         view: "popup",
         id: "addMeetingDialog",
@@ -452,7 +458,17 @@ var meetingView = {
 
     contextMenuEventId: null,
 
+<<<<<<< HEAD
     editMeeting: function (eventId) {
+=======
+    editMeeting:function(eventId) {
+        var form=$$("editMeetingForm")
+        if(Date.parse(scheduler.getEvent(eventId).start_date)<Date.now()) {
+            util.messages.showErrorMessage("Nije moguće izmijeniti događaj koji je prošao.");
+            return;
+        }
+        newEventId=eventId;
+>>>>>>> Uradjena validacija za izmjenu dogadaja. Prikaz korisnika i korisnickih grupa. Ostalo rijesiti dodavanje u bazu.
         webix.ui(webix.copy(meetingView.editMeetingDialog)).show();
         var element = scheduler.getEvent(eventId);
         var form = $$("editMeetingForm");
@@ -462,10 +478,6 @@ var meetingView = {
         form.elements.startTime.setValue(element.start_date);
         form.elements.endTime.setValue(element.end_date);
         form.elements.description.setValue(element.description);
-
-        $$("userList").load("user");
-        $$("userGroupList").load("user-group");
-
 
         //popunjavanje dokumenta
         connection.sendAjax("GET", "document/getAllByMeetingId/" + eventId,
@@ -483,8 +495,9 @@ var meetingView = {
             }
             , null);
         //popunjavanje korisnika
-        connection.sendAjax("GET", "participant/getAllByMeeting/" + eventId,
+        connection.sendAjax("GET", "user/nonParticipantsFor/" + eventId,
             function (text, data, xhr) {
+<<<<<<< HEAD
                 if (text) {
                     meetingView.files = data.json();
                     $$("userList").load(data.json());
@@ -495,11 +508,29 @@ var meetingView = {
                         }
                     );
 
+=======
+                if (text ) {
+                    $$("userList").parse(data.json());
+                    console.log(data.json());
+>>>>>>> Uradjena validacija za izmjenu dogadaja. Prikaz korisnika i korisnickih grupa. Ostalo rijesiti dodavanje u bazu.
                 } else {
                     util.messages.showErrorMessage("Greška pri učitavanju učesnika.");
                 }
             }, function (text, data, xhr) {
                 util.messages.showErrorMessage("Greška pri učitavanju učesnika.");
+
+            }
+            , null);
+        connection.sendAjax("GET", "user-group/nonParticipantsFor/" + eventId,
+            function (text, data, xhr) {
+                if (text ) {
+                    $$("userList").parse(data.json());
+                    console.log(data.json());
+                } else {
+                    util.messages.showErrorMessage("Greška pri učitavanju učesničkih grupa.");
+                }
+            }, function (text,data,xhr) {
+                util.messages.showErrorMessage("Greška pri učitavanju učesničkih grupa.");
 
             }
             , null);
@@ -623,6 +654,7 @@ var meetingView = {
             return false;
         }));
 
+<<<<<<< HEAD
     }, updateMeeting: function () {
         var file = meetingView.files[0];
         var participants = [];
@@ -641,6 +673,21 @@ var meetingView = {
                         deleted: 0,
                         companyId: companyData.id,
                         meetingId: 1
+=======
+    }, updateMeeting:function(){
+        var file=meetingView.files[0];
+        var participants=[];
+        var documents=[];
+        var userMails=[];
+
+        $$("userList").data.each(function(obj){
+                if(obj.markCheckbox==1) {
+                    var participant={
+                        userId:obj.id,
+                        deleted:0,
+                        companyId:companyData.id,
+                        meetingId:1
+>>>>>>> Uradjena validacija za izmjenu dogadaja. Prikaz korisnika i korisnickih grupa. Ostalo rijesiti dodavanje u bazu.
                     };
                     participants.push(participant);
                 }
@@ -691,6 +738,7 @@ var meetingView = {
                 roomId: meetingView.roomId.id
 
             };
+<<<<<<< HEAD
             var pro = webix.ajax().headers({
                 "Content-type": "application/json"
             }).put("meeting", newMeeting).then(function (realData) {
@@ -700,6 +748,63 @@ var meetingView = {
             pro.fail(function (err) {
                 util.messages.showErrorMessage("Neuspješna izmjena rezervacije." + err);
             });
+=======
+            console.log(newMeeting);
+            console.log(newEventId);
+            connection.sendAjax("PUT", "meeting/"+newEventId,
+                function (text, data, xhr) {
+
+                    if (data) {
+
+                        util.messages.showMessage("Uspješno izmjenjena rezervacija.");
+
+                    } else
+                        util.messages.showErrorMessage("Neuspješna izmjena rezervacije.");
+                }, function () {
+                    util.messages.showErrorMessage("Neuspješna izmjena rezervacije.");
+                }, newMeeting);
+
+
+                for(var i=0;i<participants.length;i++){
+                    participants[i].meetingId=realData.json().id;
+                }
+
+                connection.sendAjax("POST", "participant/insertAll",
+                    function (text, data, xhr) {
+
+                        if (data) {
+                            for(var j=0;j<meetingView.files.length;j++){
+                                var file=meetingView.files[j];
+                                var doc={
+                                    name:file['name'],
+                                    content:file['content'],
+                                    report:file['report'],
+                                    meetingId:realData.json().id
+                                };
+                                documents.push(doc);
+                            }
+                            connection.sendAjax("PUT", "document/updateAll/"+newEventId,
+                                function (text, data, xhr) {
+
+                                    if (data) {
+
+                                        util.messages.showMessage("Uspješno izmjenjena rezervacija.");
+
+                                    } else
+                                        util.messages.showErrorMessage("Neuspješna izmjena rezervacije.");
+                                }, function () {
+                                    util.messages.showErrorMessage("Neuspješna izmjena rezervacije.");
+                                }, documents);
+
+                        } else
+                            util.messages.showErrorMessage("Neuspješna izmjena rezervacije.");
+                    }, function () {
+                        util.messages.showErrorMessage("Neuspješna izmjena rezervacije.");
+                    }, participants);
+
+
+
+>>>>>>> Uradjena validacija za izmjenu dogadaja. Prikaz korisnika i korisnickih grupa. Ostalo rijesiti dodavanje u bazu.
             util.dismissDialog('editMeetingDialog')
 
         }
