@@ -39,6 +39,10 @@ public class MeetingController extends GenericController<Meeting, Integer> {
     private Byte finished;
     @Value("${meetingStatus.canceled}")
     private Byte canceled;
+    @Value("${badRequest.noMeeting}")
+    private String noMeeting;
+    @Value("${badRequest.alreadyFinished}")
+    private String alreadyFinished;
 
     @Autowired
     public MeetingController(MeetingRepository meetingRepository, SettingsRepository settingsRepository,ParticipantRepository participantRepository) {
@@ -61,14 +65,33 @@ public class MeetingController extends GenericController<Meeting, Integer> {
         throw new ForbiddenException("Forbidden action");
     }
 
-    @RequestMapping(value = "/finish/", method = RequestMethod.PUT)
+   /*
+    Ovo sam zakomentarisao jer validacija nije korektna, a i potreban je drugi nacin za zatvaranje
+    @RequestMapping(value = "/finish", method = RequestMethod.PUT)
     public @ResponseBody
     String finish(@RequestBody Meeting meeting) throws BadRequestException, ForbiddenException {
-        if (userBean.getUser().getId().equals(meeting.getUserId())) {
+        if (userBean.getUser().getRoleId()==admin || userBean.getUser().getId().equals(meeting.getUserId())) {
             return updateStatus(meeting, finished);
         }
         throw new ForbiddenException("Forbidden action");
-    }
+    }*/
+
+   @RequestMapping(value = "/finish/{id}",method = RequestMethod.PUT)
+
+   public @ResponseBody String finish(@PathVariable Integer id) throws BadRequestException, ForbiddenException {
+        Meeting meeting=meetingRepository.findById(id).orElse(null);
+        if (meeting==null)
+            throw new BadRequestException(noMeeting);
+        if (meeting.getStatus()==finished)
+            throw new BadRequestException(alreadyFinished);
+        if (userBean.getUser().getRoleId()==admin||userBean.getUser().getId()==meeting.getUserId()){
+                meeting.setStatus(finished);
+                if (meetingRepository.saveAndFlush(meeting)!=null)
+                    return "Success";
+                throw new BadRequestException("Cao");
+        }
+        throw new ForbiddenException("Forbidden");
+   }
 
     @RequestMapping(value = "/getByRoom/{id}", method = RequestMethod.GET)
     public @ResponseBody
@@ -114,7 +137,7 @@ public class MeetingController extends GenericController<Meeting, Integer> {
         if (oldObject != null && object.getUserId() == null || Objects.requireNonNull(oldObject).getUserId() == null ) {
             throw new BadRequestException("user id cannot be null");
         } else {
-            if (oldObject.getUserId().equals(object.getUserId()) && oldObject.getUserId().equals(userBean.getUser().getId())) {
+            if (oldObject.getUserId().equals(object.getUserId()) &&(userBean.getUser().getRoleId().equals(admin)|| oldObject.getUserId().equals(userBean.getUser().getId()))) {
                 if (check(object, false)) {
                     meetingRepository.saveAndFlush(object);
                     logUpdateAction(object, oldObject);
