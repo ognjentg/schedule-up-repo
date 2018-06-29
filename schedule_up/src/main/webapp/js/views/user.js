@@ -227,10 +227,14 @@ userView = {
                     var context = this.getContext();
                     switch (id) {
                         case "1":
+                            var item = $$("userDT").getItem(context.id.row);
+                            if(item.active == 0){
+                                util.messages.showErrorMessage("Korisnik je već deaktiviran");
+                                break;
+                            }
                             var updateBox = (webix.copy(commonViews.deaktivacijaPotvrda("korisnika", "korisnika")));
                             updateBox.callback = function (result) {
                                 if (result == 1) {
-                                    var item = $$("userDT").getItem(context.id.row);
                                     item.active = 0;
                                     //$$("userDT").detachEvent("onBeforeDelete");
                                     connection.sendAjax("PUT", "/user/" + item.id, function (text, data, xhr) {
