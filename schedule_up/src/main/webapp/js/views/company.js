@@ -330,6 +330,7 @@ var companyView = {
                 view: "toolbar",
                 cols: [{
                     view: "label",
+
                     label: "<span class='webix_icon fa-book'></span> Izmjena podataka o kompaniji",
                     width: 400
                 }, {}, {

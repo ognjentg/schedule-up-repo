@@ -27,3 +27,26 @@
     float: right !important;
     padding-right: 20px !important;
 }
+
+.upload {
+    background-color: #f58220 !important;
+    color: #ffffff !important;
+    vertical-align: top !important;
+    border-width: 0px; !important
+    width: 24px !important;
+    height: 24px !important;
+    text-align: center !important;
+    margin-block-start: 8px !important;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
+}
+
+.delete-file{
+    position: absolute !important;
+    right: 5px !important;
+}
+
+.relative{
+    position: relative !important;
+}

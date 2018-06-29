@@ -583,9 +583,16 @@ var meetingView = {
                         view: "contextmenu",
                         data: [
                             {
-                                id: 1, value: "Izmijenite"
+                                id: 1,
+                                value: "Izmijenite"
                             },
-                            {   id: 2, value: "Otkažite"
+                            {
+                                id: 2,
+                                value: "Otkažite"
+                            },
+                            {
+                                id:3,
+                                value: "Dodajte izvještaj"
                             }
                         ],
                         on: {
@@ -614,6 +621,9 @@ var meetingView = {
                                             }
                                         };
                                         webix.confirm(delBox);
+                                        break;
+                                    case "3":
+                                        meetingView.showAddReportDialog(meetingView.contextMenuEventId);
                                         break;
                                 }
                             }
@@ -904,6 +914,7 @@ var meetingView = {
         id: "addReportDialog",
         modal: true,
         position: "center",
+        meetingId:null,
         body:{
             rows:[
                 {
@@ -912,7 +923,7 @@ var meetingView = {
                         {
                             view:"label",
                             width:200,
-                            label:"<span class='webix icon_delete fa-file'/> Dodavanje izvještaja"
+                            label:"<span class='webix icon_delete fa fa-file'/> Dodavanje izvještaja"
                         },
                         {},
                         {
@@ -922,9 +933,91 @@ var meetingView = {
                             click:"util.dismissDialog('addReportDialog');"
                         }
                     ]
+                },
+                {
+                    cols:[
+                        {
+                            view:"label",
+                            width:150,
+                            label:"Dodajte dokumente"
+                        },
+                        {},
+                        {
+                            view:"uploader",
+                            id:"reportUploader",
+                            width:32,
+                            height:32,
+                            css:"upload",
+                            template:"<span class='webix fa fa-upload' /></span>",
+                            on: {
+                                onBeforeFileAdd: function (upload) {
+                                    var file = upload.file;
+                                    var reader = new FileReader();
+                                    reader.onload = function (event) {
+
+                                        var newDocument = {
+                                            name: file['name'],
+                                            content: event.target.result.split("base64,")[1],
+                                            report: 1,
+                                            meetingId: meetingView.addReportDialog.meetingId
+                                        };
+                                        $$("reportList").add(newDocument);
+                                    };
+                                    reader.readAsDataURL(file);
+                                    return false;
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    view:"list",
+                    id:"reportList",
+                    autowidth:true,
+                    height:200,
+                    css:"relative",
+                    template:"#name# <span class='delete-file'><span class='webix fa fa-close'/></span>",
+                    onClick:{
+                        'delete-file':function (e,id) {
+                            this.remove(id);
+                            return false;
+                        }
+                    }
+                },
+                {
+                    view:"button",
+                    width:140,
+                    value:"Dodajte izvještaj",
+                    click:function () {
+                        var list=$$("reportList");
+                        if (list.count()===0){
+                            util.messages.showErrorMessage("Nije odabran nijedan dokument!");
+                            return;
+                        }
+                        var reports=[];
+                        list.data.each(function (report) {
+                            report.id=null;
+                            reports.push(report);
+                        });
+
+                        webix.ajax().headers({
+                            "Content-type": "application/json"
+                        }).post("document/list/",JSON.stringify(reports)).then(function (result) {
+                            util.messages.showMessage("Izvještaj je uspješno dodat.");
+                            util.dismissDialog("addReportDialog");
+                        }).fail(function (err) {
+                            util.messages.showErrorMessage("Dodavanje izvještaja nije uspjelo!");
+                            util.dismissDialog("addReportDialog");
+                        });
+                    }
                 }
             ]
         }
+    },
+    showAddReportDialog: function (meetingId) {
+        var dialog=webix.ui(webix.copy(meetingView.addReportDialog));
+        meetingView.addReportDialog.meetingId=meetingId;
+        dialog.show();
     }
 
 
