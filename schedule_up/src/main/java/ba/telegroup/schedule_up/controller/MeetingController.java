@@ -43,6 +43,8 @@ public class MeetingController extends GenericController<Meeting, Integer> {
     private String noMeeting;
     @Value("${badRequest.alreadyFinished}")
     private String alreadyFinished;
+    @Value("${badRequest.update}")
+    private String update;
 
     @Autowired
     public MeetingController(MeetingRepository meetingRepository, SettingsRepository settingsRepository,ParticipantRepository participantRepository) {
@@ -88,7 +90,7 @@ public class MeetingController extends GenericController<Meeting, Integer> {
                 meeting.setStatus(finished);
                 if (meetingRepository.saveAndFlush(meeting)!=null)
                     return "Success";
-                throw new BadRequestException("Cao");
+                throw new BadRequestException(update);
         }
         throw new ForbiddenException("Forbidden");
    }
