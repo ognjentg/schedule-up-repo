@@ -344,7 +344,6 @@ var meetingView = {
                                     type: "form",
                                     click: "meetingView.updateMeeting",
                                     hotkey: "enter",
-                                    width: 150
                                 }]
                             }
                         ]
@@ -460,6 +459,9 @@ var meetingView = {
             util.messages.showErrorMessage("Nije moguće izmijeniti događaj koji je prošao.");
             return;
         }
+
+
+
         newEventId=eventId;
         webix.ui(webix.copy(meetingView.editMeetingDialog)).show();
         var element = scheduler.getEvent(eventId);
@@ -476,6 +478,7 @@ var meetingView = {
             function (text, data, xhr) {
                 if (text) {
                     meetingView.files = data.json();
+                    $$("fileList").clearAll();
                     $$("fileList").parse(data.json());
 
                 } else {
@@ -490,8 +493,8 @@ var meetingView = {
         connection.sendAjax("GET", "user/nonParticipantsFor/" + eventId,
             function (text, data, xhr) {
                 if (text ) {
+                    $$("userList").clearAll();
                     $$("userList").parse(data.json());
-                    console.log(data.json());
                 } else {
                     util.messages.showErrorMessage("Greška pri učitavanju učesnika.");
                 }
@@ -503,8 +506,8 @@ var meetingView = {
         connection.sendAjax("GET", "user-group/nonParticipantsFor/" + eventId,
             function (text, data, xhr) {
                 if (text ) {
-                    $$("userList").parse(data.json());
-                    console.log(data.json());
+                    $$("userGroupList").clearAll();
+                    $$("userGroupList").parse(data.json());
                 } else {
                     util.messages.showErrorMessage("Greška pri učitavanju učesničkih grupa.");
                 }
@@ -530,6 +533,7 @@ var meetingView = {
         var event = scheduler.attachEvent("onEmptyClick", function (date, e) {
             webix.ui(webix.copy(meetingView.addMeetingDialog)).show();
             $$("startTime").setValue(date);
+            $$("endTime").setValue(date);
             $$("userList").load("user");
             $$("userGroupList").load("user-group");
 
@@ -690,6 +694,7 @@ var meetingView = {
 
         if (form.validate()) {
             var newMeeting = {
+                id:newEventId,
                 start_date: formatter(form.getValues().startTime),
                 end_date: formatter(form.getValues().endTime),
                 description: form.getValues().description,
@@ -702,14 +707,46 @@ var meetingView = {
 
             };
 
-            console.log(newMeeting);
-            console.log(newEventId);
             connection.sendAjax("PUT", "meeting/"+newEventId,
                 function (text, data, xhr) {
-
                     if (data) {
+                        util.messages.showMessage("Uspješno izmjenjena  obicna rezervacija.");
+                        for(var i=0;i<participants.length;i++){
+                            participants[i].meetingId=data.json().id;
+                        }
+                        connection.sendAjax("POST", "participant/insertAll",
+                            function (text, data, xhr) {
 
-                        util.messages.showMessage("Uspješno izmjenjena rezervacija.");
+                                if (data) {
+                                    for(var j=0;j<meetingView.files.length;j++){
+                                        var file=meetingView.files[j];
+                                        var doc={
+                                            name:file['name'],
+                                            content:file['content'],
+                                            report:file['report'],
+                                            meetingId:newEventId
+                                        };
+                                        documents.push(doc);
+                                    }
+                                    console.log("prijee dokumenata, poslije ucesnika");
+                                    connection.sendAjax("PUT", "document/updateAll/"+newEventId,
+                                        function (text, data, xhr) {
+
+                                            if (data) {
+                                                console.log("Evo :");
+                                                console.log(data.json());
+                                            } else
+                                                util.messages.showErrorMessage("Neuspješna izmjena dokumenata.");
+                                        }, function () {
+                                            util.messages.showErrorMessage("Neuspješna izmjena dokumenata.");
+                                        }, documents);
+
+                                } else
+                                    util.messages.showErrorMessage("Neuspješna izmjena rezervacije.");
+                            }, function () {
+                                util.messages.showErrorMessage("Neuspješna izmjena rezervacije.");
+                            }, participants);
+
 
                     } else
                         util.messages.showErrorMessage("Neuspješna izmjena rezervacije.");
@@ -717,44 +754,6 @@ var meetingView = {
                     util.messages.showErrorMessage("Neuspješna izmjena rezervacije.");
                 }, newMeeting);
 
-
-                for(var i=0;i<participants.length;i++){
-                    participants[i].meetingId=realData.json().id;
-                }
-
-                connection.sendAjax("POST", "participant/insertAll",
-                    function (text, data, xhr) {
-
-                        if (data) {
-                            for(var j=0;j<meetingView.files.length;j++){
-                                var file=meetingView.files[j];
-                                var doc={
-                                    name:file['name'],
-                                    content:file['content'],
-                                    report:file['report'],
-                                    meetingId:realData.json().id
-                                };
-                                documents.push(doc);
-                            }
-                            connection.sendAjax("PUT", "document/updateAll/"+newEventId,
-                                function (text, data, xhr) {
-
-                                    if (data) {
-
-                                        util.messages.showMessage("Uspješno izmjenjena rezervacija.");
-
-                                    } else
-                                        util.messages.showErrorMessage("Neuspješna izmjena rezervacije.");
-                                }, function () {
-                                    util.messages.showErrorMessage("Neuspješna izmjena rezervacije.");
-                                }, documents);
-
-                        } else
-                            util.messages.showErrorMessage("Neuspješna izmjena rezervacije.");
-                    }, function () {
-                        util.messages.showErrorMessage("Neuspješna izmjena rezervacije.");
-                    }, participants);
-                
 
             util.dismissDialog('editMeetingDialog')
 
