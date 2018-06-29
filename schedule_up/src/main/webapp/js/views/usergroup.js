@@ -57,6 +57,12 @@ var usergroupView = {
 
                         onAfterContextMenu: function (item) {
                             this.select(item.row);
+                        },
+
+                        onAfterSelect: function (item) {
+                            var groupId = item.id;
+                            $$("usersFromUserGroupDT").clearAll();
+                            $$("usersFromUserGroupDT").load("user-group-has-user/custom/" + groupId);
                         }
                     }
                 },
