@@ -547,6 +547,7 @@ var meetingView = {
                                         meetingView.editMeeting(meetingView.contextMenuEventId);
                                         break;
                                     case "2":
+                                        meetingView.showFinishMeetingPopup(scheduler.getEvent(meetingView.contextMenuEventId));
                                         break;
                                 }
                             }
@@ -781,6 +782,61 @@ var meetingView = {
         $$("fileList").parse(meetingView.files);
 
     },
+
+    finishMeetingPopup: {
+        view: "popup",
+        modal: true,
+        position: "center",
+        meeting: null,
+        body: {
+            rows: [
+                {
+                    view: "uploader",
+                    id: "finishUploader",
+                    value: "Dodajte dokument",
+                    on: {
+                        onBeforeFileAdd: function (upload) {
+                            var file = upload.file;
+                            var reader = new FileReader();
+                            reader.onload = function (event) {
+
+                                var newFileObject = {
+                                    name: file['name'],
+                                    content: event.target.result.split("base64,")[1],
+                                    report: 1,
+                                    meeting_id: meetingView.finishMeetingPopup.meeting.id
+                                };
+                                $$("reportList").add(newFileObject);
+                            };
+                            reader.readAsDataURL(file);
+                            return false;
+                        }
+                    }
+
+
+                },
+                {
+                    view:"list",
+                    id:"reportList",
+                    template:"#name# <span class='delete'><span class='webix_icon fa fa-close'/span></span>",
+                    onClick:{
+                        "delete":function(ev, id){
+                            this.remove(id);
+                            return false; // blocks the default click behavior
+                        }
+                    }
+                }
+            ]
+
+        }
+    },
+
+
+    showFinishMeetingPopup: function (event) {
+        meetingView.finishMeetingPopup.meeting = event;
+        var popup = webix.copy(meetingView.finishMeetingPopup);
+        webix.ui(popup).show();
+    }
 
 
 };
