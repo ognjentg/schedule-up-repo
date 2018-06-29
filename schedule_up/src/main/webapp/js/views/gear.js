@@ -247,10 +247,7 @@ var gearView = {
                 companyId: oldItem.companyId,
                 name: $$("changeGearForm").getValues().name
             };
-
-            if (newItem.available == "Da") newItem.available = 1;
-            else newItem.available = 0;
-
+            
             //provjeriti da li je gear nov, ako jeste staviti gearId na null
             var gearExists = false;
             var allGearNames = $$("gearSuggest").getList().data;
@@ -267,8 +264,6 @@ var gearView = {
                     if (text) {
                         util.messages.showMessage("Podaci su uspješno izmijenjeni.");
 
-                        if (newItem.available == 1) newItem.available = "Da";
-                        else newItem.available = "Ne";
                         $$("gearDT").updateItem(newItem.id, newItem);
                     } else
                         util.messages.showErrorMessage("Podaci nisu izmijenjeni.");
