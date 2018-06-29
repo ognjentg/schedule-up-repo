@@ -13,7 +13,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     User getByToken(String token);
 
-    List<User> getAllByCompanyId(Integer companyId);
+    List<User> getAllByCompanyIdAndActive(Integer companyId, byte active);
 
     User getById(Integer id);
 }

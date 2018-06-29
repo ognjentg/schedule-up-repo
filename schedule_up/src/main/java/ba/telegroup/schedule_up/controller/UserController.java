@@ -53,7 +53,7 @@ public class UserController extends GenericController<User, Integer> {
     @Override
     public @ResponseBody
     List<User> getAll() {
-        return userRepository.getAllByCompanyId(userBean.getUser().getCompanyId());
+        return userRepository.getAllByCompanyIdAndActive(userBean.getUser().getCompanyId(), (byte)1);
     }
 
 
@@ -200,7 +200,6 @@ public class UserController extends GenericController<User, Integer> {
     public @ResponseBody
     List<User> getNonParticipants(@PathVariable Integer meetingId) {
         List<User> retValue = getAll();
-        retValue.removeIf(user -> user.getActive()==0);
         retValue.removeAll(userRepository.findAllById(participantRepository.getAllByMeetingIdAndDeletedIs(meetingId, (byte) 0).stream().map(Participant::getUserId).collect(Collectors.toList())));
         return retValue;
     }

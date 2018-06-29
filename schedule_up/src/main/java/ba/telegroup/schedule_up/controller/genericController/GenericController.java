@@ -6,6 +6,7 @@ import ba.telegroup.schedule_up.common.exceptions.ForbiddenException;
 import ba.telegroup.schedule_up.controller.genericLogger.GenericLogger;
 import ba.telegroup.schedule_up.session.UserBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +30,15 @@ public class GenericController<T, ID extends Serializable> extends GenericLogger
     protected JpaRepository<T, ID> repo;
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Value("${badRequest.insert}")
+    private String badRequestInsert;
+
+    @Value("${badRequest.update}")
+    private String badRequestUpdate;
+
+    @Value("${badRequest.delete}")
+    private String badRequestDelete;
 
     @Autowired
     protected  UserBean userBean;
@@ -61,7 +71,7 @@ public class GenericController<T, ID extends Serializable> extends GenericLogger
             logCreateAction(object);
             return ret;
         }
-        throw new BadRequestException("Bad request");
+        throw new BadRequestException(badRequestInsert);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
@@ -72,7 +82,7 @@ public class GenericController<T, ID extends Serializable> extends GenericLogger
             logUpdateAction(object, oldObject);
             return "Success";
         }
-        throw new BadRequestException("Bad request");
+        throw new BadRequestException(badRequestUpdate);
     }
 
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.DELETE)
@@ -86,7 +96,7 @@ public class GenericController<T, ID extends Serializable> extends GenericLogger
             return "Success";
         } catch (Exception ex) {
             ex.printStackTrace();
-            throw new BadRequestException("Bad Request");
+            throw new BadRequestException(badRequestDelete);
         }
     }
 
