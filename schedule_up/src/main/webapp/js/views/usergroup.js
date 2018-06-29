@@ -128,18 +128,12 @@ var usergroupView = {
         connection.attachAjaxEvents("usergroupDT", "user-group");
 
 
-        /*webix.ui({
+        webix.ui({
             view: "contextmenu",
             id: "userGroupContextMenu",
             width: 200,
             data: [{
                 id: "1",
-                value: "Izmijenite",
-                icon: "pencil-square-o"
-            }, {
-                $template: "Separator"
-            }, {
-                id: "2",
                 value: "Obrišite",
                 icon: "trash"
             }],
@@ -149,17 +143,15 @@ var usergroupView = {
                     var context = this.getContext();
                     switch (id) {
                         case "1":
-                            usergroupView.showChangeUserGroupDialog($$("usergroupDT").getItem(context.id.row));
-                            break;
-                        case "2":
-                            var delBox = (webix.copy(commonViews.deleteConfirm("company")));
+                            var delBox = (webix.copy(commonViews.brisanjePotvrda("korisničke grupe", "korisničku grupu")));
                             delBox.callback = function (result) {
                                 if (result == 1) {
-                                    var item = $$("companyDT").getItem(context.id.row);
-                                    $$("companyDT").detachEvent("onBeforeDelete");
-                                    connection.sendAjax("DELETE", "/company/" + item.id, function (text, data, xhr) {
+                                    var item = $$("usergroupDT").getItem(context.id.row);
+                                    $$("usergroupDT").detachEvent("onBeforeDelete");
+                                    connection.sendAjax("DELETE", "/user-group/" + item.id, function (text, data, xhr) {
                                         if (text) {
-                                            $$("companyDT").remove(context.id.row);
+                                            $$("usergroupDT").remove(context.id.row);
+                                            $$("usersFromUserGroupDT").clearAll();
                                             util.messages.showMessage("Uspjesno uklanjanje");
                                         }
                                     }, function (text, data, xhr) {
@@ -172,7 +164,7 @@ var usergroupView = {
                     }
                 }
             }
-        })*/
+        })
     },
 
 
