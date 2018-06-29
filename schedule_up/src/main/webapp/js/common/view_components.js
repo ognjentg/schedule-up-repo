@@ -27,6 +27,18 @@ var commonViews = {
         };
     },
 
+    deaktivacijaPotvrda: function (titleEntity, textEntity) {
+        var text = titleEntity;
+        if (textEntity) text = textEntity;
+        return {
+            title: "Deaktiviranje " + titleEntity,
+            ok: "Da",
+            cancel: "Ne",
+            width: 500,
+            text: "Jeste li sigurni da želite da deaktivirate " + text + "?"
+        };
+    },
+
 
     confirm: function (titleEntity, textEntity) {
         var text = titleEntity;

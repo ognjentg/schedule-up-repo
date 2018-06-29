@@ -212,6 +212,43 @@ userView = {
         $$("main").addView(webix.copy(panelCopy));
         connection.attachAjaxEvents("userDT", "user");
 
+        webix.ui({
+            view: "contextmenu",
+            id: "userContextMenu",
+            width: 200,
+            data: [{
+                id: "1",
+                value: "Deaktivirajte",
+                icon: "trash"
+            }],
+            master: $$("userDT"),
+            on: {
+                onItemClick: function (id) {
+                    var context = this.getContext();
+                    switch (id) {
+                        case "1":
+                            var updateBox = (webix.copy(commonViews.deaktivacijaPotvrda("korisnika", "korisnika")));
+                            updateBox.callback = function (result) {
+                                if (result == 1) {
+                                    var item = $$("userDT").getItem(context.id.row);
+                                    item.active = 0;
+                                    //$$("userDT").detachEvent("onBeforeDelete");
+                                    connection.sendAjax("PUT", "/user/" + item.id, function (text, data, xhr) {
+                                        if (text) {
+                                            $$("userDT").updateItem(item.id, item);
+                                            util.messages.showMessage("Uspjesno deaktiviranje");
+                                        }
+                                    }, function (text, data, xhr) {
+                                        util.messages.showErrorMessage("Neuspjesno deaktiviranje");
+                                    }, item);
+                                }
+                            };
+                            webix.confirm(updateBox);
+                            break;
+                    }
+                }
+            }
+        })
     },
 
     showAddDialog: function () {
