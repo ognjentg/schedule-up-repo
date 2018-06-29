@@ -80,7 +80,7 @@ public class Building {
     }
 
     @Basic
-    @Column(name = "company_id", nullable = false)
+    @Column(name = "company_id", nullable = false, updatable = false)
     public Integer getCompanyId() {
         return companyId;
     }

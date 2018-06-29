@@ -12,14 +12,18 @@ public class Validator {
         Metoda vraca true ako je duzina teksta jednaka vrijednosti length, u suprotnom false
      */
     public static Boolean stringLength(String text, Integer length) {
-        return text != null && length != null && Integer.valueOf(text.length()).equals(length);
+        if (text != null)
+            return Integer.valueOf(text.length()).equals(length);
+        return true;
     }
 
     /*
         Metoda vraca true ako je duzina teksta manja ili jednaka vrijednosti maxLength, u suprotnom false
     */
     public static Boolean stringMaxLength(String text, Integer maxLength) {
-        return text != null && maxLength != null && Integer.valueOf(text.length()).compareTo(maxLength) <= 0;
+        if (text != null)
+            return Integer.valueOf(text.length()).compareTo(maxLength) <= 0;
+        return true;
     }
 
     /*
@@ -27,21 +31,28 @@ public class Validator {
         Ako je tip u bazi LONGBLOB, za length se koristi vrijednost longblob.length iz application.properties
      */
     public static Boolean binaryLength(byte[] bytes, Integer length) {
-        return bytes != null && length != null && Integer.valueOf(bytes.length).equals(length);
+        if (bytes != null)
+            return Integer.valueOf(bytes.length).equals(length);
+        return true;
     }
 
     /*
         Metoda vraca true ako je broj nenegativan, u suprotnom false
      */
     public static Boolean integerNotNegative(Integer number) {
-        return number != null && number.compareTo(0) >= 0;
+        if (number != null)
+            return number.compareTo(0) >= 0;
+        return true;
     }
 
     /*
        Metoda vraca true ako je broj nenegativan, u suprotnom false
     */
     public static Boolean doubleNotNegative(Double number) {
-        return number != null && number.compareTo(0.0) >= 0;
+
+        if (number != null)
+            return number.compareTo(0.0) >= 0;
+        return true;
     }
 
     /*
@@ -89,6 +100,6 @@ public class Validator {
             return matcher.matches();
         }
 
-        return false;
+        return true;
     }
 }

@@ -4,13 +4,14 @@ import ba.telegroup.schedule_up.common.exceptions.BadRequestException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.model.Building;
 import ba.telegroup.schedule_up.repository.BuildingRepository;
+import ba.telegroup.schedule_up.util.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,6 +21,21 @@ import java.util.List;
 public class BuildingController extends GenericController<Building, Integer> {
 
     private final BuildingRepository buildingRepository;
+
+    @Value("${badRequest.insert}")
+    private String badRequestInsert;
+
+    @Value("${badRequest.update}")
+    private String badRequestUpdate;
+
+    @Value("${badRequest.delete}")
+    private String badRequestDelete;
+
+    @Value("${badRequest.stringMaxLength}")
+    private String badRequestStringMaxLength;
+
+    @Value("${badRequest.numberNotNegative}")
+    private String badRequestNumberNotNegative;
 
     @Autowired
     public BuildingController(BuildingRepository repo) {
@@ -48,6 +64,60 @@ public class BuildingController extends GenericController<Building, Integer> {
 
     }
 
+    @Transactional
+    @RequestMapping(method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.CREATED)
+    @Override
+    public @ResponseBody
+    Building insert(@RequestBody Building building) throws BadRequestException {
+        if (Validator.stringMaxLength(building.getName(), 100)) {
+            if (Validator.stringMaxLength(building.getDescription(), 500)) {
+                if (Validator.stringMaxLength(building.getAddress(), 500)) {
+                    if (Validator.doubleNotNegative(building.getLongitude())) {
+                        if (Validator.doubleNotNegative(building.getLatitude())) {
+                            if (repo.saveAndFlush(building) != null) {
+                                logCreateAction(building);
+
+                                return building;
+                            }
+                            throw new BadRequestException(badRequestInsert);
+                        }
+                        throw new BadRequestException(badRequestNumberNotNegative.replace("{tekst}", "Latituda"));
+                    }
+                    throw new BadRequestException(badRequestNumberNotNegative.replace("{tekst}", "Longituda"));
+                }
+                throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "adrese").replace("{broj}", String.valueOf(500)));
+            }
+            throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "opisa").replace("{broj}", String.valueOf(500)));
+        }
+        throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "naziva").replace("{broj}", String.valueOf(100)));
+    }
+
+    @Transactional
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    @Override
+    public @ResponseBody
+    String update(@PathVariable Integer id, @RequestBody Building building) throws BadRequestException {
+        if (Validator.stringMaxLength(building.getName(), 100)) {
+            if (Validator.stringMaxLength(building.getDescription(), 500)) {
+                if (Validator.doubleNotNegative(building.getLongitude())) {
+                    if (Validator.doubleNotNegative(building.getLatitude())) {
+                        Building oldObject = cloner.deepClone(repo.findById(id).orElse(null));
+                        if (repo.saveAndFlush(building) != null) {
+                            logUpdateAction(building, oldObject);
+                            return "Success";
+                        }
+                        throw new BadRequestException(badRequestUpdate);
+                    }
+                    throw new BadRequestException(badRequestNumberNotNegative.replace("{tekst}", "Latituda"));
+                }
+                throw new BadRequestException(badRequestNumberNotNegative.replace("{tekst}", "Longituda"));
+            }
+            throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "opisa").replace("{broj}", String.valueOf(500)));
+        }
+        throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "naziva").replace("{broj}", String.valueOf(100)));
+    }
+
     @Override
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.DELETE)
     public @ResponseBody
@@ -59,7 +129,7 @@ public class BuildingController extends GenericController<Building, Integer> {
             logDeleteAction(building);
             return "Success";
         }
-        throw new BadRequestException("Bad request");
+        throw new BadRequestException(badRequestDelete);
     }
 
 //    @Override

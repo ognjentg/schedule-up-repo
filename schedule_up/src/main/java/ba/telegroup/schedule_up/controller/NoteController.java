@@ -6,7 +6,9 @@ import ba.telegroup.schedule_up.model.Note;
 import ba.telegroup.schedule_up.model.modelCustom.NoteUser;
 import ba.telegroup.schedule_up.repository.NoteRepository;
 import ba.telegroup.schedule_up.repository.UserRepository;
+import ba.telegroup.schedule_up.util.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -24,6 +26,18 @@ public class NoteController extends GenericController<Note, Integer> {
 
     private final NoteRepository noteRepository;
     private final UserRepository userRepository;
+
+    @Value("${badRequest.insert}")
+    private String badRequestInsert;
+
+    @Value("${badRequest.update}")
+    private String badRequestUpdate;
+
+    @Value("${badRequest.delete}")
+    private String badRequestDelete;
+
+    @Value("${badRequest.stringMaxLength}")
+    private String badRequestStringMaxLength;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -82,23 +96,50 @@ public class NoteController extends GenericController<Note, Integer> {
     @ResponseStatus(HttpStatus.CREATED)
     @Override
     public @ResponseBody
-    NoteUser insert(@RequestBody Note note) {
-        repo.saveAndFlush(note);
-        logCreateAction(note);
-        entityManager.refresh(note);
-        String username = userRepository.getById(note.getUserId()).getUsername();
+    NoteUser insert(@RequestBody Note note) throws BadRequestException {
+        if (Validator.stringMaxLength(note.getName(), 100)) {
+            if (Validator.stringMaxLength(note.getDescription(), 500)) {
+                if (repo.saveAndFlush(note) != null) {
+                    logCreateAction(note);
+                    entityManager.refresh(note);
+                    String username = userRepository.getById(note.getUserId()).getUsername();
 
-        NoteUser noteUser = new NoteUser();
-        noteUser.setId(note.getId());
-        noteUser.setName(note.getName());
-        noteUser.setDescription(note.getDescription());
-        noteUser.setPublishTime(note.getPublishTime());
-        noteUser.setDeleted(note.getDeleted());
-        noteUser.setUserId(note.getUserId());
-        noteUser.setCompanyId(note.getCompanyId());
-        noteUser.setUsername(username);
+                    NoteUser noteUser = new NoteUser();
+                    noteUser.setId(note.getId());
+                    noteUser.setName(note.getName());
+                    noteUser.setDescription(note.getDescription());
+                    noteUser.setPublishTime(note.getPublishTime());
+                    noteUser.setDeleted(note.getDeleted());
+                    noteUser.setUserId(note.getUserId());
+                    noteUser.setCompanyId(note.getCompanyId());
+                    noteUser.setUsername(username);
 
-        return noteUser;
+                    return noteUser;
+                }
+                throw new BadRequestException(badRequestInsert);
+            }
+            throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "opisa").replace("{broj}", String.valueOf(500)));
+        }
+        throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "naziva").replace("{broj}", String.valueOf(100)));
+    }
+
+    @Transactional
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    @Override
+    public @ResponseBody
+    String update(@PathVariable Integer id, @RequestBody Note note) throws BadRequestException {
+        if (Validator.stringMaxLength(note.getName(), 100)) {
+            if (Validator.stringMaxLength(note.getDescription(), 500)) {
+                Note oldObject = cloner.deepClone(repo.findById(id).orElse(null));
+                if (repo.saveAndFlush(note) != null) {
+                    logUpdateAction(note, oldObject);
+                    return "Success";
+                }
+                throw new BadRequestException(badRequestUpdate);
+            }
+            throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "opisa").replace("{broj}", String.valueOf(500)));
+        }
+        throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "naziva").replace("{broj}", String.valueOf(100)));
     }
 
     @Override
@@ -112,7 +153,7 @@ public class NoteController extends GenericController<Note, Integer> {
             logDeleteAction(note);
             return "Success";
         }
-        throw new BadRequestException("Bad request");
+        throw new BadRequestException(badRequestDelete);
     }
 
 //    @RequestMapping(value = "/getAllByPublishTimeAfter/{time}", method = RequestMethod.GET)

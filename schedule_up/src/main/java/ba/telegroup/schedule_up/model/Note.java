@@ -71,7 +71,7 @@ public class Note {
     }
 
     @Basic
-    @Column(name = "user_id", nullable = false)
+    @Column(name = "user_id", nullable = false, updatable = false)
     public Integer getUserId() {
         return userId;
     }
@@ -81,7 +81,7 @@ public class Note {
     }
 
     @Basic
-    @Column(name = "company_id", nullable = false)
+    @Column(name = "company_id", nullable = false, updatable = false)
     public Integer getCompanyId() {
         return companyId;
     }
