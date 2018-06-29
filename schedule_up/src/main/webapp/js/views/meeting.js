@@ -471,6 +471,49 @@ var meetingView = {
             , null);
 
     },
+    reports:[],
+    finishMeetingPopup:{
+      view:"popup",
+        modal: true,
+        position: "center",
+        meetingId:null,
+        body:{
+          rows:[
+              { view:"uploader",
+                  id:"finishUploader",
+                  value:"Dodajte dokument",
+                  on:{
+                      onBeforeFileAdd: function(upload){
+                          var file = upload.file;
+                          var reader = new FileReader();
+                          reader.onload = function(event) {
+
+                              var newFileObject={
+                                  name:file['name'],
+                                  content:event.target.result.split("base64,")[1],
+                                  report:1,
+                                  meeting_id:finishMeetingPopup.meetingId
+                              };
+                              meetingView.reports.push(newFileObject);
+                          };
+                          reader.readAsDataURL(file);
+                          return false;
+                      }
+                  }
+
+
+              },
+              {
+                  view:"list",  id:"mylist", type:"uploader",
+                  autoheight:true, borderless:true
+              }
+          ]
+
+        }
+    },
+
+
+    showFinishMeetingPopup(event);
 
     selectPanel: function (room) {
         detachAllEvents();
@@ -518,7 +561,7 @@ var meetingView = {
         scheduler.load("meeting/getByRoom/"+room.id, "json");
 
         schedulerEvents.push(scheduler.attachEvent("onContextMenu", function (id, e){
-            if (id!=null && scheduler.getEvent(id).status===0) {
+            if (id!=null && scheduler.getEvent(id).status===0 && (userData.roleId===2  || scheduler.getEvent(id).userId===userData.id)) {
                 meetingView.contextMenuEventId=id;
                 var posx = 0;
                 var posy = 0;
