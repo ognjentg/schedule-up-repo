@@ -2,10 +2,8 @@ package ba.telegroup.schedule_up.controller;
 
 import ba.telegroup.schedule_up.common.exceptions.BadRequestException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
-import ba.telegroup.schedule_up.model.Room;
-import ba.telegroup.schedule_up.model.GearUnit;
-import ba.telegroup.schedule_up.model.RoomHasGearUnit;
-import ba.telegroup.schedule_up.model.RoomHasGearUnitPK;
+import ba.telegroup.schedule_up.model.*;
+import ba.telegroup.schedule_up.repository.BuildingRepository;
 import ba.telegroup.schedule_up.repository.GearUnitRepository;
 import ba.telegroup.schedule_up.repository.RoomHasGearUnitRepository;
 import ba.telegroup.schedule_up.repository.RoomRepository;
@@ -28,13 +26,15 @@ public class RoomController extends GenericController<Room, Integer> {
     private final RoomRepository roomRepository;
     private final RoomHasGearUnitRepository roomHasGearUnitRepository;
     private final GearUnitRepository gearUnitRepository;
+    private final BuildingRepository buildingRepository;
 
     @Autowired
-    public RoomController(RoomRepository roomRepository, RoomHasGearUnitRepository roomHasGearUnitRepository, GearUnitRepository gearUnitRepository) {
+    public RoomController(RoomRepository roomRepository, RoomHasGearUnitRepository roomHasGearUnitRepository, GearUnitRepository gearUnitRepository, BuildingRepository buildingRepository) {
         super(roomRepository);
         this.roomRepository = roomRepository;
         this.roomHasGearUnitRepository = roomHasGearUnitRepository;
         this.gearUnitRepository = gearUnitRepository;
+        this.buildingRepository = buildingRepository;
     }
 
     @Override
@@ -97,6 +97,29 @@ public class RoomController extends GenericController<Room, Integer> {
             gearUnitRepository.saveAndFlush(gearUnit);
             if (roomRepository.saveAndFlush(room) != null) logUpdateAction(room, oldRoom);
             return "Success";
+        }
+        throw new BadRequestException("Bad request");
+    }
+
+    public Room getRoomById(Integer id){
+        return roomRepository.getRoomById(id);
+    }
+
+    @RequestMapping(value = "/getBuildingByRoomId/{id}",method = RequestMethod.GET)
+    public @ResponseBody
+    Building getBuildingByRoomId(@PathVariable Integer id) throws BadRequestException{
+        Room room = getRoomById(id);
+        if(room != null) {
+            Building building = buildingRepository.getBuildingsById(room.getBuildingId());
+            if(building != null) {
+                building.setAddress(null);
+                building.setDescription(null);
+                building.setName(null);
+                building.setCompanyId(null);
+                building.setDeleted(null);
+                return building;
+            }
+            throw new BadRequestException("Bad request");
         }
         throw new BadRequestException("Bad request");
     }

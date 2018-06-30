@@ -1,5 +1,6 @@
 package ba.telegroup.schedule_up.repository.repositoryCustom.repositoryImpl;
 
+import ba.telegroup.schedule_up.model.Building;
 import ba.telegroup.schedule_up.model.modelCustom.RoomBuilding;
 import ba.telegroup.schedule_up.repository.repositoryCustom.RoomRepositoryCustom;
 
@@ -18,4 +19,6 @@ public class RoomRepositoryImpl implements RoomRepositoryCustom {
     public List getAllExtendedByCompanyId(Integer id){
         return entityManager.createNativeQuery(SQL_GET_ALL_EXTENDED_BY_COMPANY_NAME_WHERE_DELETED_IS_FALSE, "RoomBuildingMapping").setParameter(1, id).getResultList();
     }
+
+
 }

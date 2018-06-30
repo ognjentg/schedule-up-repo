@@ -10,4 +10,5 @@ public interface BuildingRepository extends JpaRepository<Building, Integer> {
     List<Building> getAllByCompanyIdAndDeletedEquals(Integer id,Byte deleted);
     List<Building> getAllByCompanyIdAndNameContainsIgnoreCaseAndDeletedEquals(Integer id,String name,Byte deleted);
     List<Building> getAllByCompanyIdAndLongitudeAndLatitudeAndDeletedEquals(Integer id,Double longitude, Double latitude,Byte deleted);
+    Building getBuildingsById(Integer id);
 }
