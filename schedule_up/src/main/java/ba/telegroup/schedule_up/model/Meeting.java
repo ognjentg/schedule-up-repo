@@ -71,7 +71,7 @@ public class Meeting {
     }
 
     @Basic
-    @Column(name = "participants_number", nullable = false)
+    @Column(name = "participants_number", nullable = false,insertable = false,updatable = false)
     public Integer getParticipantsNumber() {
         return participantsNumber;
     }
