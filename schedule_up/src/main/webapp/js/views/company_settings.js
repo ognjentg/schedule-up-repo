@@ -290,7 +290,7 @@ var companySettingsView = {
                     },{
                         view: "datatable",
                         css: "webixDatatable",
-                        width:555,
+                        width:400,
                         multiselect: false,
                         id: "holidayDT",
                         resizeColumn: true,
