@@ -716,54 +716,37 @@ var meetingView = {
                 roomId: meetingView.roomId.id
 
             };
-
-            connection.sendAjax("PUT", "meeting/"+newEventId,
-                function (text, data, xhr) {
-                    if (data) {
-                        util.messages.showMessage("Uspješno izmjenjena  obicna rezervacija.");
-                        for(var i=0;i<participants.length;i++){
-                            participants[i].meetingId=data.json().id;
-                        }
-                        connection.sendAjax("POST", "participant/insertAll",
-                            function (text, data, xhr) {
-
-                                if (data) {
-                                    for(var j=0;j<meetingView.files.length;j++){
-                                        var file=meetingView.files[j];
-                                        var doc={
-                                            name:file['name'],
-                                            content:file['content'],
-                                            report:file['report'],
-                                            meetingId:newEventId
-                                        };
-                                        documents.push(doc);
-                                    }
-                                    console.log("prijee dokumenata, poslije ucesnika");
-                                    connection.sendAjax("PUT", "document/updateAll/"+newEventId,
-                                        function (text, data, xhr) {
-
-                                            if (data) {
-                                                console.log("Evo :");
-                                                console.log(data.json());
-                                            } else
-                                                util.messages.showErrorMessage("Neuspješna izmjena dokumenata.");
-                                        }, function () {
-                                            util.messages.showErrorMessage("Neuspješna izmjena dokumenata.");
-                                        }, documents);
-
-                                } else
-                                    util.messages.showErrorMessage("Neuspješna izmjena rezervacije.");
-                            }, function () {
-                                util.messages.showErrorMessage("Neuspješna izmjena rezervacije.");
-                            }, participants);
-
-
-                    } else
-                        util.messages.showErrorMessage("Neuspješna izmjena rezervacije.");
-                }, function () {
-                    util.messages.showErrorMessage("Neuspješna izmjena rezervacije.");
-                }, newMeeting);
-
+            //docukmenti
+            if (meetingView.files.length > 0) {
+                for (var j = 0; j < meetingView.files.length; j++) {
+                    var file = meetingView.files[j];
+                    var doc = {
+                        name: file['name'],
+                        content: file['content'],
+                        report: file['report'],
+                        meetingId: newEventId
+                    };
+                    documents.push(doc);
+                }}
+            for (var i = 0; i < participants.length; i++) {
+                participants[i].meetingId = newEventId;
+            }
+            var pro = webix.ajax().headers({
+                "Content-type": "application/json"
+            }).put("meeting/"+newEventId, newMeeting).then(function (realData) {
+                return webix.ajax().headers({
+                    "Content-type": "application/json"
+                }).post("participant/insertAll",JSON.stringify(participants));
+            }).then(function(realData){
+                return webix.ajax().headers({
+                    "Content-type": "application/json"
+                }).put("document/updateAll/"+newEventId,JSON.stringify(documents));
+            }).then(function(realData){
+                util.messages.showMessage("Uspješna izmjena rezervacije.")
+            });
+            pro.fail(function (err) {
+                util.messages.showErrorMessage("Neuspješna izmjena rezervacije.");
+            });
 
             util.dismissDialog('editMeetingDialog')
 
