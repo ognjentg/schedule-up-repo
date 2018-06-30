@@ -127,18 +127,12 @@ var usergroupView = {
         $$("main").addView(webix.copy(panelCopy));
         connection.attachAjaxEvents("usergroupDT", "user-group");
 
-
         webix.ui({
             view: "contextmenu",
             id: "userGroupContextMenu",
             width: 200,
             data: [{
                 id: "1",
-                value: "Izmijeni",
-                icon: "pencil-square-o"
-            },
-                {
-                id: "2",
                 value: "Obrišite",
                 icon: "trash"
             }],
@@ -148,9 +142,6 @@ var usergroupView = {
                     var context = this.getContext();
                     switch (id) {
                         case "1":
-                            usergroupView.showChangeUserGroupDialog($$("usergroupDT").getItem(context.id.row),context.id);
-                            break;
-                        case "2":
                             var delBox = (webix.copy(commonViews.brisanjePotvrda("korisničke grupe", "korisničku grupu")));
                             delBox.callback = function (result) {
                                 if (result == 1) {
@@ -172,7 +163,51 @@ var usergroupView = {
                     }
                 }
             }
-        })
+        });
+
+        webix.ui({
+            view: "contextmenu",
+            id: "removeUserContextMenu",
+            width: 200,
+            data: [{
+                id: "1",
+                value: "Izbaci",
+                icon: "user-times"
+            }],
+            master: $$("usersFromUserGroupDT"),
+            on: {
+                onItemClick: function (id) {
+                    var context = this.getContext();
+                    switch (id) {
+                        case "1":
+                            var delBox = (webix.copy(commonViews.brisanjePotvrda("korisnik", "korisnika")));
+                            delBox.callback = function (result) {
+                                if (result == 1) {
+                                    var selectedUser = $$("usersFromUserGroupDT").getItem(context.id.row);
+                                    console.log(context.id);
+                                    var temp = $$("usergroupDT").getSelectedItem();
+                                    var item = {
+                                        userGroupId: temp.id,
+                                        userId: selectedUser.id
+                                    }
+                                    $$("usersFromUserGroupDT").detachEvent("onBeforeDelete");
+                                    connection.sendAjax("DELETE", "/user-group-has-user/" + item.userGroupId+ "/"+item.userId, function (text, data, xhr) {
+                                        if (text) {
+                                            $$("usersFromUserGroupDT").remove(context.id.row);
+                                            util.messages.showMessage("Uspjesno uklanjanje");
+                                        }
+                                    }, function (text, data, xhr) {
+                                        util.messages.showErrorMessage("Neuspjesno uklanjanje");
+                                    }, item);
+                                }
+                            };
+                            webix.confirm(delBox);
+
+                            break;
+                    }
+                }
+            }
+        });
     },
 
 
@@ -234,18 +269,8 @@ var usergroupView = {
                         width: 150
                     }]
                 }],
-                rules: {
-                    "name": function (value) {
-                        if (!value)
-                            return false;
-                        if (value.length > 100) {
-                            $$('addUsergroupForm').elements.name.config.invalidMessage = 'Maksimalan broj karaktera je 100!';
-                            return false;
-                        }
-                        return true;
-                    }
 
-                }
+
             }]
         }
     },
@@ -289,89 +314,5 @@ var usergroupView = {
         }
         util.dismissDialog('addUsergroupDialog');
 
-    },
-
-    showChangeUserGroupDialog: function (usergroup,id) {
-        webix.ui(webix.copy(usergroupView.changeUsergroupDialog));
-        var form = $$("changeUsergroupForm");
-        form.elements.name.setValue(usergroup.name);
-        var temp= form.elements.users;
-        //add "/user-group-has-user/custom/"+id to users? how?
-        setTimeout(function () {
-            $$("changeUsergroupDialog").show();
-            webix.UIManager.setFocus("name");
-        }, 0);
-    },
-
-    changeUsergroupDialog: {
-        view: "popup",
-        id: "changeUsergroupDialog",
-        modal: true,
-        position: "center",
-        body: {
-            id: "changeUsergroupInside",
-            rows: [{
-                view: "toolbar",
-                cols: [{
-                    view: "label",
-                    label: "<span class='webix_icon fa-book'></span> Izmjena podataka o korisnčkim grupama",
-                    width: 400
-                }, {}, {
-                    view: "icon",
-                    icon: "close",
-                    align: "right",
-                    click: "util.dismissDialog('changeUsergroupDialog');"
-                }]
-            }, {
-                view: "form",
-                id: "changeUsergroupForm",
-                width: 600,
-                elementsConfig: {
-                    labelWidth: 200,
-                    bottomPadding: 18
-                },
-                elements: [{
-                    view: "text",
-                    id: "name",
-                    name: "name",
-                    label: "Naziv korisničke grupe",
-                    invalidMessage: "Unesite naziv korisničke grupe!",
-                    required: true
-                }, {
-                    view: "multicombo",
-                    id: "users",
-                    name: "users",
-                    label: "Korisnici",
-                    suggest: {
-                        body: {
-                            template: "#firstName# #lastName#"
-                        }
-                    }
-                }, {
-                    margin: 5,
-                    cols: [{}, {
-                        id: "saveChangedUsergroup",
-                        view: "button",
-                        value: "Sačuvajte",
-                        type: "form",
-                        click: "usergroupView.saveChangedUsergroup",
-                        hotkey: "enter",
-                        width: 150
-                    }]
-                }],
-                rules: {
-                    "name": function (value) {
-                        if (!value)
-                            return false;
-                        if (value.length > 100) {
-                            $$('changeUsergroupForm').elements.name.config.invalidMessage = 'Maksimalan broj karaktera je 100!';
-                            return false;
-                        }
-                        return true;
-                    }
-
-                }
-            }]
-        }
     }
 }

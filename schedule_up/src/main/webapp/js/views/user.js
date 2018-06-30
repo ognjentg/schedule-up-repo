@@ -134,14 +134,7 @@ userView = {
                     labelWidth: 200,
                     bottomPadding: 18
                 },
-                elements: [{
-                    view: "text",
-                    id: "username",
-                    name: "name",
-                    label: "Ime naloga",
-                    invalidMessage: "Unesite ime naloga!",
-                    required: true
-                },
+                elements: [
                     {
                         view: "text",
                         id: "email",
@@ -173,15 +166,6 @@ userView = {
                         }]
                     }],
                 rules: {
-                    "name": function (value) {
-                        if (!value)
-                            return false;
-                        if (value.length > 15) {
-                            $$('addUserForm').elements.name.config.invalidMessage = 'Maksimalan broj karaktera je 15!';
-                            return false;
-                        }
-                        return true;
-                    },
                     "email": function (value) {
                         if (!value) {
                             $$('addUserForm').elements.email.config.invalidMessage = 'Unesite E-mail!';
@@ -264,7 +248,6 @@ userView = {
         var form = $$("addUserForm");
         if (form.validate()) {
             var newUser = {
-                username: $$("addUserForm").getValues().name,
                 email: $$("addUserForm").getValues().email,
                 roleId: $$("role").getValue(),
                 companyId: userData.companyId,
