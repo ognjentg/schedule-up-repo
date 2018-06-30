@@ -1,5 +1,6 @@
 var contextMenu;
 var formatter = webix.Date.dateToStr("%d-%m-%Y %H:%i");
+var parser = webix.Date.strToDate("%d-%m-%Y %H:%i");
 var meetingView = {
 
     roomId:null,
@@ -824,11 +825,14 @@ var meetingView = {
                     roomId: meetingView.roomId.id
 
                 };
+                var insertedMeeting;
                 var pro = webix.ajax().headers({
                     "Content-type": "application/json"
                 }).post("meeting", newMeeting).then(function (realData) {
+                    insertedMeeting=realData.json();
                     for (var i = 0; i < participants.length; i++) {
                         participants[i].meetingId = realData.json().id;
+
                     }
 
                     connection.sendAjax("POST", "participant/insertAll",
@@ -853,6 +857,7 @@ var meetingView = {
                                                 meetingView.files = [];
                                                 $$("fileList").clearAll();
                                                 util.messages.showMessage("Uspješno kreirana rezervacija.");
+                                                scheduler.addEvent(insertedMeeting);
 
                                             } else
                                                 util.messages.showErrorMessage("Neuspješno kreiranje rezervacije.");
@@ -860,6 +865,7 @@ var meetingView = {
                                             util.messages.showErrorMessage("Neuspješno kreiranje rezervacije.");
                                         }, documents);
                                 } else {
+                                    scheduler.addEvent(insertedMeeting);
                                     util.messages.showMessage("Uspješno kreirana rezervacija.");
                                 }
                             } else
