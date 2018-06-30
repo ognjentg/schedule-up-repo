@@ -53,7 +53,13 @@ public class UserController extends GenericController<User, Integer> {
     @Override
     public @ResponseBody
     List<User> getAll() {
-        return userRepository.getAllByCompanyIdAndActive(userBean.getUser().getCompanyId(), (byte)1);
+        List<User> users = userRepository.getAllByCompanyIdAndActive(userBean.getUser().getCompanyId(), (byte)1);
+        for(User user : users){
+            user.setPassword(null);
+            user.setPin(null);
+        }
+
+        return users;
     }
 
 
@@ -64,6 +70,7 @@ public class UserController extends GenericController<User, Integer> {
         User user = userRepository.findById(id).orElse(null);
         if (user != null && Objects.equals(user.getCompanyId(), userBean.getUser().getCompanyId())) {
             user.setPassword(null);
+            user.setPin(null);
             return user;
         } else {
             throw new BadRequestException("Bad request");
@@ -92,6 +99,7 @@ public class UserController extends GenericController<User, Integer> {
 
         if (successLogin) {
             user.setPassword(null);
+            user.setPin(null);
             userBean.setUser(user);
             userBean.setLoggedIn(true);
 
