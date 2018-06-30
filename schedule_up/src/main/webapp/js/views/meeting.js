@@ -959,7 +959,7 @@ var meetingView = {
                     autowidth:true,
                     height:200,
                     css:"relative",
-                    template:"#name# <span class='delete-file'><span class='webix fa fa-close'/></span>",
+                    template:"<div class='list-name'>#name#</div> <span class='delete-file'><span class='webix fa fa-close'/></span>",
                     onClick:{
                         'delete-file':function (e,id) {
                             this.remove(id);

@@ -50,3 +50,11 @@
 .relative{
     position: relative !important;
 }
+
+.list-name{
+    overflow: hidden !important;
+    height: 34px !important;;
+    width: 200px !important;;
+    display: inline-block !important;
+    text-overflow: ellipsis !important;
+}
