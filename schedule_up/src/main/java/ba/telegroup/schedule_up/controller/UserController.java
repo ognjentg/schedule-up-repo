@@ -217,4 +217,11 @@ public class UserController extends GenericController<User, Integer> {
             return newUser;
         }).collect(Collectors.toList());
     }
+
+    @Transactional
+    @RequestMapping(value = {"/participantsFor/{meetingId}"}, method = RequestMethod.GET)
+    public @ResponseBody
+    List<User> getParticipants(@PathVariable Integer meetingId) {
+        return userRepository.findAllById(participantRepository.getAllByMeetingIdAndDeletedIs(meetingId, (byte) 0).stream().map(Participant::getUserId).collect(Collectors.toList()));
+    }
 }
