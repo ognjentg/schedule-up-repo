@@ -486,14 +486,14 @@ var roomView = {
                     id: "floor",
                     name: "floor",
                     label: "Broj sprata",
-                    min: 0,
+                    min: -1000,
                     value: 0
                 }, {
                     view: "counter",
                     id: "capacity",
                     name: "capacity",
                     label: "Kapacitet sale",
-                    min: -1000,
+                    min: 1,
                     value: 1
                 }, {
                     view: "text",
