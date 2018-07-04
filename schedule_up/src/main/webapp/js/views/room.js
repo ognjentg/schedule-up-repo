@@ -38,7 +38,6 @@ var roomView = {
 
             }, {
                 id: "name",
-                editable: false,
                 fillspace: true,
                 editor: "text",
                 sort: "string",
@@ -50,7 +49,6 @@ var roomView = {
             }, {
                 id: "floor",
                 fillspace: true,
-                editable: false,
                 editor: "text",
                 sort: "int",
                 header: ["Sprat",
@@ -61,7 +59,6 @@ var roomView = {
                 {
                     id: "capacity",
                     fillspace: true,
-                    editable: false,
                     editor: "text",
                     sort: "int",
                     header: ["Kapacitet", {
@@ -71,8 +68,6 @@ var roomView = {
                 {
                     id: "buildingName",
                     fillspace: true,
-                    editable: false,
-                    editor: "text",
                     sort: "string",
                     header: [
                         "Naziv zgrade", {
@@ -107,7 +102,8 @@ var roomView = {
             ],
             select: "row",
             navigation: true,
-            editable: false,
+            editable: true,
+            editaction: "dblclick",
             url: "room/",
             on: {
 
@@ -200,10 +196,10 @@ var roomView = {
                 $template: "Separator"
             },
                 {
-                id: "3",
-                value: "Prikaz rezervacija",
-                icon: "calendar"
-            }
+                    id: "3",
+                    value: "Prikaz rezervacija",
+                    icon: "calendar"
+                }
             ],
             master: $$("roomDT"),
             on: {
