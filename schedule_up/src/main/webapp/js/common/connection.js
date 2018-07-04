@@ -150,7 +150,7 @@ var connection = {
 
                     retVal.isNew = true;
                     if(dtId == "roomDT")
-                        $$(dtId).load("room");
+                        retVal.buildingName = obj.buildingName;// za azuriranje tabele
                     try {
                         $$(dtId).add(retVal);
                     } catch (ex) {

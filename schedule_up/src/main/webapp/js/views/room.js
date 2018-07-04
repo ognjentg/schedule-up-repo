@@ -404,6 +404,8 @@ var roomView = {
 
     save: function () {
         var form = $$("addRoomForm");
+        var buildingName = form.elements.buildingName.getList().getItem(form.getValues().buildingName).name;
+
         if (form.validate()) {
             var newRoom = {
                 name: form.getValues().name,
@@ -412,7 +414,8 @@ var roomView = {
                 pin: form.getValues().pin,
                 description: form.getValues().description,
                 buildingId: form.getValues().buildingName,
-                companyId: companyData.id
+                companyId: companyData.id,
+                buildingName: buildingName
             };
             $$("roomDT").add(newRoom);
             util.dismissDialog('addRoomDialog');
@@ -555,7 +558,6 @@ var roomView = {
                         return true;
                     },
                     "pin": function (value) {
-                        console.log(value);
                         if (!value)
                             return false;
                         if (isNaN(value) || value != parseInt(value, 10)) {
@@ -598,6 +600,7 @@ var roomView = {
 
     saveChangedRoom: function () {
         var form = $$("changeRoomForm");
+        var buildingName = form.elements.buildingName.getList().getItem(form.getValues().buildingName).name;
         if (form.validate()) {
             var newRoom = {
                 id: form.getValues().id,
@@ -608,15 +611,15 @@ var roomView = {
                 description: form.getValues().description,
                 buildingId: form.getValues().buildingName,
                 companyId: companyData.id,
-                deleted: 0
+                deleted: 0,
+                buildingName: buildingName
             };
 
             connection.sendAjax("PUT", "room/" + newRoom.id,
                 function (text, data, xhr) {
                     if (text) {
                         util.messages.showMessage("Podaci su uspješno izmijenjeni.");
-                        //$$("roomDT").updateItem(newRoom.id, newRoom);
-                        $$("roomDT").load("room"); //da bi se azurirao naziv zgrade
+                        $$("roomDT").updateItem(newRoom.id, newRoom);
                     } else
                         util.messages.showErrorMessage("Podaci nisu izmijenjeni.");
                 }, function () {
