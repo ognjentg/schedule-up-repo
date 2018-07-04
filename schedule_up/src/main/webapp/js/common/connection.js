@@ -149,6 +149,8 @@ var connection = {
                     }
 
                     retVal.isNew = true;
+                    if(dtId == "roomDT")
+                        $$(dtId).load("room");
                     try {
                         $$(dtId).add(retVal);
                     } catch (ex) {

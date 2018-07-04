@@ -615,7 +615,8 @@ var roomView = {
                 function (text, data, xhr) {
                     if (text) {
                         util.messages.showMessage("Podaci su uspješno izmijenjeni.");
-                        $$("roomDT").updateItem(newRoom.id, newRoom);
+                        //$$("roomDT").updateItem(newRoom.id, newRoom);
+                        $$("roomDT").load("room"); //da bi se azurirao naziv zgrade
                     } else
                         util.messages.showErrorMessage("Podaci nisu izmijenjeni.");
                 }, function () {
