@@ -354,14 +354,14 @@ var roomView = {
                         return true;
                     },
                     "floor": function (value) {
-                        if (isNaN(value) || value !== parseInt(value, 10)) {
+                        if (isNaN(value) || value != parseInt(value, 10)) {
                             $$('addRoomForm').elements.floor.config.invalidMessage = 'Broj spratova mora biti cijeli broj!';
                             return false;
                         }
                         return true;
                     },
                     "capacity": function (value) {
-                        if (isNaN(value) || value !== parseInt(value, 10)) {
+                        if (isNaN(value) || value != parseInt(value, 10)) {
                             $$('addRoomForm').elements.capacity.config.invalidMessage = 'Kapacitet sale mora biti cijeli broj!';
                             $$('addRoomForm').elements.capacity.setValue(1);
                             return false;
@@ -536,14 +536,14 @@ var roomView = {
                         return true;
                     },
                     "floor": function (value) {
-                        if (isNaN(value) || value !== parseInt(value, 10)) {
+                        if (isNaN(value) || value != parseInt(value, 10)) {
                             $$('changeRoomForm').elements.floor.config.invalidMessage = 'Broj spratova mora biti cijeli broj!';
                             return false;
                         }
                         return true;
                     },
                     "capacity": function (value) {
-                        if (isNaN(value) || value !== parseInt(value, 10)) {
+                        if (isNaN(value) || value != parseInt(value, 10)) {
                             $$('changeRoomForm').elements.capacity.config.invalidMessage = 'Kapacitet sale mora biti cijeli broj!';
                             $$('changeRoomForm').elements.capacity.setValue(1);
                             return false;
