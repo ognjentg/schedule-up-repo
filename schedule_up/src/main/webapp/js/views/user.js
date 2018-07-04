@@ -137,7 +137,7 @@ userView = {
                         options: [
                             {id:4, "value":"korisnik"},
                             {id: 3, "value":"napredni korisnik"},
-                            {id:2 , "value":"administrator"}]
+                            ]
                     },
                     {
                         margin: 5,
