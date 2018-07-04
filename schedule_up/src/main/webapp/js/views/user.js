@@ -77,21 +77,7 @@ userView = {
                         content: "textFilter"
                     }
                 ]
-            }, {
-                id: "active",
-                fillspace: true,
-                editable: false,
-                sort: "text",
-                format: function (value) {
-                    if (value == 1) return "Da";
-                    else return "Ne";
-                },
-                header: [
-                    "Aktivan", {
-                        content: "textFilter"
-                    }
-                ]
-            },
+            }
             ],
             select: "row",
             navigation: true,

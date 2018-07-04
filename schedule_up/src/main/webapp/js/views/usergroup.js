@@ -67,52 +67,70 @@ var usergroupView = {
                     }
                 },
                 {
-                    //druga tabela
-                    view: "datatable",
-                    css: "webixDatatable",
-                    multiselect: false,
-                    id: "usersFromUserGroupDT",
-                    resizeColumn: true,
-                    resizeRow: true,
-                    onContext: {},
-                    columns: [{
-                        id: "id",
-                        hidden: true,
-                        fillspace: true,
+                    rows:[{
+                        view: "toolbar",
+                        padding: 8,
+                        css: "panelToolbar",
+                        cols: [{
+                            view: "label",
+                            width: 400,
+                            template: "<span class='fa fa-users'></span> Korisnici"
+                        }, {}, {
+                            id: "addUsersBtn",
+                            view: "button",
+                            type: "iconButton",
+                            label: "Dodajte korisnike",
+                            icon: "plus-circle",
+                            click: 'usergroupView.addUsersToGroup',
+                            autowidth: true
+                        }]
+                    },{//druga tabela
+                        view: "datatable",
+                        css: "webixDatatable",
+                        multiselect: false,
+                        id: "usersFromUserGroupDT",
+                        resizeColumn: true,
+                        resizeRow: true,
+                        onContext: {},
+                        columns: [{
+                            id: "id",
+                            hidden: true,
+                            fillspace: true,
 
-                    },{
-                        id: "firstName",
-                        editable: false,
-                        fillspace: true,
-                        editor: "text",
-                        sort: "string",
-                        header: [
-                            "Ime", {
-                                content: "textFilter"
-                            }
-                        ]
-                    },{
-                        id: "lastName",
-                        editable: false,
-                        fillspace: true,
-                        editor: "text",
-                        sort: "string",
-                        header: [
-                            "Prezime", {
-                                content: "textFilter"
-                            }
-                        ]
-                    }
-                    ],
-                    select: "row",
-                    navigation: true,
-                    editable: false,
-                    on: {
-
-                        onAfterContextMenu: function (item) {
-                            this.select(item.row);
+                        },{
+                            id: "firstName",
+                            editable: false,
+                            fillspace: true,
+                            editor: "text",
+                            sort: "string",
+                            header: [
+                                "Ime", {
+                                    content: "textFilter"
+                                }
+                            ]
+                        },{
+                            id: "lastName",
+                            editable: false,
+                            fillspace: true,
+                            editor: "text",
+                            sort: "string",
+                            header: [
+                                "Prezime", {
+                                    content: "textFilter"
+                                }
+                            ]
                         }
-                    }
+                        ],
+                        select: "row",
+                        navigation: true,
+                        editable: false,
+                        on: {
+
+                            onAfterContextMenu: function (item) {
+                                this.select(item.row);
+                            }
+                        }}],
+
                 }
             ]
         }]
@@ -171,6 +189,10 @@ var usergroupView = {
             width: 200,
             data: [{
                 id: "1",
+                value: "Dodaj",
+                icon: "user-plus"
+            },{
+                id: "2",
                 value: "Izbaci",
                 icon: "user-times"
             }],
@@ -179,8 +201,8 @@ var usergroupView = {
                 onItemClick: function (id) {
                     var context = this.getContext();
                     switch (id) {
-                        case "1":
-                            var delBox = (webix.copy(commonViews.brisanjePotvrda("korisnik", "korisnika")));
+                        case "2":
+                            var delBox = (webix.copy(commonViews.deaktivacijaPotvrda("korisnik", "korisnika")));
                             delBox.callback = function (result) {
                                 if (result == 1) {
                                     var selectedUser = $$("usersFromUserGroupDT").getItem(context.id.row);
@@ -203,6 +225,9 @@ var usergroupView = {
                             };
                             webix.confirm(delBox);
 
+                            break;
+                        case "1":
+                            util.messages.showMessage("to be implemented");
                             break;
                     }
                 }
