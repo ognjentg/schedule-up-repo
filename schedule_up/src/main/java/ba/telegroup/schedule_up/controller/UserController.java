@@ -53,7 +53,7 @@ public class UserController extends GenericController<User, Integer> {
     @Override
     public @ResponseBody
     List<User> getAll() {
-        List<User> users = userRepository.getAllByCompanyIdAndActive(userBean.getUser().getCompanyId(), (byte)1);
+        List<User> users = cloner.deepClone(userRepository.getAllByCompanyIdAndActive(userBean.getUser().getCompanyId(), (byte)1));
         for(User user : users){
             user.setPassword(null);
             user.setPin(null);

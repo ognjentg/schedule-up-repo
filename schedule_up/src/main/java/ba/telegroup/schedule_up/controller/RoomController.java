@@ -108,7 +108,7 @@ public class RoomController extends GenericController<Room, Integer> {
     @RequestMapping(value = "/getBuildingByRoomId/{id}",method = RequestMethod.GET)
     public @ResponseBody
     Building getBuildingByRoomId(@PathVariable Integer id) throws BadRequestException{
-        Room room = getRoomById(id);
+        Room room = cloner.deepClone(getRoomById(id));
         if(room != null) {
             Building building = buildingRepository.getBuildingsById(room.getBuildingId());
             if(building != null) {
