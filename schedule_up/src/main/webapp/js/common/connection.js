@@ -173,9 +173,6 @@ var connection = {
                 var oldValue = state.old;
 
                 if (newValue == oldValue) return;
-                if (typeof preserveId === 'undefined' || preserveId !== true) {
-                    delete obj["id"];
-                }
                 var editLink = "";
                 if (typeof customInsert !== 'undefined' && customInsert === true) {
                     editLink = link + "/custom/" + id;
@@ -184,6 +181,7 @@ var connection = {
                 }
                 var data = $$(dtId).getItem(id);
                 data[column] = newValue;
+                if(data.deleted==null) data.deleted=0;
 
                 var commitEdit = function () {
                     util.preloader.inc();
@@ -198,7 +196,7 @@ var connection = {
                                 }
                                 connection.reload();
                             } else {
-                                util.messages.showErrorMessage("Greška pri izmeni podataka");
+                                util.messages.showErrorMessage("Greška pri izmjeni podataka");
                                 data[column] = oldValue;
                                 try {
                                     $$(dtId).updateItem(id, data);
@@ -207,8 +205,9 @@ var connection = {
                             }
                             util.preloader.dec();
                         }, success: function (text, data) {
-                            if (!data.json()) {
-                                util.messages.showErrorMessage("Greška pri izmeni podataka");
+                            //if (!data.json()) {
+                            if(text!="Success")
+                            {  util.messages.showErrorMessage("Greška pri izmjeni podataka");
                                 data[column] = oldValue;
                                 try {
                                     $$(dtId).updateItem(id, data);
