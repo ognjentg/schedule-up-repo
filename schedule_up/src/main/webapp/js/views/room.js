@@ -199,6 +199,14 @@ var roomView = {
                     id: "3",
                     value: "Prikaz rezervacija",
                     icon: "calendar"
+                },
+                {
+                    $template:"Separator"
+                },
+                {
+                    id: "4",
+                    value: "Oprema u sali",
+                    icon: "hdd-o"
                 }
             ],
             master: $$("roomDT"),
@@ -232,6 +240,9 @@ var roomView = {
                             break;
                         case "3":
                             meetingView.selectPanel($$("roomDT").getItem(context.id.row));
+                            break;
+                        case "4":
+                            roomView.showGearDialog($$("roomDT").getItem(context.id.row).id);
                             break;
 
                     }
@@ -628,6 +639,73 @@ var roomView = {
 
             util.dismissDialog('changeRoomDialog');
         }
+    },
+    gearDialog: {
+        view: "popup",
+        id: "gearDialog",
+        modal: true,
+        position: "center",
+        roomId:null,
+        body: {
+            rows: [
+                {
+                    view: "toolbar",
+                    cols: [{
+                        view: "label",
+                        label: "<span class='webix_icon fa-hdd-o'></span> Oprema u sali",
+                        width: 200
+                    }, {}, {
+                        view: "icon",
+                        icon: "close",
+                        align: "right",
+                        click: "util.dismissDialog('gearDialog');"
+                    }]
+                },
+                {
+                    paddingY:10,
+                    cols:[
+                        {},
+                        {
+                            view:"button",
+                            icon:"plus-circle",
+                            type:"iconButton",
+                            label:"Dodajte opremu",
+
+                            autowidth:true
+                        }
+                    ]
+                },
+                {
+                    id:"gearList",
+                    view:"list",
+                    width:300,
+                    height:300,
+                    select:true,
+                    type:{
+                        height:"auto",
+                        template:"<div class='gear-name'>#name#</div><div class='gear-description'>#description#</div>"
+                    },
+
+                    data:[
+                        {id:"1",name:"Oprema",description:"Test opis bla"}
+                    ]
+                }
+
+            ]
+        }
+    },
+
+    showGearDialog:function (roomId) {
+        var dialog=webix.ui(webix.copy(this.gearDialog));
+        this.gearDialog.roomId=roomId;
+        $$("gearList").load("gear-unit/custom/byRoom/"+roomId).then(function (response){
+            if (response)
+                dialog.show();
+            else
+                util.messages.showErrorMessage("Nemoguće učitati opremu iz sale!");
+        }).fail(function (error) {
+            util.messages.showErrorMessage("Nemoguće učitati opremu iz sale!");
+        });
     }
 
 };
