@@ -175,11 +175,11 @@ public class UserController extends GenericController<User, Integer> {
         try {
             User user = entityManager.find(User.class, newUser.getId());
             user.setUsername(newUser.getUsername());
-            user.setPassword(newUser.getPassword());
+            user.setPassword(Util.hashPassword(newUser.getPassword()));
             user.setFirstName(newUser.getFirstName());
             user.setLastName(newUser.getLastName());
             user.setPhoto(newUser.getPhoto());
-            user.setPin(newUser.getPin());
+            user.setPin(Util.hashPassword(newUser.getPin()));
             user.setActive((byte) 1);
 
             repo.saveAndFlush(user);

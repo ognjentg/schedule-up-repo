@@ -38,7 +38,7 @@ public class User {
     private String email;
     private String username;
     private String password;
-    private byte[] pin;
+    private String pin;
     private String firstName;
     private String lastName;
     private byte[] photo;
@@ -53,7 +53,7 @@ public class User {
     {
 
     }
-    public User(Integer id, String email, String username, String password, byte[] pin, String first_name, String last_name,
+    public User(Integer id, String email, String username, String password, String pin, String first_name, String last_name,
                 byte[] photo, Byte active, String deactivation_reason, String token,
                 Integer company_id, Integer role_id, Date token_time, Byte deleted)
     {
@@ -116,12 +116,12 @@ public class User {
     }
 
     @Basic
-    @Column(name = "pin", nullable = true)
-    public byte[] getPin() {
+    @Column(name = "pin", nullable = true, length = 128)
+    public String getPin() {
         return pin;
     }
 
-    public void setPin(byte[] pin) {
+    public void setPin(String pin) {
         this.pin = pin;
     }
 
@@ -234,7 +234,7 @@ public class User {
                 Objects.equals(email, user.email) &&
                 Objects.equals(username, user.username) &&
                 Objects.equals(password, user.password) &&
-                Arrays.equals(pin, user.pin) &&
+                Objects.equals(pin, user.pin) &&
                 Objects.equals(firstName, user.firstName) &&
                 Objects.equals(lastName, user.lastName) &&
                 Arrays.equals(photo, user.photo) &&
@@ -250,8 +250,7 @@ public class User {
     @Override
     public int hashCode() {
 
-        int result = Objects.hash(id, email, username, password, firstName, lastName, active, deleted, deactivationReason, token, tokenTime, companyId, roleId);
-        result = 31 * result + Arrays.hashCode(pin);
+        int result = Objects.hash(id, email, username, password, pin, firstName, lastName, active, deleted, deactivationReason, token, tokenTime, companyId, roleId);
         result = 31 * result + Arrays.hashCode(photo);
         return result;
     }

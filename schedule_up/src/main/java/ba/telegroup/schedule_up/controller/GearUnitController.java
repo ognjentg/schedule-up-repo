@@ -46,6 +46,12 @@ public class GearUnitController extends GenericController<GearUnit, Integer> {
         return gearUnitRepository.getAllExtendedById(id);
     }
 
+    @RequestMapping(value = "/custom/byRoom/{roomId}", method = RequestMethod.GET)
+    public @ResponseBody
+    List<GearUnitGear> getAllExtendedByRoomId(@PathVariable Integer roomId) {
+        return gearUnitRepository.getAllExtendedByRoomId(userBean.getUser().getCompanyId(), roomId);
+    }
+
     @Transactional
     @RequestMapping(value = "/custom/", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)

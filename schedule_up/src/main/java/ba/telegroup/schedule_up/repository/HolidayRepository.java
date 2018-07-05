@@ -13,9 +13,9 @@ public interface HolidayRepository extends JpaRepository<Holiday,Integer>{
 
     Holiday findOneByIdAndCompanyId(Integer id, Integer companyId);
     List<Holiday> getAllByDeletedEqualsAndCompanyId(byte deleted, Integer companyId);
-    List<Holiday> getAllByCompanyIdAndDeletedEqualsAndCompanyId(Integer id, byte deleted, Integer companyId);
-    List<Holiday> getAllByNameContainsIgnoreCaseAndDeletedEqualsAndCompanyId(String name, byte deleted, Integer companyId);
-    List<Holiday> getAllByDateAfterAndDeletedEqualsAndCompanyId(java.sql.Date date, byte deleted, Integer companyId);
-    List<Holiday> getAllByDateBeforeAndDeletedEqualsAndCompanyId(java.sql.Date date, byte deleted, Integer companyId);
-    List<Holiday> getAllByDateBetweenAndDeletedEqualsAndCompanyId(java.sql.Date from, java.sql.Date to, byte deleted, Integer companyId);
+    List<Holiday> getAllByCompanyIdAndDeletedEqualsAndCompanyIdOrderByDateAsc(Integer id, byte deleted, Integer companyId);
+    List<Holiday> getAllByNameContainsIgnoreCaseAndDeletedEqualsAndCompanyIdOrderByDateAsc(String name, byte deleted, Integer companyId);
+    List<Holiday> getAllByDateAfterAndDeletedEqualsAndCompanyIdOrderByDateAsc(java.sql.Date date, byte deleted, Integer companyId);
+    List<Holiday> getAllByDateBeforeAndDeletedEqualsAndCompanyIdOrderByDateAsc(java.sql.Date date, byte deleted, Integer companyId);
+    List<Holiday> getAllByDateBetweenAndDeletedEqualsAndCompanyIdOrderByDateAsc(java.sql.Date from, java.sql.Date to, byte deleted, Integer companyId);
 }

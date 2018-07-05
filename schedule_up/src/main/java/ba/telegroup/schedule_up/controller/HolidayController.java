@@ -56,30 +56,30 @@ public class HolidayController extends GenericController<Holiday, Integer> {
     @RequestMapping(value = "/getAllByCompanyId/{id}", method = RequestMethod.GET)
     public @ResponseBody
     List getAllByCompanyId(@PathVariable Integer id) {
-        return holidayRepository.getAllByCompanyIdAndDeletedEqualsAndCompanyId(userBean.getUser().getCompanyId(), (byte) 0, userBean.getUser().getCompanyId());
+        return holidayRepository.getAllByCompanyIdAndDeletedEqualsAndCompanyIdOrderByDateAsc(userBean.getUser().getCompanyId(), (byte) 0, userBean.getUser().getCompanyId());
     }
 
     @RequestMapping(value = "/getAllByNameContains/{name}", method = RequestMethod.GET)
     public @ResponseBody
     List getAllByNameContains(@PathVariable String name) {
-        return holidayRepository.getAllByNameContainsIgnoreCaseAndDeletedEqualsAndCompanyId(name, (byte) 0, userBean.getUser().getCompanyId());
+        return holidayRepository.getAllByNameContainsIgnoreCaseAndDeletedEqualsAndCompanyIdOrderByDateAsc(name, (byte) 0, userBean.getUser().getCompanyId());
     }
 
     @RequestMapping(value = "/getAllByDateAfter/{date}", method = RequestMethod.GET)
     public @ResponseBody
     List getAllByDateAfter(@PathVariable java.sql.Date date) {
-        return holidayRepository.getAllByDateAfterAndDeletedEqualsAndCompanyId(date, (byte) 0, userBean.getUser().getCompanyId());
+        return holidayRepository.getAllByDateAfterAndDeletedEqualsAndCompanyIdOrderByDateAsc(date, (byte) 0, userBean.getUser().getCompanyId());
     }
 
     @RequestMapping(value = "/getAllByDateBefore/{date}", method = RequestMethod.GET)
     public @ResponseBody
     List getAllByDateBefore(@PathVariable java.sql.Date date) {
-        return holidayRepository.getAllByDateBeforeAndDeletedEqualsAndCompanyId(date, (byte) 0, userBean.getUser().getCompanyId());
+        return holidayRepository.getAllByDateBeforeAndDeletedEqualsAndCompanyIdOrderByDateAsc(date, (byte) 0, userBean.getUser().getCompanyId());
     }
 
     @RequestMapping(value = "/getAllByDateBetween/{from}/{to}", method = RequestMethod.GET)
     public @ResponseBody
     List getAllByDateBetween(@PathVariable java.sql.Date from, @PathVariable java.sql.Date to) {
-        return holidayRepository.getAllByDateBetweenAndDeletedEqualsAndCompanyId(from, to, (byte) 0, userBean.getUser().getCompanyId());
+        return holidayRepository.getAllByDateBetweenAndDeletedEqualsAndCompanyIdOrderByDateAsc(from, to, (byte) 0, userBean.getUser().getCompanyId());
     }
 }
