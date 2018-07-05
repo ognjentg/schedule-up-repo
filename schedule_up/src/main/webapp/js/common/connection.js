@@ -224,6 +224,7 @@ var connection = {
 
                 if (typeof editValidationRules !== 'undefined') {
                     for (var i = 0; i < editValidationRules.length; i++) {
+
                         if (editValidationRules[i].column == editor.column) {
 
                             if (editValidationRules[i].rule == "canChange") {
@@ -270,7 +271,32 @@ var connection = {
                                     util.messages.showErrorMessage("Unesite validan broj telefona.")
                                 }
                             }
-
+                            else if(editValidationRules[i].rule == "checkLength") {
+                                var length;
+                                if(editor.column == "name")
+                                    length = 100;
+                                else if(editor.column == "description")
+                                    length = 500;
+                                if(!util.validation.checkLength(state.value, length)) {
+                                    state.value = state.old;
+                                    data[column] = state.old;
+                                    util.messages.showErrorMessage("Maksimalan broj karaktera je " + length + "!");
+                                }
+                            }
+                            else if(editValidationRules[i].rule == "isInteger") {
+                                if(!util.validation.isInteger(state.value)) {
+                                    state.value = state.old;
+                                    data[column] = state.old;
+                                    util.messages.showErrorMessage("Broj spratova mora biti cijeli broj!")
+                                }
+                            }
+                            else if(editValidationRules[i].rule == "isPositiveInteger") {
+                                if(!util.validation.isInteger(state.value) || state.value < 1) {
+                                    state.value = state.old;
+                                    data[column] = state.old;
+                                    util.messages.showErrorMessage("Kapacitet sale mora biti pozitivan cijeli broj!");
+                                }
+                            }
 
                             else if (util.validation.validateUponEdit(editor, editValidationRules[i].rule)) break;
                             else {

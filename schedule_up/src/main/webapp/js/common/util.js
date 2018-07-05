@@ -196,6 +196,7 @@ var util = {
             var macRegex = new RegExp("^[\+]?[0-9]{1,20}$");
             return macRegex.test(mac);
         },
+
         valueHasWhitespaces: function (value) {
             return (/\s/.test(value));
         },
@@ -213,6 +214,13 @@ var util = {
             }
 
             return true;
+        },
+        checkLength: function(value, length) {
+            return value.length <= length;
+        },
+        isInteger(value) {
+            return (!isNaN(value) && parseInt(value, 10) &&
+                    !value.includes("."));
         }
     },
 

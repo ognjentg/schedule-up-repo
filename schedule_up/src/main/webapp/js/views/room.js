@@ -175,7 +175,7 @@ var roomView = {
         var panelCopy = webix.copy(this.panel);
 
         $$("main").addView(webix.copy(panelCopy));
-        connection.attachAjaxEvents("roomDT", "room");
+        connection.attachAjaxEvents("roomDT", "room", false, false, editValidationRules);
         $$("roomDT").detachEvent("onBeforeDelete");
 
         webix.ui({
@@ -631,3 +631,13 @@ var roomView = {
     }
 
 };
+
+var editValidationRules = [
+    {column: "name", rule: "isEmpty"},
+    {column: "name", rule: "checkLength"},
+    {column: "floor", rule: "isEmpty"},
+    {column: "floor", rule: "isInteger"},
+    {column: "capacity", rule: "isEmpty"},
+    {column: "capacity", rule: "isPositiveInteger"},
+    {column: "description", rule: "checkLength"}
+];
