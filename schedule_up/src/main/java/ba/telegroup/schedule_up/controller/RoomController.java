@@ -66,12 +66,10 @@ public class RoomController extends GenericController<Room, Integer> {
         GearUnit gearUnit = gearUnitRepository.getOne(gearUnitId);
         //GearUnit oldGearUnit = cloner.deepClone(gearUnit);
         if((room.getCapacity() != 0) && (gearUnit.getAvailable() == (byte) 1)){
-            room.setCapacity(room.getCapacity()-1);
             gearUnit.setAvailable((byte) 0);
             RoomHasGearUnit connection = new RoomHasGearUnit();
             connection.setRoomId(roomId);
             connection.setGearUnitId(gearUnitId);
-            connection.setCurrently((byte) 1);
             roomHasGearUnitRepository.saveAndFlush(connection);
             gearUnitRepository.saveAndFlush(gearUnit);
             if (roomRepository.saveAndFlush(room) != null) logUpdateAction(room, oldRoom);
@@ -91,7 +89,6 @@ public class RoomController extends GenericController<Room, Integer> {
         pk.setGearUnitId(gearUnitId);
         RoomHasGearUnit connection = roomHasGearUnitRepository.getOne(pk);
         if((gearUnit.getAvailable() == (byte) 0)){
-            room.setCapacity(room.getCapacity()+1);
             gearUnit.setAvailable((byte) 1);
             roomHasGearUnitRepository.delete(connection);
             gearUnitRepository.saveAndFlush(gearUnit);
