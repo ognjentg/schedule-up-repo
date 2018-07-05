@@ -111,6 +111,7 @@ var roomView = {
                     this.select(item.row);
                 }
             },
+
             onMouseMove:{
                 info:function(e, id){
                     roomView.showMapDetailsDialog(this.getItem(id).latitude,this.getItem(id).longitude);
@@ -177,6 +178,7 @@ var roomView = {
         $$("main").addView(webix.copy(panelCopy));
         connection.attachAjaxEvents("roomDT", "room", false, false, editValidationRules);
         $$("roomDT").detachEvent("onBeforeDelete");
+
 
         webix.ui({
             view: "contextmenu",
@@ -678,6 +680,7 @@ var roomView = {
                 {
                     id:"gearList",
                     view:"list",
+                    onContext: {},
                     width:300,
                     height:300,
                     select:true,
@@ -685,6 +688,12 @@ var roomView = {
                         height:"auto",
                         template:"<div class='gear-name'>#name#</div><div class='gear-description'>#description#</div>"
                     },
+                    on: {
+
+                        onAfterContextMenu: function (item) {
+                            this.select(item.row);
+                        }
+                    }
 
                     
                 }
@@ -696,6 +705,49 @@ var roomView = {
     showGearDialog:function (roomId) {
         var dialog=webix.ui(webix.copy(this.gearDialog));
         this.gearDialog.roomId=roomId;
+        webix.ui({
+            view: "contextmenu",
+            id: "gearContextMenu",
+            width: 200,
+            data: [{
+                id: "1",
+                value: "Obrišite",
+                icon: "trash"
+            }
+            ],
+            master: $$("gearList"),
+            on: {
+                onItemClick: function (id) {
+                    var context = this.getContext();
+                    switch (id) {
+                        case "1":
+                            var delBox = (webix.copy(commonViews.brisanjePotvrda("opreme", "opremu")));
+                            console.log(context.id.row);
+                            var newItem = $$("gearList").getItem(context.id);
+                            delBox.callback = function (result) {
+                                if (result == 1) {
+
+                                    connection.sendAjax("DELETE", "gear-unit/" + newItem.id,
+                                        function (text, data, xhr) {
+                                            if (text) {
+                                                util.messages.showMessage("Oprema uspješno obrisana.");
+                                                $$("gearList").remove(context.id);
+                                            } else
+                                                util.messages.showErrorMessage("Neuspješno brisanje.");
+                                        }, function () {
+                                            util.messages.showErrorMessage("Neuspješno brisanje.");
+                                        }, null);
+
+                                }
+                            };
+                            webix.confirm(delBox);
+                            break;
+
+                    }
+                }
+            }
+        });
+
         $$("gearList").load("gear-unit/custom/byRoom/"+roomId).then(function (response){
             if (response)
                 dialog.show();
