@@ -9,7 +9,6 @@ import java.util.Objects;
 public class RoomHasGearUnit {
     private Integer roomId;
     private Integer gearUnitId;
-    private Byte currently;
 
     @Id
     @Column(name = "room_id", nullable = false)
@@ -31,15 +30,6 @@ public class RoomHasGearUnit {
         this.gearUnitId = gearUnitId;
     }
 
-    @Basic
-    @Column(name = "currently", nullable = false)
-    public Byte getCurrently() {
-        return currently;
-    }
-
-    public void setCurrently(Byte currently) {
-        this.currently = currently;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -47,13 +37,12 @@ public class RoomHasGearUnit {
         if (o == null || getClass() != o.getClass()) return false;
         RoomHasGearUnit that = (RoomHasGearUnit) o;
         return Objects.equals(roomId, that.roomId) &&
-                Objects.equals(gearUnitId, that.gearUnitId) &&
-                Objects.equals(currently, that.currently);
+                Objects.equals(gearUnitId, that.gearUnitId);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(roomId, gearUnitId, currently);
+        return Objects.hash(roomId, gearUnitId);
     }
 }
