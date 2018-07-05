@@ -176,6 +176,8 @@ public class UserController extends GenericController<User, Integer> {
             User user = entityManager.find(User.class, newUser.getId());
             user.setUsername(newUser.getUsername());
             user.setPassword(Util.hashPassword(newUser.getPassword()));
+            user.setToken(null);
+            user.setTokenTime(null);
             user.setFirstName(newUser.getFirstName());
             user.setLastName(newUser.getLastName());
             user.setPhoto(newUser.getPhoto());
