@@ -64,7 +64,7 @@ var noteView = {
 
                 }, {
                     id: "name",
-                    editable: false,
+                    editable: true,
                     fillspace: false, width: 400,
                     editor: "text",
                     header: ["Naziv", {
@@ -76,7 +76,7 @@ var noteView = {
                     id: "description",
                     fillspace: true,
                     editor: "text",
-                    editable: false,
+                    editable: true,
                     header: ["Opis", {
                         content: "textFilter"
                     }],
@@ -85,7 +85,7 @@ var noteView = {
             ],
             select: "row",
             navigation: true,
-            editable: false,
+            editable: true,
             url: "note/",
             on: {
 
