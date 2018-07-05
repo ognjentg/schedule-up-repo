@@ -686,9 +686,7 @@ var roomView = {
                         template:"<div class='gear-name'>#name#</div><div class='gear-description'>#description#</div>"
                     },
 
-                    data:[
-                        {id:"1",name:"Oprema",description:"Test opis bla"}
-                    ]
+                    
                 }
 
             ]
