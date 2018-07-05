@@ -25,6 +25,7 @@ import java.util.Date;
                         @ColumnResult(name="deleted", type = Byte.class),
                         @ColumnResult(name="user_id", type = Integer.class),
                         @ColumnResult(name="company_id", type = Integer.class),
+                        @ColumnResult(name="expired_time", type = Timestamp.class),
                         @ColumnResult(name = "username", type = String.class)
                 }
         )
@@ -39,7 +40,7 @@ public class NoteUser extends Note {
 
     @SuppressWarnings("WeakerAccess")
     public NoteUser(Integer id, String name, String description, Date publish_time, Byte deleted,
-                    Integer user_id, Integer company_id, String username) {
+                    Integer user_id, Integer company_id, Date expired_time, String username) {
         setId(id);
         setName(name);
         setDescription(description);
@@ -47,6 +48,7 @@ public class NoteUser extends Note {
         setDeleted(deleted);
         setUserId(user_id);
         setCompanyId(company_id);
+        setExpiredTime(new Timestamp(expired_time.getTime()));
         this.username = username;
     }
 

@@ -9,10 +9,10 @@ import java.util.List;
 
 public class NoteRepositoryImpl implements NoteRepositoryCustom {
 
-    private static final String SQL_GET_ALL_EXTENDED = "SELECT n.id, n.name, n.description, n.publish_time, n.deleted, n.user_id, n.company_id, u.username FROM note n JOIN user u ON n.user_id=u.id WHERE n.company_id=? AND n.deleted=0 AND u.deleted=0";
-    private static final String SQL_GET_ALL_EXTENDED_BY_ID = "SELECT n.id, n.name, n.description, n.publish_time, n.deleted, n.user_id, n.company_id, u.username FROM note n JOIN user u ON n.user_id=u.id WHERE n.company_id=? AND n.id=? AND n.deleted=0 AND u.deleted=0";
-    private static final String SQL_GET_ALL_EXTENDED_BY_USER_ID = "SELECT n.id, n.name, n.description, n.publish_time, n.deleted, n.user_id, n.company_id, u.username FROM note n JOIN user u ON n.user_id=u.id WHERE n.company_id=? AND u.id=? AND n.deleted=0 AND u.deleted=0";
-    private static final String SQL_GET_ALL_EXTENDED_BY_NAME_CONTAINS = "SELECT n.id, n.name, n.description, n.publish_time, n.deleted, n.user_id, n.company_id, u.username FROM note n JOIN user u ON n.user_id=u.id WHERE n.company_id=? AND LOWER(n.name) LIKE LOWER(?) AND n.deleted=0 AND u.deleted=0";
+    private static final String SQL_GET_ALL_EXTENDED = "SELECT n.id, n.name, n.description, n.publish_time, n.deleted, n.user_id, n.company_id, n.expired_time, u.username FROM note n JOIN user u ON n.user_id=u.id WHERE n.company_id=? AND n.deleted=0 AND u.deleted=0 AND n.expired_time>now() order by n.publish_time desc";
+    private static final String SQL_GET_ALL_EXTENDED_BY_ID = "SELECT n.id, n.name, n.description, n.publish_time, n.deleted, n.user_id, n.company_id, n.expired_time, u.username FROM note n JOIN user u ON n.user_id=u.id WHERE n.company_id=? AND n.id=? AND n.deleted=0 AND u.deleted=0 AND n.expired_time>now() order by n.publish_time desc";
+    private static final String SQL_GET_ALL_EXTENDED_BY_USER_ID = "SELECT n.id, n.name, n.description, n.publish_time, n.deleted, n.user_id, n.company_id, n.expired_time, u.username FROM note n JOIN user u ON n.user_id=u.id WHERE n.company_id=? AND u.id=? AND n.deleted=0 AND u.deleted=0 AND n.expired_time>now() order by n.publish_time desc";
+    private static final String SQL_GET_ALL_EXTENDED_BY_NAME_CONTAINS = "SELECT n.id, n.name, n.description, n.publish_time, n.deleted, n.user_id, n.company_id, n.expired_time, u.username FROM note n JOIN user u ON n.user_id=u.id WHERE n.company_id=? AND LOWER(n.name) LIKE LOWER(?) AND n.deleted=0 AND u.deleted=0 AND n.expired_time>now() order by n.publish_time desc";
 
     @PersistenceContext
     private EntityManager entityManager;

@@ -18,6 +18,7 @@ public class Note {
     private Byte deleted;
     private Integer userId;
     private Integer companyId;
+    private Timestamp expiredTime;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,7 +52,7 @@ public class Note {
     }
 
     @Basic
-    @Column(name = "publish_time", nullable = false,insertable = false,updatable = false)
+    @Column(name = "publish_time", nullable = false, insertable = false, updatable = false)
     public Timestamp getPublishTime() {
         return publishTime;
     }
@@ -61,7 +62,7 @@ public class Note {
     }
 
     @Basic
-    @Column(name = "deleted", nullable = false,insertable = false)
+    @Column(name = "deleted", nullable = false, insertable = false)
     public Byte getDeleted() {
         return deleted;
     }
@@ -90,6 +91,16 @@ public class Note {
         this.companyId = companyId;
     }
 
+    @Basic
+    @Column(name = "expired_time", nullable = false)
+    public Timestamp getExpiredTime() {
+        return expiredTime;
+    }
+
+    public void setExpiredTime(Timestamp expiredTime) {
+        this.expiredTime = expiredTime;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -101,12 +112,13 @@ public class Note {
                 Objects.equals(publishTime, note.publishTime) &&
                 Objects.equals(deleted, note.deleted) &&
                 Objects.equals(userId, note.userId) &&
-                Objects.equals(companyId, note.companyId);
+                Objects.equals(companyId, note.companyId) &&
+                Objects.equals(expiredTime, note.expiredTime);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(id, name, description, publishTime, deleted, userId, companyId);
+        return Objects.hash(id, name, description, publishTime, deleted, userId, companyId, expiredTime);
     }
 }

@@ -39,6 +39,9 @@ public class NoteController extends GenericController<Note, Integer> {
     @Value("${badRequest.stringMaxLength}")
     private String badRequestStringMaxLength;
 
+    @Value("${badRequest.dateTimeCompare}")
+    private String badRequestDateTimeCompare;
+
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -99,24 +102,28 @@ public class NoteController extends GenericController<Note, Integer> {
     NoteUser insert(@RequestBody Note note) throws BadRequestException {
         if (Validator.stringMaxLength(note.getName(), 100)) {
             if (Validator.stringMaxLength(note.getDescription(), 500)) {
-                if (repo.saveAndFlush(note) != null) {
-                    logCreateAction(note);
-                    entityManager.refresh(note);
-                    String username = userRepository.getById(note.getUserId()).getUsername();
+                if(Validator.timestampCompare(note.getPublishTime(),note.getExpiredTime())!=null &&
+                        Validator.timestampCompare(note.getPublishTime(),note.getExpiredTime())<=0){
+                    if (repo.saveAndFlush(note) != null) {
+                        logCreateAction(note);
+                        entityManager.refresh(note);
+                        String username = userRepository.getById(note.getUserId()).getUsername();
 
-                    NoteUser noteUser = new NoteUser();
-                    noteUser.setId(note.getId());
-                    noteUser.setName(note.getName());
-                    noteUser.setDescription(note.getDescription());
-                    noteUser.setPublishTime(note.getPublishTime());
-                    noteUser.setDeleted(note.getDeleted());
-                    noteUser.setUserId(note.getUserId());
-                    noteUser.setCompanyId(note.getCompanyId());
-                    noteUser.setUsername(username);
+                        NoteUser noteUser = new NoteUser();
+                        noteUser.setId(note.getId());
+                        noteUser.setName(note.getName());
+                        noteUser.setDescription(note.getDescription());
+                        noteUser.setPublishTime(note.getPublishTime());
+                        noteUser.setDeleted(note.getDeleted());
+                        noteUser.setUserId(note.getUserId());
+                        noteUser.setCompanyId(note.getCompanyId());
+                        noteUser.setUsername(username);
 
-                    return noteUser;
+                        return noteUser;
+                    }
+                    throw new BadRequestException(badRequestInsert);
                 }
-                throw new BadRequestException(badRequestInsert);
+                throw new BadRequestException(badRequestDateTimeCompare.replace("{date1}", "Vrijeme isteka").replace("{prijePoslije}", "poslije").replace("{date2}", "vremena objavljivanja"));
             }
             throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "opisa").replace("{broj}", String.valueOf(500)));
         }
@@ -130,12 +137,16 @@ public class NoteController extends GenericController<Note, Integer> {
     String update(@PathVariable Integer id, @RequestBody Note note) throws BadRequestException {
         if (Validator.stringMaxLength(note.getName(), 100)) {
             if (Validator.stringMaxLength(note.getDescription(), 500)) {
-                Note oldObject = cloner.deepClone(repo.findById(id).orElse(null));
-                if (repo.saveAndFlush(note) != null) {
-                    logUpdateAction(note, oldObject);
-                    return "Success";
+                if(Validator.timestampCompare(note.getPublishTime(),note.getExpiredTime())!=null &&
+                        Validator.timestampCompare(note.getPublishTime(),note.getExpiredTime())<=0){
+                    Note oldObject = cloner.deepClone(repo.findById(id).orElse(null));
+                    if (repo.saveAndFlush(note) != null) {
+                        logUpdateAction(note, oldObject);
+                        return "Success";
+                    }
+                    throw new BadRequestException(badRequestUpdate);
                 }
-                throw new BadRequestException(badRequestUpdate);
+                throw new BadRequestException(badRequestDateTimeCompare.replace("{date1}", "Vrijeme isteka").replace("{prijePoslije}", "poslije").replace("{date2}", "vremena objavljivanja"));
             }
             throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "opisa").replace("{broj}", String.valueOf(500)));
         }
