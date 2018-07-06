@@ -3,6 +3,7 @@ var formatter = webix.Date.dateToStr("%d-%m-%Y %H:%i");
 var parser = webix.Date.strToDate("%d-%m-%Y %H:%i");
 var meetingView = {
 
+    room:null,
     roomId:null,
     newEventId:null,
     files:[],
@@ -528,6 +529,7 @@ var meetingView = {
             name: "activeList"
         }, webix.ui.list, webix.ActiveContent);
         $$("main").removeView(rightPanel);
+        meetingView.room=room;
         meetingView.roomId = room;
         rightPanel = "meetingPanel";
         var panelCopy = webix.copy(this.panel);
@@ -556,6 +558,25 @@ var meetingView = {
 
         });
         schedulerEvents.push(event);
+
+        var onClick=scheduler.attachEvent("onClick", function (id, e) {
+            var event1 = scheduler.getEvent(id);
+            event1.roomName = room.name;
+            event1.meetingParticipantsExtended = [];
+            //alert("Dogadjaj"+" meeting id:"+event1.id);
+
+            webix.promise.all([webix.ajax("user/" + event1.userId), webix.ajax("/user/participantsFor/" + event1.id), webix.ajax("document/getAllByMeetingId/" + event1.id)]).then(
+                function (results) {
+                    event1.creatorUsername = JSON.parse(results[0].text()).username;
+                    alert(JSON.parse(results[0].text()).username);
+
+                    event1.meetingParticipants = JSON.parse(results[1].text());
+                    event1.meetingDocuments = JSON.parse(results[2].text());
+                    meetingView.showEventPopup(event1);
+                });
+        });
+        schedulerEvents.push(onClick);
+
         scheduler.config.xml_date = "%d-%m-%Y %H:%i";
         scheduler.config.readonly = true;
         scheduler.config.first_hour = parseInt(companyData.timeFrom.substr(0, 2));
@@ -650,7 +671,285 @@ var meetingView = {
             return false;
         }));
 
-    }, updateMeeting: function () {
+
+    },
+
+    showEventPopup: function (event) {
+        //alert("show event popup function"+event.meetingParticipantsExtended[0].name);
+        webix.ui(webix.copy(meetingView.eventDialog));
+        //
+        var formRight = $$("rightForm");
+        var format = webix.Date.dateToStr("%d.%m.%Y. %H:%i");
+
+        formRight.elements.text.setValue(event.text);
+        formRight.elements.start_date.setValue(format(event.start_date));
+        formRight.elements.end_date.setValue(format(event.end_date));
+        formRight.elements.participantsNumber.setValue(event.participantsNumber);
+        formRight.elements.description.setValue(event.description);
+        formRight.elements.roomName.setValue(event.roomName);
+        formRight.elements.creatorNameLbl.setValue(event.creatorUsername);
+
+        var formLeft = $$("leftForm");
+
+        $$("list").clearAll();
+        alert("duzina liste ucesnika:"+event.meetingParticipants.length);
+        $$("list").parse(event.meetingParticipants);
+        $$("listDocuments").clearAll();
+        $$("listDocuments").parse(event.meetingDocuments);
+        $$("listDocuments").attachEvent("onItemClick", function(id, e, node) {
+            //meetingView.showDocumentDetailsDialog(id);
+            return false;
+            });
+        $$("eventDialog").show();
+    },
+
+    showDocumentDetailsDialog: function(id){
+        webix.ui(webix.copy(meetingView.showDocumentDialog));
+        $$("pdf").clear();
+        $$("pdf").define('scale', 'page-width');
+        var contentEncoded=$$("listDocuments").getItem(id).content;
+        var contentDecoded=window.atob(contentEncoded);
+        lcFileName = { "data": contentDecoded };
+
+        $$("pdf").load(lcFileName);
+        $$("documentLabel").data.label="<span class='webix_icon fa fa-file-pdf '></span> Pregled dokumenta: "+$$("listDocuments").getItem(id).name;
+        $$("showDocumentDialog").show();
+    },
+
+
+    showDocumentDialog:{
+        view: "popup",
+        id: "showDocumentDialog",
+        modal: true,
+        position: "center",
+        body: {
+            id: "showDocumentDialogInside",
+            rows: [{
+                view: "toolbar",
+                cols: [{
+                    id:"documentLabel",
+                    view: "label",
+                    label: "<span class='webix_icon fa fa-map-marker '></span> Pregled dokumenta",
+                    width: 600,
+                }, {}, {
+                    hotkey: 'esc',
+                    view: "icon",
+                    icon: "close",
+                    align: "right",
+                    click: "util.dismissDialog('showDocumentDialog');"
+                }]
+            }, {
+                type:"space",
+                rows:[
+                    { view:"pdfbar",
+                        id:"toolbar"
+                    },
+                    { view:"pdfviewer",
+                        id:"pdf",
+                        //url:"binary->files/WebixDocs.pdf",
+                        toolbar:"toolbar",
+                        on:{
+                            onDocumentReady:function(){
+                                webix.message("Loaded and rendered")
+                            }
+                        }}
+                ]
+
+            },]
+        }
+    },
+    eventDialog: {
+        view: "popup",
+        id: "eventDialog",
+        modal: true,
+        position: "center",
+        body: {
+            id: "eventInside",
+            rows: [{
+                view: "toolbar",
+                cols: [{
+                    view: "label",
+                    label: "<span class='calendar-alt'></span> Rezervacija",
+                    width: 800
+                }, {}, {
+                    view: "icon",
+                    icon: "close",
+                    align: "right",
+                    click: "util.dismissDialog('eventDialog');"
+                }]
+            },
+                {
+
+                    cols:[
+                        {
+                            view: "form",
+                            id: "rightForm",
+                            width: 400,
+                            elementsConfig: {
+                                labelWidth: 120,
+                                bottomPadding: 8
+                            },
+                            elements: [{
+                                view: "text",
+                                id: "text",
+                                name: "text",
+                                label: "Naziv",
+                                readonly: true
+                            },
+                                {
+                                    view: "text",
+                                    id: "creatorNameLbl",
+                                    name: "creatorNameLbl",
+                                    label: "Autor",
+                                    readonly: true
+                                },
+                                {
+                                    view: "text",
+                                    id: "start_date",
+                                    name: "start_date",
+                                    label: "Početak",
+                                    readonly: true
+                                },
+                                {
+                                    view: "text",
+                                    id: "end_date",
+                                    name: "end_date",
+                                    label: "Kraj",
+                                    readonly: true
+                                },
+                                {
+                                    view: "text",
+                                    id: "roomName",
+                                    name: "roomName",
+                                    label: "Sala",
+                                    readonly: true
+                                },
+                                {
+                                    view: "text",
+                                    id: "participantsNumber",
+                                    name: "participantsNumber",
+                                    label: "Broj učesnika",
+                                    readonly: true
+                                },
+                                {
+                                    view: "textarea",
+                                    id: "description",
+                                    name: "description",
+                                    label: "Opis",
+                                    readonly: true,
+                                    height: 100
+                                },
+                                {
+                                    view:"button",
+                                    width:356,
+                                    height:46,
+                                    value:"Pogledajte lokaciju sale",
+                                    id: "location",
+                                    name: "location",
+                                    click: "meetingView.showMap",
+                                    //click: "roomView.showMapDetailsDialog("+meetingView.room.latitude+","+meetingView.room.longitude+")",
+                                    //template: "<span class='fa fa-map-marker info'></span>",
+
+                                },
+
+                            ]
+                        },
+                        {
+                            view: "form",
+                            id: "leftForm",
+                            width: 400,
+                            elementsConfig: {
+                                labelWidth: 120,
+                                bottomPadding: 8
+                            },
+                            elements:[
+                                {
+                                    id: "listToolbar",
+                                    name: "listToolbar",
+                                    width:300,
+                                    rows:[
+                                        {
+                                            height: 35,
+                                            view:"toolbar",
+                                            elements:[
+                                                {view:"text", id:"listParticipants_input",label:"Učesnici", labelWidth:170}
+                                            ]
+                                        },
+                                        {
+                                            id:"list",
+                                            name: "list",
+                                            view:"list",
+                                            width:320,
+                                            height:200,
+                                            float:"left",
+                                            margin:"20px",
+                                            template:"#firstName# #lastName# <div style='padding-left:18px'> E-mail : #email#</div>",
+                                            type:{
+                                                height:62
+                                            },
+                                            select:false,
+                                        }
+                                    ]
+                                },
+                                {},
+                                {
+                                    id: "documentsListToolbar",
+                                    name: "documentsListToolbar",
+                                    width:300,
+                                    rows:[
+                                        {
+                                            height: 35,
+                                            view:"toolbar",
+                                            elements:[
+                                                {view:"text", id:"listDocuments_input",label:"Dokumenti", labelWidth:170}
+                                            ]
+                                        },
+                                        {
+                                            id:"listDocuments",
+                                            name: "listDocuments",
+                                            view:"list",
+                                            width:320,
+                                            height:200,
+                                            float:"left",
+                                            margin:"20px",
+                                            template:"#name# <div style='padding-left:18px'></div>",
+                                            type:{
+                                                height:32
+                                            },
+                                            select: true,
+                                            /*onClick:{
+                                                "downloadDocumentFunction":function(id, e, node){
+                                                    console.log("Klik");
+                                                    return false;
+                                                }
+                                            },*/
+
+                                        }
+                                    ]
+
+
+
+                                },
+
+                            ]
+                        }
+                    ]
+
+
+                },
+
+            ]
+        }
+
+
+    },
+    
+     showMap: function () {
+         roomView.showMapDetailsDialog(meetingView.room.latitude,meetingView.room.longitude);
+     }   
+
+
+    , updateMeeting: function () {
         var file = meetingView.files[0];
         var participants = [];
         var documents = [];
