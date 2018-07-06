@@ -60,6 +60,7 @@ var usergroupView = {
                         },
 
                         onAfterSelect: function (item) {
+                            $$("addUsersBtn").show();
                             var groupId = item.id;
                             $$("usersFromUserGroupDT").clearAll();
                             $$("usersFromUserGroupDT").load("user-group-has-user/custom/" + groupId);
@@ -69,6 +70,7 @@ var usergroupView = {
                 {
                     rows:[{
                         view: "toolbar",
+                        id: "usersToolbar",
                         padding: 8,
                         css: "panelToolbar",
                         cols: [{
@@ -78,6 +80,7 @@ var usergroupView = {
                         }, {}, {
                             id: "addUsersBtn",
                             view: "button",
+                            hidden: true,
                             type: "iconButton",
                             label: "Dodajte korisnike",
                             icon: "plus-circle",
@@ -189,10 +192,6 @@ var usergroupView = {
             width: 200,
             data: [{
                 id: "1",
-                value: "Dodaj",
-                icon: "user-plus"
-            },{
-                id: "2",
                 value: "Izbaci",
                 icon: "user-times"
             }],
@@ -201,7 +200,7 @@ var usergroupView = {
                 onItemClick: function (id) {
                     var context = this.getContext();
                     switch (id) {
-                        case "2":
+                        case "1":
                             var delBox = (webix.copy(commonViews.deaktivacijaPotvrda("korisnik", "korisnika")));
                             delBox.callback = function (result) {
                                 if (result == 1) {
@@ -305,6 +304,90 @@ var usergroupView = {
         webix.UIManager.setFocus("name");
     },
 
+    addUsersDialog: {
+        view: "popup",
+        id: "addUsersToGroupDialog",
+        modal: true,
+        position: "center",
+        body: {
+            id: "addUsersInside",
+            rows: [{
+                view: "toolbar",
+                cols: [{
+                    view: "label",
+                    label: "<span class='webix_icon fa-users'></span> Dodavanje korisnika u grupu",
+                    width: 400
+                }, {}, {
+                    hotkey: 'esc',
+                    view: "icon",
+                    icon: "close",
+                    align: "right",
+                    click: "util.dismissDialog('addUsersToGroupDialog');"
+                }]
+            }, {
+                view: "form",
+                id: "addUsersToGroupForm",
+                width: 600,
+                elementsConfig: {
+                    labelWidth: 200,
+                    bottomPadding: 18
+                },
+                elements: [
+                    {
+                    view: "multicombo",
+                    id: "users",
+                    name: "users",
+                    label: "Korisnici",
+                    suggest: {
+                        body: {
+                            template: "#firstName# #lastName#",
+                            url: "user/nonInGroup"
+                        }
+                    }
+                }, {
+                    margin: 5,
+                    cols: [{}, {
+                        id: "saveUsers",
+                        view: "button",
+                        value: "Sačuvajte",
+                        type: "form",
+                        click: "usergroupView.finishAddUsersToGroup",
+                        hotkey: "enter",
+                        width: 150
+                    }]
+                }],
+            }]
+        }
+
+    },
+    finishAddUsersToGroup: function(context){
+        var temp = $$("usergroupDT").getSelectedItem();
+        var selected = $$("addUsersToGroupForm").getValues().users;
+        var selectedIds=selected.split(",");
+        for (var i = 0; i < selectedIds.length; i++) {
+            var newUser = {
+                userGroupId: temp.id,
+                userId: Number(selectedIds[i])
+            }
+            connection.sendAjax("POST", "user-group-has-user",
+                function (text, data, xhr) {
+                }, function () {
+                    util.messages.showErrorMessage("Podaci nisu dodati.");
+                }, newUser);
+            connection.sendAjax("GET","user/"+Number(selectedIds[i]),function (text,data,xhr) {
+                var user= JSON.parse(text);
+                $$("usersFromUserGroupDT").add(user);
+            },function () {});
+        }
+        util.dismissDialog("addUsersToGroupDialog");
+    },
+
+    addUsersToGroup: function(){
+        webix.ui(webix.copy(usergroupView.addUsersDialog)).show();
+        webix.UIManager.setFocus("users");
+
+    },
+
     save: function () {
         var form = $$("addUsergroupForm");
         if (form.validate()) {
@@ -327,8 +410,7 @@ var usergroupView = {
                                 userId: Number(userIds[i])
                             }
                             connection.sendAjax("POST", "user-group-has-user",
-                                function (text, data, xhr) {
-                                }, function () {
+                                function (text, data, xhr) {}, function () {
                                     util.messages.showErrorMessage("Podaci nisu dodati.");
                                 }, newUserGroupHasUser);
                         }
