@@ -244,7 +244,7 @@ public class UserController extends GenericController<User, Integer> {
     @Transactional
     @RequestMapping(value = {"/nonInGroup/{groupId}"}, method = RequestMethod.GET)
     public @ResponseBody
-    List<User> getNonInGroup(@PathVariable Integer groupId) {
+    List<User> getNonInGroupByGroupId(@PathVariable Integer groupId) {
         List<User> users = cloner.deepClone(userRepository.getNotInGroupByCompanyIdAndGroupId(userBean.getUser().getCompanyId(), groupId));
         for(User user : users){
             user.setPassword(null);
