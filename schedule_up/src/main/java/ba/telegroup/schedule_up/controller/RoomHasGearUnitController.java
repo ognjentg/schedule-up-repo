@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+@RequestMapping(value = "/room-has-gear-unit")
+@Controller
+@Scope("request")
 public class RoomHasGearUnitController extends GenericController<RoomHasGearUnit, RoomHasGearUnitPK> {
     private final RoomHasGearUnitRepository roomHasGearUnitRepository;
 

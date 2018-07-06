@@ -165,7 +165,7 @@ var roomView = {
                 center:tableCentar,
                 data:tableData
 
-            },]
+            }]
         }
     },
 
@@ -683,17 +683,20 @@ var roomView = {
                     onContext: {},
                     width:300,
                     height:300,
-                    select:true,
+                    select: "row",
                     type:{
                         height:"auto",
                         template:"<div class='gear-name'>#name#</div><div class='gear-description'>#description#</div>"
                     },
-                    on: {
 
-                        onAfterContextMenu: function (item) {
-                            this.select(item.row);
+                    on:{
+                        onAfterContextMenu: function(id, e, node){
+
+                            $$("gearList").select(id);
                         }
                     }
+
+
 
                     
                 }
@@ -722,12 +725,13 @@ var roomView = {
                     switch (id) {
                         case "1":
                             var delBox = (webix.copy(commonViews.brisanjePotvrda("opreme", "opremu")));
-                            console.log(context.id.row);
+                            console.log(context.id);
                             var newItem = $$("gearList").getItem(context.id);
                             delBox.callback = function (result) {
                                 if (result == 1) {
-
-                                    connection.sendAjax("DELETE", "gear-unit/" + newItem.id,
+                                        console.log(roomId);
+                                    console.log(newItem.id);
+                                    connection.sendAjax("DELETE", "room-has-gear-unit/"+roomId+"/" + newItem.id,
                                         function (text, data, xhr) {
                                             if (text) {
                                                 util.messages.showMessage("Oprema uspješno obrisana.");
