@@ -233,7 +233,19 @@ public class UserController extends GenericController<User, Integer> {
     @RequestMapping(value = {"/nonInGroup"}, method = RequestMethod.GET)
     public @ResponseBody
     List<User> getNonInGroup() {
-        List<User> users = cloner.deepClone(userRepository.getNonInGroupByCompanyId(userBean.getUser().getCompanyId()));
+        List<User> users = cloner.deepClone(userRepository.getNotInGroupByCompanyId(userBean.getUser().getCompanyId()));
+        for(User user : users){
+            user.setPassword(null);
+            user.setPin(null);
+        }
+        return users;
+    }
+
+    @Transactional
+    @RequestMapping(value = {"/nonInGroup/{groupId}"}, method = RequestMethod.GET)
+    public @ResponseBody
+    List<User> getNonInGroup(@PathVariable Integer groupId) {
+        List<User> users = cloner.deepClone(userRepository.getNotInGroupByCompanyIdAndGroupId(userBean.getUser().getCompanyId(), groupId));
         for(User user : users){
             user.setPassword(null);
             user.setPin(null);

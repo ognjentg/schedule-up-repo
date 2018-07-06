@@ -6,5 +6,6 @@ import java.util.List;
 
 public interface UserRepositoryCustom {
 
-    List<User> getNonInGroupByCompanyId(Integer companyId);
+    List<User> getNotInGroupByCompanyId(Integer companyId);
+    List<User> getNotInGroupByCompanyIdAndGroupId(Integer companyId, Integer groupId);
 }
