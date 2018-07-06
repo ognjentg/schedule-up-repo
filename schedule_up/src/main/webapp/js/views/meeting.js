@@ -568,7 +568,7 @@ var meetingView = {
             webix.promise.all([webix.ajax("user/" + event1.userId), webix.ajax("/user/participantsFor/" + event1.id), webix.ajax("document/getAllByMeetingId/" + event1.id)]).then(
                 function (results) {
                     event1.creatorUsername = JSON.parse(results[0].text()).username;
-                    alert(JSON.parse(results[0].text()).username);
+                    //alert(JSON.parse(results[0].text()).username);
 
                     event1.meetingParticipants = JSON.parse(results[1].text());
                     event1.meetingDocuments = JSON.parse(results[2].text());
@@ -692,7 +692,7 @@ var meetingView = {
         var formLeft = $$("leftForm");
 
         $$("list").clearAll();
-        alert("duzina liste ucesnika:"+event.meetingParticipants.length);
+        //alert("duzina liste ucesnika:"+event.meetingParticipants.length);
         $$("list").parse(event.meetingParticipants);
         $$("listDocuments").clearAll();
         $$("listDocuments").parse(event.meetingDocuments);
