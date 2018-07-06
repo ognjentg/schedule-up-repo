@@ -6,9 +6,9 @@ import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.interaction.Notification;
 import ba.telegroup.schedule_up.model.Participant;
 import ba.telegroup.schedule_up.model.User;
-import ba.telegroup.schedule_up.repository.CompanyRepository;
-import ba.telegroup.schedule_up.repository.ParticipantRepository;
-import ba.telegroup.schedule_up.repository.UserRepository;
+import ba.telegroup.schedule_up.model.UserGroup;
+import ba.telegroup.schedule_up.model.UserGroupHasUser;
+import ba.telegroup.schedule_up.repository.*;
 import ba.telegroup.schedule_up.util.LoginInformation;
 import ba.telegroup.schedule_up.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +35,7 @@ public class UserController extends GenericController<User, Integer> {
     private final UserRepository userRepository;
     private final CompanyRepository companyRepository;
     private final ParticipantRepository participantRepository;
+    private final UserGroupHasUserRepository userGroupHasUserRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -43,11 +44,12 @@ public class UserController extends GenericController<User, Integer> {
     private Integer randomStringLength;
 
     @Autowired
-    public UserController(UserRepository repo, CompanyRepository companyRepository, ParticipantRepository participantRepository) {
+    public UserController(UserRepository repo, CompanyRepository companyRepository, ParticipantRepository participantRepository, UserGroupHasUserRepository userGroupHasUserRepository) {
         super(repo);
         this.userRepository = repo;
         this.companyRepository = companyRepository;
         this.participantRepository = participantRepository;
+        this.userGroupHasUserRepository = userGroupHasUserRepository;
     }
 
     @Override
@@ -225,5 +227,17 @@ public class UserController extends GenericController<User, Integer> {
     public @ResponseBody
     List<User> getParticipants(@PathVariable Integer meetingId) {
         return userRepository.findAllById(participantRepository.getAllByMeetingIdAndDeletedIs(meetingId, (byte) 0).stream().map(Participant::getUserId).collect(Collectors.toList()));
+    }
+
+    @Transactional
+    @RequestMapping(value = {"/nonInGroup"}, method = RequestMethod.GET)
+    public @ResponseBody
+    List<User> getNonInGroup() {
+        List<User> users = cloner.deepClone(userRepository.getNonInGroupByCompanyId(userBean.getUser().getCompanyId()));
+        for(User user : users){
+            user.setPassword(null);
+            user.setPin(null);
+        }
+        return users;
     }
 }

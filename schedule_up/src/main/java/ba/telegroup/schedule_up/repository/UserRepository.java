@@ -1,11 +1,12 @@
 package ba.telegroup.schedule_up.repository;
 
 import ba.telegroup.schedule_up.model.User;
+import ba.telegroup.schedule_up.repository.repositoryCustom.UserRepositoryCustom;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface UserRepository extends JpaRepository<User, Integer> {
+public interface UserRepository extends JpaRepository<User, Integer>, UserRepositoryCustom {
 
     User getByCompanyIdAndRoleIdAndActiveAndDeleted(Integer companyId, Integer roleId, byte active, byte deleted);
 
