@@ -334,17 +334,17 @@ var usergroupView = {
                 },
                 elements: [
                     {
-                    view: "multicombo",
-                    id: "users",
-                    name: "users",
-                    label: "Korisnici",
-                    suggest: {
-                        body: {
-                            template: "#firstName# #lastName#",
-                            url: "user/nonInGroup"
+                        view: "multicombo",
+                        id: "users",
+                        name: "users",
+                        label: "Korisnici",
+                        master: $$("addUsersToGroupDialog"),
+                        suggest:{
+                            body: {
+                                template: "#firstName# #lastName#"
+                            }
                         }
-                    }
-                }, {
+                    }, {
                     margin: 5,
                     cols: [{}, {
                         id: "saveUsers",
@@ -384,8 +384,9 @@ var usergroupView = {
 
     addUsersToGroup: function(){
         webix.ui(webix.copy(usergroupView.addUsersDialog)).show();
+        var temp=$$("users").getPopup().getList();
+        temp.load("user/nonInGroup/"+$$("usergroupDT").getSelectedItem().id);
         webix.UIManager.setFocus("users");
-
     },
 
     save: function () {
@@ -420,6 +421,5 @@ var usergroupView = {
                 }, newUsergroup);
         }
         util.dismissDialog('addUsergroupDialog');
-
     }
 }
