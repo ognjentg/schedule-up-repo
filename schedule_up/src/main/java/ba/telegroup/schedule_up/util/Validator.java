@@ -30,9 +30,9 @@ public class Validator {
         Metoda vraca true ako je duzina niza bajtova jednaka vrijednosti length, u suprotnom false
         Ako je tip u bazi LONGBLOB, za length se koristi vrijednost longblob.length iz application.properties
      */
-    public static Boolean binaryLength(byte[] bytes, Integer length) {
+    public static Boolean binaryMaxLength(byte[] bytes, Integer maxLength) {
         if (bytes != null)
-            return Integer.valueOf(bytes.length).equals(length);
+            return Integer.valueOf(bytes.length).compareTo(maxLength) <= 0;
         return true;
     }
 

@@ -4,13 +4,11 @@ import ba.telegroup.schedule_up.common.exceptions.BadRequestException;
 import ba.telegroup.schedule_up.common.exceptions.ForbiddenException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.interaction.Notification;
-import ba.telegroup.schedule_up.model.Participant;
-import ba.telegroup.schedule_up.model.User;
-import ba.telegroup.schedule_up.model.UserGroup;
-import ba.telegroup.schedule_up.model.UserGroupHasUser;
+import ba.telegroup.schedule_up.model.*;
 import ba.telegroup.schedule_up.repository.*;
 import ba.telegroup.schedule_up.util.LoginInformation;
 import ba.telegroup.schedule_up.util.Util;
+import ba.telegroup.schedule_up.util.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
@@ -42,6 +40,33 @@ public class UserController extends GenericController<User, Integer> {
 
     @Value("${randomString.length}")
     private Integer randomStringLength;
+
+    @Value("${badRequest.noUser}")
+    private String badRequestNoUser;
+
+    @Value("${badRequest.insert}")
+    private String badRequestInsert;
+
+    @Value("${badRequest.update}")
+    private String badRequestUpdate;
+
+    @Value("${badRequest.delete}")
+    private String badRequestDelete;
+
+    @Value("${badRequest.stringMaxLength}")
+    private String badRequestStringMaxLength;
+
+    @Value("${badRequest.binaryLength}")
+    private String badRequestBinaryLength;
+
+    @Value("${badRequest.registration}")
+    private String badRequestRegistration;
+
+    @Value("${longblob.length}")
+    private Integer longblobLength;
+
+    @Value("${badRequest.validateEmail}")
+    private String badRequestValidateEmail;
 
     @Autowired
     public UserController(UserRepository repo, CompanyRepository companyRepository, ParticipantRepository participantRepository, UserGroupHasUserRepository userGroupHasUserRepository) {
@@ -75,7 +100,7 @@ public class UserController extends GenericController<User, Integer> {
             user.setPin(null);
             return user;
         } else {
-            throw new BadRequestException("Bad request");
+            throw new BadRequestException(badRequestNoUser);
         }
     }
 
@@ -127,7 +152,7 @@ public class UserController extends GenericController<User, Integer> {
     @RequestMapping(value = "/invitationToRegistration", method = RequestMethod.POST)
     public @ResponseBody
     String invitationToRegistration(@RequestParam("mail") String mail, @RequestParam("role") Integer roleId, @RequestParam("company") Integer companyId) throws BadRequestException {
-        try {
+        if(Validator.validateEmail(mail)){
             String randomToken = Util.randomString(randomStringLength);
             User newUser = new User();
             newUser.setEmail(mail);
@@ -144,15 +169,15 @@ public class UserController extends GenericController<User, Integer> {
             newUser.setTokenTime(new Timestamp(System.currentTimeMillis()));
             newUser.setCompanyId(companyId);
             newUser.setRoleId(roleId);
-            repo.saveAndFlush(newUser);
+            if(repo.saveAndFlush(newUser) != null){
+                logCreateAction(newUser);
+                Notification.sendRegistrationLink(mail.trim(), "http://127.0.0.1:8020/user/registration/" + randomToken);
 
-            Notification.sendRegistrationLink(mail.trim(), "http://127.0.0.1:8020/user/registration/" + randomToken);
-
-            return "Success";
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            throw new BadRequestException("Bad Request");
+                return "Success";
+            }
+            throw new BadRequestException(badRequestInsert);
         }
+        throw new BadRequestException(badRequestValidateEmail);
     }
 
     @RequestMapping(value = "/registration/{token}", method = RequestMethod.GET)
@@ -174,25 +199,35 @@ public class UserController extends GenericController<User, Integer> {
     @RequestMapping(value = "/registration", method = RequestMethod.POST)
     public @ResponseBody
     String registration(@RequestBody User newUser) throws BadRequestException {
-        try {
-            User user = entityManager.find(User.class, newUser.getId());
-            user.setUsername(newUser.getUsername());
-            user.setPassword(Util.hashPassword(newUser.getPassword()));
-            user.setToken(null);
-            user.setTokenTime(null);
-            user.setFirstName(newUser.getFirstName());
-            user.setLastName(newUser.getLastName());
-            user.setPhoto(newUser.getPhoto());
-            user.setPin(Util.hashPassword(newUser.getPin()));
-            user.setActive((byte) 1);
+        if (Validator.stringMaxLength(newUser.getUsername(), 100)) {
+            if (Validator.stringMaxLength(newUser.getFirstName(), 100)) {
+                if (Validator.stringMaxLength(newUser.getLastName(), 100)) {
+                    if(Validator.binaryMaxLength(newUser.getPhoto(), longblobLength)){
+                        User user = entityManager.find(User.class, newUser.getId());
+                        User oldObject = cloner.deepClone(user);
+                        user.setUsername(newUser.getUsername());
+                        user.setPassword(Util.hashPassword(newUser.getPassword()));
+                        user.setToken(null);
+                        user.setTokenTime(null);
+                        user.setFirstName(newUser.getFirstName());
+                        user.setLastName(newUser.getLastName());
+                        user.setPhoto(newUser.getPhoto());
+                        user.setPin(Util.hashPassword(newUser.getPin()));
+                        user.setActive((byte) 1);
 
-            repo.saveAndFlush(user);
-
-            return "Success";
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            throw new BadRequestException("Bad Request");
+                        if(repo.saveAndFlush(user) != null){
+                            logUpdateAction(user, oldObject);
+                            return "Success";
+                        }
+                        throw new BadRequestException(badRequestRegistration);
+                    }
+                    throw new BadRequestException(badRequestBinaryLength.replace("{tekst}", "slike"));
+                }
+                throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "prezimena").replace("{broj}", String.valueOf(100)));
+            }
+            throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "imena").replace("{broj}", String.valueOf(100)));
         }
+        throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "username-a").replace("{broj}", String.valueOf(100)));
     }
 
 
