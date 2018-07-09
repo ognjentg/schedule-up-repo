@@ -1,5 +1,6 @@
 package ba.telegroup.schedule_up.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
@@ -52,7 +53,7 @@ public class Note {
     }
 
     @Basic
-    @Column(name = "publish_time", nullable = false, insertable = false, updatable = false)
+    @Column(name = "publish_time", nullable = false, insertable = false)
     public Timestamp getPublishTime() {
         return publishTime;
     }

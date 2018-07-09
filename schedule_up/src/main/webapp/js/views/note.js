@@ -1,3 +1,5 @@
+var formatter = webix.Date.dateToStr("%d-%m-%Y %H:%i");
+
 var noteView = {
     panel: {
         id: "notePanel",
@@ -60,7 +62,7 @@ var noteView = {
                     editable: false,
                     header: ["Korisnik", {
                         content: "textFilter"
-                    }],
+                    }]
 
                 }, {
                     id: "name",
@@ -79,13 +81,33 @@ var noteView = {
                     editable: true,
                     header: ["Opis", {
                         content: "textFilter"
+                    }]
+
+                },{
+                    id: "expiredTime",
+                    editable: false,
+                    fillspace: false,
+                    width: 150,
+                    editor: "date",
+                    header: ["Datum isteka", {
+                        content: "textFilter"
                     }],
+                    format: function (value) {
+                        date = new Date(value);
+                        var hours = date.getHours();
+                        var minutes = date.getMinutes();
+
+                        minutes = minutes < 10 ? '0' + minutes : minutes;
+                        var strTime = hours + ':' + minutes + "h";
+                        return date.getDate() + "." + (date.getMonth() + 1) + "." + date.getFullYear() + ".  " + strTime;
+                    }
 
                 }
             ],
             select: "row",
             navigation: true,
             editable: true,
+            editaction: "dblclick",
             url: "note/",
             on: {
 
@@ -196,6 +218,14 @@ var noteView = {
                     height: 200,
                     invalidMessage: "Unesite tekst oglasa!",
                     required: true
+                },{
+                    view: "datepicker",
+                    value: new Date(Date.now() + 1296000000),
+                    timepicker: true,
+                    id: "expiredTime",
+                    name: "expiredTime",
+                    label: "Datum isteka",
+                    required: true
                 }, {
                     margin: 5,
                     cols: [{}, {
@@ -222,7 +252,16 @@ var noteView = {
                         if (!value)
                             return false;
                         if (value.length > 500) {
-                            $$('addNoteForm').elements.name.config.invalidMessage = 'Maksimalan broj karaktera je 500!';
+                            $$('addNoteForm').elements.description.config.invalidMessage = 'Maksimalan broj karaktera je 500!';
+                            return false;
+                        }
+                        return true;
+                    },
+                    "expiredTime": function(value){
+                        if(!value)
+                            return false;
+                        if(value<new Date(Date.now())){
+                            $$('addNoteForm').elements.expiredTime.config.invalidMessage = 'Datum isteka ne smije biti prije trenutnog datuma!';
                             return false;
                         }
                         return true;
@@ -245,6 +284,7 @@ var noteView = {
                 description: form.getValues().description,
                 userId: userData.id,
                 companyId: companyData.id,
+                expiredTime: form.getValues().expiredTime
             };
             $$("noteDT").add(newNote);
             util.dismissDialog('addNoteDialog');
@@ -298,6 +338,14 @@ var noteView = {
                     height: 200,
                     invalidMessage: "Unesite tekst oglasa!",
                     required: true
+                },{
+                    view: "datepicker",
+                    timepicker: true,
+                    id: "expiredTime",
+                    name: "expiredTime",
+                    label: "Datum isteka",
+                    invalidMessage: "Unesite validan datum isteka oglasa!",
+                    required: true
                 }, {
                     margin: 5,
                     cols: [{}, {
@@ -315,7 +363,7 @@ var noteView = {
                         if (!value)
                             return false;
                         if (value.length > 100) {
-                            $$('addNoteForm').elements.name.config.invalidMessage = 'Maksimalan broj karaktera je 100!';
+                            $$('changeNoteForm').elements.name.config.invalidMessage = 'Maksimalan broj karaktera je 100!';
                             return false;
                         }
                         return true;
@@ -324,7 +372,16 @@ var noteView = {
                         if (!value)
                             return false;
                         if (value.length > 500) {
-                            $$('addNoteForm').elements.name.config.invalidMessage = 'Maksimalan broj karaktera je 500!';
+                            $$('changeNoteForm').elements.name.config.invalidMessage = 'Maksimalan broj karaktera je 500!';
+                            return false;
+                        }
+                        return true;
+                    },
+                    "expiredTime": function(value){
+                        if(!value)
+                            return false;
+                        if(value<new Date(Date.now())){
+                            $$('changeNoteForm').elements.expiredTime.config.invalidMessage = 'Datum isteka ne smije biti prije trenutnog datuma!';
                             return false;
                         }
                         return true;
@@ -340,6 +397,7 @@ var noteView = {
         form.elements.id.setValue(note.id);
         form.elements.name.setValue(note.name);
         form.elements.description.setValue(note.description);
+        form.elements.expiredTime.setValue(new Date(note.expiredTime));
         // form.elements.publishedTime.setValue(note.publishedTime);
         //datum?!?
         setTimeout(function () {
@@ -351,15 +409,19 @@ var noteView = {
     saveChangedNote: function () {
         if ($$("changeNoteForm").validate()) {
             //changeItem is a copy of add new item, same atributes
+            var oldItem = $$("noteDT").getSelectedItem();
+
             var newItem = {
                 id: $$("changeNoteForm").getValues().id,
                 name: $$("changeNoteForm").getValues().name,
                 description: $$("changeNoteForm").getValues().description,
-                publishedTime: new Date(),
+                publishTime: new Date(),
                 deleted: 0,
                 userId: userData.id,
                 companyId: companyData.id,
+                expiredTime: $$("changeNoteForm").getValues().expiredTime
             };
+
             connection.sendAjax("PUT", "note/" + newItem.id,
                 function (text, data, xhr) {
                     if (text) {

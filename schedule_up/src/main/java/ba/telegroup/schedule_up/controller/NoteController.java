@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 @RequestMapping(value = "/note")
@@ -102,8 +105,8 @@ public class NoteController extends GenericController<Note, Integer> {
     NoteUser insert(@RequestBody Note note) throws BadRequestException {
         if (Validator.stringMaxLength(note.getName(), 100)) {
             if (Validator.stringMaxLength(note.getDescription(), 500)) {
-                if(Validator.timestampCompare(note.getPublishTime(),note.getExpiredTime())!=null &&
-                        Validator.timestampCompare(note.getPublishTime(),note.getExpiredTime())<=0){
+                if(Validator.timestampCompare(new Timestamp(System.currentTimeMillis()),note.getExpiredTime())!=null &&
+                        Validator.timestampCompare(new Timestamp(System.currentTimeMillis()),note.getExpiredTime())<=0){
                     if (repo.saveAndFlush(note) != null) {
                         logCreateAction(note);
                         entityManager.refresh(note);
@@ -118,6 +121,7 @@ public class NoteController extends GenericController<Note, Integer> {
                         noteUser.setUserId(note.getUserId());
                         noteUser.setCompanyId(note.getCompanyId());
                         noteUser.setUsername(username);
+                        noteUser.setExpiredTime(note.getExpiredTime());
 
                         return noteUser;
                     }
