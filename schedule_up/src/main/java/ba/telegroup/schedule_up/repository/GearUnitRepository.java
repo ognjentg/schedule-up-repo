@@ -5,4 +5,5 @@ import ba.telegroup.schedule_up.repository.repositoryCustom.GearUnitRepositoryCu
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface GearUnitRepository extends JpaRepository<GearUnit, Integer>, GearUnitRepositoryCustom {
+     GearUnit getGearUnitById(Integer id);
 }

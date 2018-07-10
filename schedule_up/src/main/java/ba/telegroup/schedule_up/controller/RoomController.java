@@ -9,6 +9,7 @@ import ba.telegroup.schedule_up.repository.RoomHasGearUnitRepository;
 import ba.telegroup.schedule_up.repository.RoomRepository;
 import ba.telegroup.schedule_up.repository.repositoryCustom.GearUnitRepositoryCustom;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,6 +28,25 @@ public class RoomController extends GenericController<Room, Integer> {
     private final RoomHasGearUnitRepository roomHasGearUnitRepository;
     private final GearUnitRepository gearUnitRepository;
     private final BuildingRepository buildingRepository;
+
+    @Value("${badRequest.alreadyTaken}")
+    private String badRequestAlreadyTaken;
+
+    @Value("${badRequest.noGearUnitInRoom}")
+    private String badRequestNoGearUnitInRoom;
+
+    @Value("${badRequest.alreadyReleased}")
+    private String badRequestAlreadyReleased;
+
+    @Value("${badRequest.noRoom}")
+    private String badRequestNoRoom;
+
+    @Value("${badRequest.noBuilding}")
+    private String badRequestNoBuilding;
+
+    @Value("${badRequest.noGearUnit}")
+    private String badRequestNoGearUnit;
+
 
     @Autowired
     public RoomController(RoomRepository roomRepository, RoomHasGearUnitRepository roomHasGearUnitRepository, GearUnitRepository gearUnitRepository, BuildingRepository buildingRepository) {
@@ -48,7 +68,7 @@ public class RoomController extends GenericController<Room, Integer> {
             logDeleteAction(room);
             return "Success";
         }
-        throw new BadRequestException("Bad request");
+        throw new BadRequestException(badRequestNoRoom);
     }
 
     @Override
@@ -61,41 +81,49 @@ public class RoomController extends GenericController<Room, Integer> {
     @RequestMapping(value = "/addGearUnit/{roomId}/{gearUnitId}", method = RequestMethod.GET)
     public @ResponseBody
     String addGearUnit(@PathVariable Integer roomId, @PathVariable Integer gearUnitId)throws BadRequestException {
-        Room room = roomRepository.getOne(roomId);
+        Room room = roomRepository.getRoomById(roomId);
+        if(room == null)
+            throw new BadRequestException(badRequestNoRoom);
         Room oldRoom = cloner.deepClone(room);
-        GearUnit gearUnit = gearUnitRepository.getOne(gearUnitId);
-        //GearUnit oldGearUnit = cloner.deepClone(gearUnit);
-        if((room.getCapacity() != 0) && (gearUnit.getAvailable() == (byte) 1)){
-            gearUnit.setAvailable((byte) 0);
-            RoomHasGearUnit connection = new RoomHasGearUnit();
-            connection.setRoomId(roomId);
-            connection.setGearUnitId(gearUnitId);
-            roomHasGearUnitRepository.saveAndFlush(connection);
-            gearUnitRepository.saveAndFlush(gearUnit);
-            if (roomRepository.saveAndFlush(room) != null) logUpdateAction(room, oldRoom);
-            return "Success";
-        }
-        throw new BadRequestException("Bad request");
+        GearUnit gearUnit = gearUnitRepository.getGearUnitById(gearUnitId);
+        if(gearUnit == null)
+            throw new BadRequestException(badRequestNoGearUnit);
+    if(gearUnit.getAvailable() == (byte) 1){
+        gearUnit.setAvailable((byte) 0);
+        RoomHasGearUnit connection = new RoomHasGearUnit();
+        connection.setRoomId(roomId);
+        connection.setGearUnitId(gearUnitId);
+        roomHasGearUnitRepository.saveAndFlush(connection);
+        gearUnitRepository.saveAndFlush(gearUnit);
+        if (roomRepository.saveAndFlush(room) != null) logUpdateAction(room, oldRoom);
+        return "Success";
     }
-
+    else throw new BadRequestException(badRequestAlreadyTaken);
+}
     @RequestMapping(value = "/removeGearUnit/{roomId}/{gearUnitId}", method = RequestMethod.GET)
     public @ResponseBody
     String removeGearUnit(@PathVariable Integer roomId, @PathVariable Integer gearUnitId)throws BadRequestException {
-        Room room = roomRepository.getOne(roomId);
+        Room room = roomRepository.getRoomById(roomId);
+        if(room == null)
+            throw new BadRequestException(badRequestNoRoom);
         Room oldRoom = cloner.deepClone(room);
-        GearUnit gearUnit = gearUnitRepository.getOne(gearUnitId);
+        GearUnit gearUnit = gearUnitRepository.getGearUnitById(gearUnitId);
+        if(gearUnit == null)
+            throw new BadRequestException(badRequestNoGearUnit);
         RoomHasGearUnitPK pk = new RoomHasGearUnitPK();
         pk.setRoomId(roomId);
         pk.setGearUnitId(gearUnitId);
-        RoomHasGearUnit connection = roomHasGearUnitRepository.getOne(pk);
-        if((gearUnit.getAvailable() == (byte) 0)){
+        RoomHasGearUnit connection = roomHasGearUnitRepository.getRoomHasGearUnitByRoomIdAndGearUnitId(roomId, gearUnitId);
+        if(connection == null)
+            throw new BadRequestException(badRequestNoGearUnitInRoom);
+        else if((gearUnit.getAvailable() == (byte) 0)){
             gearUnit.setAvailable((byte) 1);
             roomHasGearUnitRepository.delete(connection);
             gearUnitRepository.saveAndFlush(gearUnit);
             if (roomRepository.saveAndFlush(room) != null) logUpdateAction(room, oldRoom);
             return "Success";
         }
-        throw new BadRequestException("Bad request");
+        else throw new BadRequestException(badRequestAlreadyReleased);
     }
 
     public Room getRoomById(Integer id){
@@ -116,8 +144,8 @@ public class RoomController extends GenericController<Room, Integer> {
                 building.setDeleted(null);
                 return building;
             }
-            throw new BadRequestException("Bad request");
+            throw new BadRequestException(badRequestNoBuilding);
         }
-        throw new BadRequestException("Bad request");
+        throw new BadRequestException(badRequestNoRoom);
     }
 }
