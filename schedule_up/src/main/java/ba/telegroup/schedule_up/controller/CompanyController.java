@@ -62,7 +62,7 @@ public class CompanyController extends GenericController<Company, Integer> {
     private String badRequestValidateEmail;
 
     @Value("${longblob.length}")
-    private Integer longblobLength;
+    private Long longblobLength;
 
     public CompanyController(CompanyRepository repo, UserRepository userRepository) {
         super(repo);
@@ -100,7 +100,7 @@ public class CompanyController extends GenericController<Company, Integer> {
 
     //Ovo je metoda za insert CompanyUser
     @Transactional
-    @RequestMapping(value = "/custom/", method = RequestMethod.POST)
+    @RequestMapping(value = "/custom", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public @ResponseBody
     CompanyUser insertExtended(@RequestBody CompanyUser companyUser) throws BadRequestException {
@@ -115,8 +115,8 @@ public class CompanyController extends GenericController<Company, Integer> {
                         company.setTimeFrom(companyUser.getTimeFrom());
                         company.setDeleted((byte) 0);
                         if(repo.saveAndFlush(company) != null){
-                            logCreateAction(company);
                             entityManager.refresh(company);
+                            logCreateAction(company);
 
                             String randomToken = Util.randomString(randomStringLength);
                             User user = new User();
@@ -178,6 +178,7 @@ public class CompanyController extends GenericController<Company, Integer> {
                         company.setTimeTo(companyUser.getTimeTo());
                         company.setCompanyLogo(companyUser.getCompanyLogo());
                         if(repo.saveAndFlush(company) != null){
+                            entityManager.refresh(company);
                             logUpdateAction(company, oldObject);
                             if (adminUser != null && !companyUser.getEmail().equals(adminUser.getEmail())) {
                                 adminUser.setActive((byte) 0);

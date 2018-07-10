@@ -12,6 +12,7 @@ import ba.telegroup.schedule_up.util.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -62,8 +63,17 @@ public class UserController extends GenericController<User, Integer> {
     @Value("${badRequest.registration}")
     private String badRequestRegistration;
 
+    @Value("${badRequest.usernameExists}")
+    private String badRequestUsernameExists;
+
+    @Value("${badRequest.passwordStrength}")
+    private String badRequestPasswordStrength;
+
+    @Value("${badRequest.pinStrength}")
+    private String badRequestPinStrength;
+
     @Value("${longblob.length}")
-    private Integer longblobLength;
+    private Long longblobLength;
 
     @Value("${badRequest.validateEmail}")
     private String badRequestValidateEmail;
@@ -150,6 +160,8 @@ public class UserController extends GenericController<User, Integer> {
 
     @SuppressWarnings("SameReturnValue")
     @RequestMapping(value = "/invitationToRegistration", method = RequestMethod.POST)
+    @Transactional
+    @ResponseStatus(HttpStatus.CREATED)
     public @ResponseBody
     String invitationToRegistration(@RequestParam("mail") String mail, @RequestParam("role") Integer roleId, @RequestParam("company") Integer companyId) throws BadRequestException {
         if(Validator.validateEmail(mail)){
@@ -170,6 +182,7 @@ public class UserController extends GenericController<User, Integer> {
             newUser.setCompanyId(companyId);
             newUser.setRoleId(roleId);
             if(repo.saveAndFlush(newUser) != null){
+                entityManager.refresh(newUser);
                 logCreateAction(newUser);
                 Notification.sendRegistrationLink(mail.trim(), "http://127.0.0.1:8020/user/registration/" + randomToken);
 
@@ -199,35 +212,43 @@ public class UserController extends GenericController<User, Integer> {
     @RequestMapping(value = "/registration", method = RequestMethod.POST)
     public @ResponseBody
     String registration(@RequestBody User newUser) throws BadRequestException {
-        if (Validator.stringMaxLength(newUser.getUsername(), 100)) {
-            if (Validator.stringMaxLength(newUser.getFirstName(), 100)) {
-                if (Validator.stringMaxLength(newUser.getLastName(), 100)) {
-                    if(Validator.binaryMaxLength(newUser.getPhoto(), longblobLength)){
-                        User user = entityManager.find(User.class, newUser.getId());
-                        User oldObject = cloner.deepClone(user);
-                        user.setUsername(newUser.getUsername());
-                        user.setPassword(Util.hashPassword(newUser.getPassword()));
-                        user.setToken(null);
-                        user.setTokenTime(null);
-                        user.setFirstName(newUser.getFirstName());
-                        user.setLastName(newUser.getLastName());
-                        user.setPhoto(newUser.getPhoto());
-                        user.setPin(Util.hashPassword(newUser.getPin()));
-                        user.setActive((byte) 1);
+        User userWithUsername = userRepository.getByUsernameAndCompanyId(newUser.getUsername(), newUser.getCompanyId());
+        if(userWithUsername == null) {
+            if (Validator.stringMaxLength(newUser.getUsername(), 100)) {
+                if(Validator.passwordChecking(newUser.getPassword())){
+                    if (Validator.stringMaxLength(newUser.getFirstName(), 100)) {
+                        if (Validator.stringMaxLength(newUser.getLastName(), 100)) {
+                            if(Validator.pinChecking(newUser.getPin())){
+                                if(Validator.binaryMaxLength(newUser.getPhoto(), longblobLength)){
+                                    User user = entityManager.find(User.class, newUser.getId());
+                                    user.setUsername(newUser.getUsername());
+                                    user.setPassword(Util.hashPassword(newUser.getPassword()));
+                                    user.setToken(null);
+                                    user.setTokenTime(null);
+                                    user.setFirstName(newUser.getFirstName());
+                                    user.setLastName(newUser.getLastName());
+                                    user.setPhoto(newUser.getPhoto());
+                                    user.setPin(Util.hashPassword(newUser.getPin()));
+                                    user.setActive((byte) 1);
 
-                        if(repo.saveAndFlush(user) != null){
-                            logUpdateAction(user, oldObject);
-                            return "Success";
+                                    if(repo.saveAndFlush(user) != null){
+                                        return "Success";
+                                    }
+                                    throw new BadRequestException(badRequestRegistration);
+                                }
+                                throw new BadRequestException(badRequestBinaryLength.replace("{tekst}", "slike"));
+                            }
+                            throw new BadRequestException(badRequestPinStrength);
                         }
-                        throw new BadRequestException(badRequestRegistration);
+                        throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "prezimena").replace("{broj}", String.valueOf(100)));
                     }
-                    throw new BadRequestException(badRequestBinaryLength.replace("{tekst}", "slike"));
+                    throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "imena").replace("{broj}", String.valueOf(100)));
                 }
-                throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "prezimena").replace("{broj}", String.valueOf(100)));
+                throw new BadRequestException(badRequestPasswordStrength);
             }
-            throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "imena").replace("{broj}", String.valueOf(100)));
+            throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "username-a").replace("{broj}", String.valueOf(100)));
         }
-        throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "username-a").replace("{broj}", String.valueOf(100)));
+        throw new BadRequestException(badRequestUsernameExists);
     }
 
 

@@ -9,8 +9,36 @@ import java.util.regex.Pattern;
 public class Validator {
 
     /*
+        Metoda vraca true ako je lozinka duzine 8 ili vise karaktera, sadrzi velika i mala slova, brojeve i specijalne karaktere, u suprotnom false
+    */
+    public static Boolean passwordChecking(String password) {
+        if (password != null){
+            String regex = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(password);
+
+            return matcher.matches();
+        }
+        return true;
+    }
+
+    /*
+        Metoda vraca true ako je pin duzine tacno cetiri karaktere i sadrzi samo brojeve, u suprotnom false
+    */
+    public static Boolean pinChecking(String pin) {
+        if(pin != null){
+            String regex = "[0-9]{4}";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(pin);
+
+            return pin.length() == 4 && matcher.matches();
+        }
+        return true;
+    }
+
+    /*
         Metoda vraca true ako je duzina teksta jednaka vrijednosti length, u suprotnom false
-     */
+    */
     public static Boolean stringLength(String text, Integer length) {
         if (text != null)
             return Integer.valueOf(text.length()).equals(length);
@@ -30,9 +58,9 @@ public class Validator {
         Metoda vraca true ako je duzina niza bajtova jednaka vrijednosti length, u suprotnom false
         Ako je tip u bazi LONGBLOB, za length se koristi vrijednost longblob.length iz application.properties
      */
-    public static Boolean binaryMaxLength(byte[] bytes, Integer maxLength) {
+    public static Boolean binaryMaxLength(byte[] bytes, Long maxLength) {
         if (bytes != null)
-            return Integer.valueOf(bytes.length).compareTo(maxLength) <= 0;
+            return Long.valueOf(bytes.length).compareTo(maxLength) <= 0;
         return true;
     }
 
