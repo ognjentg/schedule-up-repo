@@ -35,7 +35,20 @@ public class ParticipantController extends GenericController<Participant, Intege
     private Integer advancedUser;
     @Value("${user.id}")
     private Integer user;
-
+    @Value("${forbidden.notAuthorized}")
+    private String forbiddenNotAuthorized;
+    @Value("${badRequest.participantNotExist}")
+    private String badRequestParticipantNotExist;
+    @Value("${badRequest.update")
+    private String badRequestUpdate;
+    @Value("${badRequest.meetingNotExist")
+    private String badRequestMeetingNotExist;
+    @Value("${badRequest.participantExist")
+    private String badRequestParticipantExist;
+    @Value("${success.Delete")
+    private String successDelete;
+    @Value("${badRequest}")
+    private String badRequest;
     @Autowired
     public ParticipantController(ParticipantRepository participantRepository, MeetingRepository meetingRepository) {
         super(participantRepository);
@@ -51,22 +64,22 @@ public class ParticipantController extends GenericController<Participant, Intege
     Participant insert(@RequestBody Participant object) throws BadRequestException, ForbiddenException {
         if (object.getMeetingId() != null) {
             Meeting meeting = meetingRepository.findById(object.getMeetingId()).orElse(null);
-            if (checkPermissions() && meeting != null && meeting.getUserId().equals(userBean.getUser().getId())) {
+            if (checkUserPermissions() && meeting != null && meeting.getUserId().equals(userBean.getUser().getId())) {
                 List<Participant> participants = participantRepository.getAllByMeetingIdAndDeletedIs(meeting.getId(), notDeleted);
                 if (participants.stream().filter(participant -> participant.equalsIgnorePrimaryKey(object)).count() == 0)
                     return super.insert(object);
-                throw new BadRequestException("Bad request");
+                throw new BadRequestException(badRequestParticipantExist);
             }
-            throw new ForbiddenException("Forbidden action");
+            throw new ForbiddenException(forbiddenNotAuthorized+" ili "+badRequestMeetingNotExist);
         }
-        throw new BadRequestException("Bad request");
+        throw new BadRequestException(badRequestMeetingNotExist);
     }
 
     @Override
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.DELETE)
     public @ResponseBody
     String delete(@PathVariable Integer id) throws ForbiddenException, BadRequestException {
-        if (checkPermissions()) {
+        if (checkUserPermissions()) {
             Participant participant = participantRepository.findById(id).orElse(null);
             if (participant != null) {
                 Meeting meeting = meetingRepository.findById(participant.getMeetingId()).orElse(null);
@@ -74,66 +87,66 @@ public class ParticipantController extends GenericController<Participant, Intege
                     Objects.requireNonNull(participant).setDeleted(deleted);
                     participantRepository.saveAndFlush(participant);
                     logDeleteAction(participant);
-                    return "Success";
+                    return successDelete;
                 }
             }
-            throw new BadRequestException("Bad request");
+            throw new BadRequestException(badRequestParticipantNotExist);
         }
-        throw new ForbiddenException("Forbidden action");
+        throw new ForbiddenException(forbiddenNotAuthorized);
     }
 
     @RequestMapping(value = {"/getAllByMeeting/{id}"}, method = RequestMethod.GET)
     public @ResponseBody
     List<Participant> getAllByMeetingId(@PathVariable Integer id) throws ForbiddenException {
-        if (checkPermissions()) {
+        if (checkUserPermissions()) {
             return participantRepository.getAllByMeetingIdAndDeletedIs(id, notDeleted);
         }
-        throw new ForbiddenException("Forbidden action");
+        throw new ForbiddenException(forbiddenNotAuthorized);
     }
 
     @RequestMapping(value = {"/getAllByCompany/{id}"}, method = RequestMethod.GET)
     public @ResponseBody
     List<Participant> getAllByCompanyId(@PathVariable Integer id) throws ForbiddenException {
-        if (checkPermissions()) {
+        if (checkUserPermissions()) {
             return participantRepository.getAllByCompanyIdAndDeletedIs(id, notDeleted);
         }
-        throw new ForbiddenException("Forbidden action");
+        throw new ForbiddenException(forbiddenNotAuthorized);
     }
 
     @RequestMapping(value = {"/getAllByUserGroup/{id}"}, method = RequestMethod.GET)
     public @ResponseBody
     List<Participant> getAllByUserGroupId(@PathVariable Integer id) throws ForbiddenException {
-        if (checkPermissions()) {
+        if (checkUserPermissions()) {
             return participantRepository.getAllByUserGroupIdAndDeletedIs(id, notDeleted);
         }
-        throw new ForbiddenException("Forbidden action");
+        throw new ForbiddenException(forbiddenNotAuthorized);
     }
 
     @RequestMapping(value = {"/getAllByUser/{id}"}, method = RequestMethod.GET)
     public @ResponseBody
     List<Participant> getAllByUserId(@PathVariable Integer id) throws ForbiddenException {
-        if (checkPermissions()) {
+        if (checkUserPermissions()) {
             return participantRepository.getAllByUserIdAndDeletedIs(id, notDeleted);
         }
-        throw new ForbiddenException("Forbidden action");
+        throw new ForbiddenException(forbiddenNotAuthorized);
     }
 
     @RequestMapping(value = {"/getAllByEmail/{email}"}, method = RequestMethod.GET)
     public @ResponseBody
     List<Participant> getAllByEmail(@PathVariable String email) throws ForbiddenException {
-        if (checkPermissions()) {
+        if (checkUserPermissions()) {
             return participantRepository.getAllByEmailAndDeletedIs(email, notDeleted);
         }
-        throw new ForbiddenException("Forbidden action");
+        throw new ForbiddenException(forbiddenNotAuthorized);
     }
 
-    private boolean checkPermissions() {
+    private boolean checkUserPermissions() {
         return userBean.getUser().getRoleId().equals(admin) || userBean.getUser().getRoleId().equals(advancedUser);
     }
 
     @Override
     public String update(Integer integer, Participant object) throws ForbiddenException {
-        throw new ForbiddenException("Forbidden exception");
+        throw new ForbiddenException(badRequestUpdate);
     }
 
     @Transactional
@@ -147,7 +160,7 @@ public class ParticipantController extends GenericController<Participant, Intege
             }
             return insertedParticipants;
         }
-        throw new BadRequestException("Bad request");
+        throw new BadRequestException(badRequest);
     }
 
 
