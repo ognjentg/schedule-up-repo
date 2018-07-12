@@ -11,6 +11,7 @@ import ba.telegroup.schedule_up.repository.DocumentRepository;
 import ba.telegroup.schedule_up.repository.MeetingRepository;
 import ba.telegroup.schedule_up.repository.ParticipantRepository;
 import ba.telegroup.schedule_up.repository.SettingsRepository;
+import ba.telegroup.schedule_up.util.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
@@ -34,6 +35,8 @@ public class MeetingController extends GenericController<Meeting, Integer> {
     private final DocumentRepository documentRepository;
     @Value("${admin.id}")
     private Integer admin;
+    @Value("${superAdmin.id}")
+    private Integer superAdmin;
     @Value("${advancedUser.id}")
     private Integer advancedUser;
     @Value("${user.id}")
@@ -50,6 +53,36 @@ public class MeetingController extends GenericController<Meeting, Integer> {
     private String alreadyFinished;
     @Value("${badRequest.update}")
     private String update;
+    @Value("${forbidden.notAuthorized}")
+    private String forbiddenNotAuthorized;
+    @Value("${badRequest.participantNotExist}")
+    private String badRequestParticipantNotExist;
+    @Value("${badRequest.update}")
+    private String badRequestUpdate;
+    @Value("${badRequest.meetingNotExist}")
+    private String badRequestMeetingNotExist;
+    @Value("${badRequest.participantExist}")
+    private String badRequestParticipantExist;
+    @Value("${success.action}")
+    private String success;
+    @Value("${badRequest}")
+    private String badRequest;
+    @Value("${badRequest.delete}")
+    private String badRequestDelete;
+    @Value("${badRequest.stringMaxLength}")
+    private String badRequestStringMaxLength;
+    @Value("${badRequest.minimalCancelTime}")
+    private String badRequestMinimalCancelTime;
+    @Value("${badRequest.userNull}")
+    private String userNull;
+    @Value("${badRequest.dateTimeCompare}")
+    private String badRequestDateTimeCompare;
+    @Value("${badRequest.status}")
+    private String badRequestStatus;
+    @Value("${badRequest.meetingPeriodViolation}")
+    private String badRequestMeetingPeriodViolation;
+    @Value("${badRequest.meetingCompanyMismatch}")
+    private String badRequestMeetingCompanyMismatch;
 
     @Autowired
     public MeetingController(MeetingRepository meetingRepository, SettingsRepository settingsRepository, ParticipantRepository participantRepository, DocumentRepository documentRepository) {
@@ -64,55 +97,40 @@ public class MeetingController extends GenericController<Meeting, Integer> {
     @Override
     public @ResponseBody
     List<Meeting> getAll() throws ForbiddenException {
-        if (userBean.getUser().getRoleId().equals(admin)) {
+        if (!userBean.getUser().getRoleId().equals(superAdmin)) {
             return meetingRepository.getAllByStatusInAndCompanyId(new Byte[]{scheduled, finished}, userBean.getUser().getCompanyId());
-        } else if (userBean.getUser().getRoleId().equals(advancedUser) || userBean.getUser().getRoleId().equals(user)) {
-            return meetingRepository.getAllByStatusInParticipant(userBean.getUser().getId());
         }
-        throw new ForbiddenException("Forbidden action");
+        throw new ForbiddenException(forbiddenNotAuthorized);
     }
 
-   /*
-    Ovo sam zakomentarisao jer validacija nije korektna, a i potreban je drugi nacin za zatvaranje
-    @RequestMapping(value = "/finish", method = RequestMethod.PUT)
-    public @ResponseBody
-    String finish(@RequestBody Meeting meeting) throws BadRequestException, ForbiddenException {
-        if (userBean.getUser().getRoleId()==admin || userBean.getUser().getId().equals(meeting.getUserId())) {
-            return updateStatus(meeting, finished);
-        }
-        throw new ForbiddenException("Forbidden action");
-    }*/
 
     @RequestMapping(value = "/finish/{id}", method = RequestMethod.PUT)
-
     public @ResponseBody
     String finish(@PathVariable Integer id) throws BadRequestException, ForbiddenException {
         Meeting meeting = meetingRepository.findById(id).orElse(null);
         if (meeting == null)
             throw new BadRequestException(noMeeting);
-        if (meeting.getStatus() == finished)
+        if (meeting.getStatus() .equals( finished))
             throw new BadRequestException(alreadyFinished);
-        if (userBean.getUser().getRoleId() == admin || userBean.getUser().getId() == meeting.getUserId()) {
+        if (userBean.getUser().getRoleId().equals(admin) || userBean.getUser().getId() == meeting.getUserId()) {
             meeting.setStatus(finished);
             if (meetingRepository.saveAndFlush(meeting) != null)
-                return "Success";
+                return success;
             throw new BadRequestException(update);
         }
-        throw new ForbiddenException("Forbidden");
+        throw new ForbiddenException(forbiddenNotAuthorized);
     }
 
     @RequestMapping(value = "/getByRoom/{id}", method = RequestMethod.GET)
     public @ResponseBody
     List<Meeting> getByRoom(@PathVariable Integer id) throws BadRequestException, ForbiddenException {
         if (id != null) {
-            if (userBean.getUser().getRoleId().equals(admin)) {
+            if (!userBean.getUser().getRoleId().equals(superAdmin)) {
                 return meetingRepository.getAllByStatusInAndRoomIdAndCompanyId(new Byte[]{scheduled, finished}, id, userBean.getUser().getCompanyId());
-            } else if (userBean.getUser().getRoleId().equals(advancedUser) || userBean.getUser().getRoleId().equals(user)) {
-                return meetingRepository.getAllByStatusInParticipantAndRoomId(new Byte[]{scheduled, finished}, userBean.getUser().getId(), id);
             }
-            throw new ForbiddenException("Forbidden action");
+            throw new ForbiddenException(forbiddenNotAuthorized);
         }
-        throw new BadRequestException("Bad request");
+        throw new BadRequestException(badRequest);
     }
 
     @RequestMapping(value = "/cancel/", method = RequestMethod.PUT)
@@ -130,31 +148,51 @@ public class MeetingController extends GenericController<Meeting, Integer> {
                 && meeting.getUserId().equals(dbMeeting.getUserId())) {
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             Timestamp minimalCancelTime = new Timestamp(meeting.getStartTime().getTime() + settingsRepository.getByCompanyId(meeting.getCompanyId()).getCancelTime().getTime());
-            if (meeting.getCancelationReason() != null && currentTime.before(minimalCancelTime))
-                return updateStatus(meeting, canceled);
-            throw new BadRequestException("Bad request");
+            if(meeting.getDescription()!=null && !Validator.stringMaxLength(meeting.getDescription(),500)){
+                throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}","description-a").replace("{broj}",String.valueOf(500)));
+            }
+            if (currentTime.before(minimalCancelTime) && Validator.timestampCompare(currentTime,minimalCancelTime)!=null
+                    && Validator.timestampCompare(currentTime,minimalCancelTime)==-1) {
+                if(meeting.getCancelationReason() != null && Validator.stringMaxLength(meeting.getCancelationReason(),500)
+                        && Validator.stringMaxLength(meeting.getTopic(),500)) {
+                    return updateStatus(meeting, canceled);
+                }
+                throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}","topic-a").replace("{broj}",String.valueOf(500)));
+            }
+            throw new BadRequestException(badRequestMinimalCancelTime);
         }
-        throw new ForbiddenException("Forbidden action");
+        throw new ForbiddenException(forbiddenNotAuthorized);
     }
 
     @Override
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public @ResponseBody
-    String update(@PathVariable Integer id, @RequestBody Meeting object) throws BadRequestException, ForbiddenException {
-        Meeting oldObject = cloner.deepClone(meetingRepository.findById(id).orElse(null));
-        if (oldObject != null && object.getUserId() == null || Objects.requireNonNull(oldObject).getUserId() == null) {
-            throw new BadRequestException("user id cannot be null");
-        } else {
-            if (oldObject.getUserId().equals(object.getUserId()) && (userBean.getUser().getRoleId().equals(admin) || oldObject.getUserId().equals(userBean.getUser().getId()))) {
-                if (check(object, false)) {
-                    meetingRepository.saveAndFlush(object);
-                    logUpdateAction(object, oldObject);
-                    return "Success";
-                }
-                throw new BadRequestException("Bad request");
-            }
-            throw new ForbiddenException("Forbidden action");
+    String update(@PathVariable Integer id, @RequestBody Meeting meeting) throws BadRequestException, ForbiddenException {
+        Meeting oldMeeting = cloner.deepClone(meetingRepository.findById(id).orElse(null));
+        Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+        if (oldMeeting == null) {
+            throw new BadRequestException(noMeeting);
         }
+        if (oldMeeting.getUserId().equals(meeting.getUserId()) && (userBean.getUser().getRoleId().equals(admin) || oldMeeting.getUserId().equals(userBean.getUser().getId()))) {
+            if(!oldMeeting.getStartTime().equals(meeting.getStartTime())){
+                if(Validator.timestampCompare(meeting.getStartTime(),currentTime) != null && Validator.timestampCompare(meeting.getStartTime(), currentTime) <0){
+                    throw new BadRequestException(badRequestDateTimeCompare.replace("{date1}","vrijeme pocetka")
+                            .replace("{prijePoslije}","poslije").replace("{date2}","trenutnog vremena"));
+                }
+            }
+            if(!oldMeeting.getEndTime().equals(meeting.getEndTime())){
+                if(Validator.timestampCompare(meeting.getEndTime(),currentTime) != null && Validator.timestampCompare(meeting.getEndTime(), currentTime) <0){
+                    throw new BadRequestException(badRequestDateTimeCompare.replace("{date1}","vrijeme zavrsetka")
+                            .replace("{prijePoslije}","poslije").replace("{date2}","trenutnog vremena"));
+                }
+            }
+            if (checkMeeting(meeting, false)) {
+                    meetingRepository.saveAndFlush(meeting);
+                    logUpdateAction(meeting, oldMeeting);
+                    return success;
+            }
+        }
+        throw new ForbiddenException(forbiddenNotAuthorized);
     }
 
 
@@ -162,7 +200,7 @@ public class MeetingController extends GenericController<Meeting, Integer> {
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.DELETE)
     public @ResponseBody
     String delete(@PathVariable Integer id) throws ForbiddenException {
-        throw new ForbiddenException("Forbidden action");
+        throw new ForbiddenException(badRequestDelete);
     }
 
 
@@ -171,68 +209,93 @@ public class MeetingController extends GenericController<Meeting, Integer> {
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public @ResponseBody
-    Meeting insert(@RequestBody Meeting object) throws BadRequestException, ForbiddenException {
+    Meeting insert(@RequestBody Meeting meeting) throws BadRequestException, ForbiddenException {
         if (userBean.getUser().getRoleId().equals(admin) || userBean.getUser().getRoleId().equals(advancedUser)) {
-            if (object != null && object.getCompanyId() != null && userBean.getUser().getCompanyId().equals(object.getCompanyId())) {
-                if (check(object, true)) {
-                    if ((object = meetingRepository.saveAndFlush(object)) != null) {
+            if (meeting != null && meeting.getCompanyId() != null && userBean.getUser().getCompanyId().equals(meeting.getCompanyId())) {
+                if (checkMeeting(meeting, true)) {
+                    if ((meeting = meetingRepository.saveAndFlush(meeting)) != null) {
                         Participant creator = new Participant();
-                        creator.setMeetingId(object.getId());
-                        creator.setUserId(object.getUserId());
-                        creator.setCompanyId(object.getCompanyId());
+                        creator.setMeetingId(meeting.getId());
+                        creator.setUserId(meeting.getUserId());
+                        creator.setCompanyId(meeting.getCompanyId());
                         creator.setDeleted((byte) 0);
                         if (participantRepository.saveAndFlush(creator) != null) {
-                            return object;
+                            return meeting;
                         }
+                        throw new BadRequestException(badRequest);
                     }
                 }
-                throw new BadRequestException("Bad request");
             }
+            throw new BadRequestException(badRequestMeetingCompanyMismatch);
         }
-        throw new ForbiddenException("Forbidden action");
+        throw new ForbiddenException(forbiddenNotAuthorized);
     }
 
-    private Boolean check(Meeting meeting, Boolean insert) {
+    private Boolean checkMeeting(Meeting meeting, Boolean insert) throws BadRequestException {
         Timestamp currentTime = new Timestamp(System.currentTimeMillis());
         if (meeting != null
                 && meeting.getEndTime() != null
                 && meeting.getStartTime() != null
-                && meeting.getEndTime().after(meeting.getStartTime())
                 && meeting.getUserId() != null
                 && meeting.getRoomId() != null
                 && meeting.getCompanyId() != null
                 && meeting.getStatus() != null
                 && meeting.getTopic() != null) {
-            List<Integer> ids = meetingRepository.getIdsOfMeetingsBetween(meeting.getStartTime(), meeting.getEndTime(), meeting.getRoomId());
-            if (insert && meeting.getStartTime().after(currentTime)
-                    && meeting.getEndTime().after(currentTime)) {
-                return ids.size() <= 0;
-            } else {
-                return meeting.getId() != null && ids.size() == 1 && ids.get(0).equals(meeting.getId());
+            if (Validator.timestampCompare(meeting.getStartTime(), meeting.getEndTime()) != null && Validator.timestampCompare(meeting.getStartTime(), meeting.getEndTime()) <= 0) {
+                if (Validator.stringMaxLength(meeting.getTopic(), 500)) {
+                    if(meeting.getDescription()!=null && !Validator.stringMaxLength(meeting.getDescription(),500)){
+                        throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}","description-a").replace("{broj}",String.valueOf(500)));
+                    }
+                    if(meeting.getStatus().equals(canceled) && meeting.getCancelationReason()!=null && !Validator.stringMaxLength(meeting.getCancelationReason(),500)){
+                        throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}","cancelation reason-a").replace("{broj}",String.valueOf(500)));
+                    }
+                    List<Integer> ids = meetingRepository.getIdsOfMeetingsBetween(meeting.getStartTime(), meeting.getEndTime(), meeting.getRoomId());
+                    if (insert ){
+                        if(Validator.timestampCompare(meeting.getStartTime(),currentTime) != null && Validator.timestampCompare(meeting.getStartTime(), currentTime) <0){
+                             throw new BadRequestException(badRequestDateTimeCompare.replace("{date1}","vrijeme pocetka")
+                                    .replace("{prijePoslije}","poslije").replace("{date2}","trenutnog vremena"));
+                        }
+                        if(Validator.timestampCompare(meeting.getEndTime(),currentTime) != null && Validator.timestampCompare(meeting.getEndTime(), currentTime) < 0) {
+                            throw new BadRequestException(badRequestDateTimeCompare.replace("{date1}","vrijeme zavrsetka")
+                                    .replace("{prijePoslije}","poslije").replace("{date2}","trenutnog vremena"));
+                        }
+                        if(ids.size() == 0){
+                            return true;
+                        }
+                        throw new BadRequestException(badRequestMeetingPeriodViolation);
+                    } else {
+                        if(meeting.getId() != null && ((ids.size() == 1 && ids.get(0).equals(meeting.getId())) || ids.size()==0)){
+                            return true;
+                        }
+                        throw new BadRequestException(badRequestMeetingPeriodViolation);
+                    }
+                }
+                throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}","topic-a").replace("{broj}",String.valueOf(500)));
             }
+            throw new BadRequestException(badRequestDateTimeCompare.replace("{date1}","datum pocetka")
+                    .replace("{prijePoslije}","prije").replace("{date2}","datuma kraja"));
         }
-        return false;
+        throw new BadRequestException(badRequest);
     }
 
     @SuppressWarnings("SameReturnValue")
     private String updateStatus(Meeting updatedObject, byte status) throws BadRequestException, ForbiddenException {
         if (status > 2) {
-            throw new BadRequestException("Bad request");
+            throw new BadRequestException(badRequestStatus);
         }
-        Meeting oldObject = cloner.deepClone(meetingRepository.findById(updatedObject.getId()).orElse(null));
-        if (oldObject != null && oldObject.getUserId() == null || Objects.requireNonNull(oldObject).getUserId() == null) {
-            throw new BadRequestException("user id cannot be null");
+        Meeting oldMeeting = cloner.deepClone(meetingRepository.findById(updatedObject.getId()).orElse(null));
+        if (oldMeeting == null) {
+            throw new BadRequestException(noMeeting);
         } else {
-            if (oldObject.getUserId().equals(userBean.getUser().getId())) {
+            if (oldMeeting.getUserId().equals(userBean.getUser().getId())) {
                 Objects.requireNonNull(updatedObject).setStatus(status);
-                if (check(updatedObject, false)) {
+                if (checkMeeting(updatedObject, false)) {
                     meetingRepository.saveAndFlush(updatedObject);
-                    logUpdateAction(updatedObject, oldObject);
-                    return "Success";
+                    logUpdateAction(updatedObject, oldMeeting);
+                    return success;
                 }
-                throw new BadRequestException("Bad request");
             }
-            throw new ForbiddenException("Forbidden action");
+            throw new ForbiddenException(forbiddenNotAuthorized);
         }
     }
 
@@ -241,7 +304,6 @@ public class MeetingController extends GenericController<Meeting, Integer> {
     public @ResponseBody
     MeetingDocumentParticipant insertFullMeeting(@RequestBody MeetingDocumentParticipant meeting) throws BadRequestException, ForbiddenException {
         Meeting insertedMeeting= insert(meeting.getMeeting());
-
         meeting.getMeeting().setId(insertedMeeting.getId());
         meeting.getParticipants().forEach(participant -> participant.setMeetingId(meeting.getMeeting().getId()));
         meeting.getDocuments().forEach(document -> document.setMeetingId(meeting.getMeeting().getId()));

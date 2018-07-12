@@ -7,6 +7,7 @@ import ba.telegroup.schedule_up.model.Meeting;
 import ba.telegroup.schedule_up.model.Participant;
 import ba.telegroup.schedule_up.repository.MeetingRepository;
 import ba.telegroup.schedule_up.repository.ParticipantRepository;
+import ba.telegroup.schedule_up.util.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
@@ -39,16 +40,18 @@ public class ParticipantController extends GenericController<Participant, Intege
     private String forbiddenNotAuthorized;
     @Value("${badRequest.participantNotExist}")
     private String badRequestParticipantNotExist;
-    @Value("${badRequest.update")
+    @Value("${badRequest.update}")
     private String badRequestUpdate;
-    @Value("${badRequest.meetingNotExist")
+    @Value("${badRequest.meetingNotExist}")
     private String badRequestMeetingNotExist;
-    @Value("${badRequest.participantExist")
+    @Value("${badRequest.participantExist}")
     private String badRequestParticipantExist;
-    @Value("${success.Delete")
-    private String successDelete;
+    @Value("${success.action}")
+    private String success;
     @Value("${badRequest}")
     private String badRequest;
+    @Value("${badRequest.stringMaxLength}")
+    private String badRequestStringMaxLength;
     @Autowired
     public ParticipantController(ParticipantRepository participantRepository, MeetingRepository meetingRepository) {
         super(participantRepository);
@@ -62,18 +65,23 @@ public class ParticipantController extends GenericController<Participant, Intege
     @ResponseStatus(HttpStatus.CREATED)
     public @ResponseBody
     Participant insert(@RequestBody Participant object) throws BadRequestException, ForbiddenException {
-        if (object.getMeetingId() != null) {
-            Meeting meeting = meetingRepository.findById(object.getMeetingId()).orElse(null);
-            if (checkUserPermissions() && meeting != null && meeting.getUserId().equals(userBean.getUser().getId())) {
-                List<Participant> participants = participantRepository.getAllByMeetingIdAndDeletedIs(meeting.getId(), notDeleted);
-                if (participants.stream().filter(participant -> participant.equalsIgnorePrimaryKey(object)).count() == 0)
-                    return super.insert(object);
-                throw new BadRequestException(badRequestParticipantExist);
+
+            if (object.getMeetingId() != null) {
+                Meeting meeting = meetingRepository.findById(object.getMeetingId()).orElse(null);
+                if (checkUserPermissions() && meeting != null && meeting.getUserId().equals(userBean.getUser().getId())) {
+                    if (Validator.stringMaxLength(object.getEmail(), 100)) {
+                        List<Participant> participants = participantRepository.getAllByMeetingIdAndDeletedIs(meeting.getId(), notDeleted);
+                        if (participants.stream().filter(participant -> participant.equalsIgnorePrimaryKey(object)).count() == 0)
+                            return super.insert(object);
+                        throw new BadRequestException(badRequestParticipantExist);
+                    }
+                    throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}","email-a").replace("{broj}",String.valueOf(100)));
+                }
+                throw new ForbiddenException(forbiddenNotAuthorized + " ili " + badRequestMeetingNotExist);
             }
-            throw new ForbiddenException(forbiddenNotAuthorized+" ili "+badRequestMeetingNotExist);
+            throw new BadRequestException(badRequestMeetingNotExist);
         }
-        throw new BadRequestException(badRequestMeetingNotExist);
-    }
+
 
     @Override
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.DELETE)
@@ -87,7 +95,7 @@ public class ParticipantController extends GenericController<Participant, Intege
                     Objects.requireNonNull(participant).setDeleted(deleted);
                     participantRepository.saveAndFlush(participant);
                     logDeleteAction(participant);
-                    return successDelete;
+                    return success;
                 }
             }
             throw new BadRequestException(badRequestParticipantNotExist);
