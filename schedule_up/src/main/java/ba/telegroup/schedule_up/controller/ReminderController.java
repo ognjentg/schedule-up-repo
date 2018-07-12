@@ -1,9 +1,11 @@
 package ba.telegroup.schedule_up.controller;
 
+import ba.telegroup.schedule_up.common.exceptions.BadRequestException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.model.Reminder;
 import ba.telegroup.schedule_up.repository.ReminderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Controller;
@@ -26,6 +28,9 @@ public class ReminderController extends GenericController<Reminder, Integer> {
 
     private ReminderRepository reminderRepository;
 
+    @Value("${badRequest.noReminder}")
+    private String badRequestNoReminder;
+
     @Autowired
     public ReminderController(ReminderRepository repo) {
         super(repo);
@@ -42,12 +47,15 @@ public class ReminderController extends GenericController<Reminder, Integer> {
     @Override
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.DELETE)
     public @ResponseBody
-    String delete(@PathVariable Integer id) {
+    String delete(@PathVariable Integer id) throws BadRequestException {
         Reminder reminder = repo.findById(id).orElse(null);
-        Objects.requireNonNull(reminder).setDeleted((byte) 1);
-        repo.saveAndFlush(reminder);
-        logDeleteAction(reminder);
-        return "Success";
+        if (reminder != null) {
+            (reminder).setDeleted((byte) 1);
+            repo.saveAndFlush(reminder);
+            logDeleteAction(reminder);
+            return "Success";
+        }
+        throw new BadRequestException(badRequestNoReminder);
     }
 
 }

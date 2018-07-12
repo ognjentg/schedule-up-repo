@@ -5,6 +5,7 @@ import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.model.RoomHasGearUnit;
 import ba.telegroup.schedule_up.model.RoomHasGearUnitPK;
 import ba.telegroup.schedule_up.repository.RoomHasGearUnitRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Controller;
@@ -18,6 +19,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Scope("request")
 public class RoomHasGearUnitController extends GenericController<RoomHasGearUnit, RoomHasGearUnitPK> {
     private final RoomHasGearUnitRepository roomHasGearUnitRepository;
+
+    @Value("${badRequest.roomDoesNotHaveUnit}")
+    private String roomDoesNotHaveUnit;
 
     public RoomHasGearUnitController(RoomHasGearUnitRepository repo) {
         super(repo);
@@ -37,6 +41,6 @@ public class RoomHasGearUnitController extends GenericController<RoomHasGearUnit
             logDeleteAction(roomHasGearUnit);
             return "Success";
         }
-        throw new BadRequestException("Bad Request");
+        throw new BadRequestException(roomDoesNotHaveUnit);
     }
 }
