@@ -5,7 +5,9 @@ import ba.telegroup.schedule_up.common.exceptions.ForbiddenException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.model.Gear;
 import ba.telegroup.schedule_up.repository.GearRepository;
+import ba.telegroup.schedule_up.util.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
@@ -21,6 +23,15 @@ import java.util.List;
 public class GearController extends GenericController<Gear, Integer> {
 
     private GearRepository gearRepository;
+
+    @Value("${badRequest.insert}")
+    private String badRequestInsert;
+
+    @Value("${badRequest.stringMaxLength}")
+    private String badRequestStringMaxLength;
+
+    @Value("${badRequest.update}")
+    private String badRequestUpdate;
 
     @Autowired
     public GearController(GearRepository repo) {
@@ -56,17 +67,25 @@ public class GearController extends GenericController<Gear, Integer> {
         if (gears == null || gears.size() == 0) {
             if (Integer.valueOf(2).equals(userBean.getUser().getRoleId()) || Integer.valueOf(3).equals(userBean.getUser().getRoleId())) {
                 if (object.getName() != null) {
-                    return super.insert(object);
+                    if(Validator.stringMaxLength(object.getName(), 100)) {
+                        return super.insert(object);
+                    }
+                    throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "naziva").replace("{broj}", String.valueOf(100)));
                 }
-                throw new BadRequestException("Bad request");
+                throw new BadRequestException(badRequestInsert);
             }
             throw new ForbiddenException("Forbidden action");
         } else {
             if (gears.size() > 1)
-                throw new BadRequestException("Bad request");
-            update(object.getId(), object);
+                throw new BadRequestException(badRequestInsert);
+            if(Validator.stringMaxLength(object.getName(), 100)) {
+                update(object.getId(), object);
+            }
+            else {
+                throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "naziva").replace("{broj}", String.valueOf(100)));
+            }
+            return object;
         }
-        throw new BadRequestException("Bad request");
     }
 
     @RequestMapping(method = RequestMethod.PUT)
@@ -79,13 +98,16 @@ public class GearController extends GenericController<Gear, Integer> {
     public String update(Integer integer, Gear object) throws ForbiddenException, BadRequestException {
         List<Gear> gears = gearRepository.getAllByNameContainsIgnoreCase(object.getName());
         if (gears == null || gears.size() != 1)
-            throw new BadRequestException("Bad request");
+            throw new BadRequestException(badRequestUpdate);
         Gear oldObj = gears.get(0);
         if (Integer.valueOf(2).equals(userBean.getUser().getRoleId()) || Integer.valueOf(3).equals(userBean.getUser().getRoleId())) {
             if (object.getName() != null) {
-                return super.update(oldObj.getId(), object);
+                if(Validator.stringMaxLength(object.getName(),100)) {
+                    return super.update(oldObj.getId(), object);
+                }
+                throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "naziva").replace("{broj}", String.valueOf(100)));
             }
-            throw new BadRequestException("Bad request");
+            throw new BadRequestException(badRequestUpdate);
         }
         throw new ForbiddenException("Forbidden action");
     }

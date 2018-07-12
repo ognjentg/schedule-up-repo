@@ -1,5 +1,6 @@
 package ba.telegroup.schedule_up.controller;
 
+import ba.telegroup.schedule_up.common.exceptions.BadRequestException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.model.GearUnit;
 import ba.telegroup.schedule_up.model.modelCustom.GearUnitGear;
@@ -7,7 +8,9 @@ import ba.telegroup.schedule_up.repository.GearRepository;
 import ba.telegroup.schedule_up.repository.GearUnitRepository;
 import ba.telegroup.schedule_up.repository.repositoryCustom.GearUnitRepositoryCustom;
 import ba.telegroup.schedule_up.repository.repositoryCustom.repositoryImpl.GearUnitRepositoryImpl;
+import ba.telegroup.schedule_up.util.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
@@ -25,6 +28,15 @@ public class GearUnitController extends GenericController<GearUnit, Integer> {
 
     private GearUnitRepository gearUnitRepository;
     private GearRepository gearRepository;
+
+    @Value("${badRequest.insert}")
+    private String badRequestInsert;
+
+    @Value("${badRequest.update}")
+    private String badRequestUpdate;
+
+    @Value("${badRequest.stringMaxLength}")
+    private String badRequestStringMaxLength;
 
     @Autowired
     public GearUnitController(GearUnitRepository repo, GearRepository gearRepository) {
@@ -56,15 +68,29 @@ public class GearUnitController extends GenericController<GearUnit, Integer> {
     @RequestMapping(value = "/custom/", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public @ResponseBody
-    GearUnitGear insertExtended(@RequestBody GearUnitGear gearUnitGear) {
-        return gearUnitRepository.insertExtended(gearUnitGear);
+    GearUnitGear insertExtended(@RequestBody GearUnitGear gearUnitGear) throws BadRequestException {
+        if(Validator.stringMaxLength(gearUnitGear.getName(),100)) {
+            if(Validator.stringMaxLength(gearUnitGear.getDescription(), 500)) {
+                return gearUnitRepository.insertExtended(gearUnitGear);
+            }
+            throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "opisa").replace("{broj}", String.valueOf(500)));
+        }
+        throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "naziva").replace("{broj}", String.valueOf(100)));
+
     }
 
     @Transactional
     @RequestMapping(value = "/custom/", method = RequestMethod.PUT)
     public @ResponseBody
-    GearUnitGear updateExtended(@RequestBody GearUnitGear gearUnitGear) {
-        return gearUnitRepository.updateExtended(gearUnitGear);
+    GearUnitGear updateExtended(@RequestBody GearUnitGear gearUnitGear) throws BadRequestException {
+        if(Validator.stringMaxLength(gearUnitGear.getName(),100)) {
+            if(Validator.stringMaxLength(gearUnitGear.getDescription(), 500)) {
+                return gearUnitRepository.updateExtended(gearUnitGear);
+            }
+            throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "opisa").replace("{broj}", String.valueOf(500)));
+        }
+        throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "naziva").replace("{broj}", String.valueOf(100)));
+
     }
 
     @Override
