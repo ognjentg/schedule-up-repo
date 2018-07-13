@@ -8,7 +8,9 @@ import ba.telegroup.schedule_up.model.User;
 import ba.telegroup.schedule_up.model.UserGroup;
 import ba.telegroup.schedule_up.repository.ParticipantRepository;
 import ba.telegroup.schedule_up.repository.UserGroupRepository;
+import ba.telegroup.schedule_up.util.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -25,6 +27,14 @@ import java.util.stream.Collectors;
 public class UserGroupController extends GenericController<UserGroup, Integer> {
     private final UserGroupRepository usergroupRepository;
     private final ParticipantRepository participantRepository;
+
+
+    @Value("${badRequest.delete}")
+    private String badRequestDelete;
+
+    @Value("${badRequest.stringMaxLength}")
+    private String badRequestStringMaxLength;
+
 
     @Autowired
     public UserGroupController(UserGroupRepository repo,ParticipantRepository participantRepository) {
@@ -44,12 +54,15 @@ public class UserGroupController extends GenericController<UserGroup, Integer> {
     @Override
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.DELETE)
     public @ResponseBody
-    String delete(@PathVariable Integer id) {
+    String delete(@PathVariable Integer id) throws BadRequestException {
         UserGroup userGroup = repo.findById(id).orElse(null);
-        Objects.requireNonNull(userGroup).setDeleted((byte) 1);
-        repo.saveAndFlush(userGroup);
-        logDeleteAction(userGroup);
-        return "Success";
+        if (userGroup != null) {
+            Objects.requireNonNull(userGroup).setDeleted((byte) 1);
+            repo.saveAndFlush(userGroup);
+            logDeleteAction(userGroup);
+            return "Success";
+        }
+        throw new BadRequestException(badRequestDelete);
     }
 
     @Override
@@ -57,7 +70,11 @@ public class UserGroupController extends GenericController<UserGroup, Integer> {
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public @ResponseBody
     String update(@PathVariable Integer id, @RequestBody UserGroup object) throws BadRequestException, ForbiddenException {
-        return super.update(id, object);
+        if(Validator.stringMaxLength(object.getName(), 100))
+        {
+            return super.update(id, object);
+        }
+        throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "naziva").replace("{broj}", String.valueOf(100)));
     }
 
     @Override
@@ -66,7 +83,11 @@ public class UserGroupController extends GenericController<UserGroup, Integer> {
     @ResponseStatus(HttpStatus.CREATED)
     public @ResponseBody
     UserGroup insert(@RequestBody UserGroup object) throws BadRequestException, ForbiddenException {
-        return super.insert(object);
+        if(Validator.stringMaxLength(object.getName(), 100))
+        {
+            return super.insert(object);
+        }
+        throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "naziva").replace("{broj}", String.valueOf(100)));
     }
 
     @Transactional
