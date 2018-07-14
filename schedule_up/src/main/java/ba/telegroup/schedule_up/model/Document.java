@@ -74,7 +74,7 @@ public class Document {
     @Override
     public int hashCode() {
 
-        int result = Objects.hash(id, name, report, meetingId);
+        int result = Objects.hash(id);
         result = 31 * result + Arrays.hashCode(content);
         return result;
     }

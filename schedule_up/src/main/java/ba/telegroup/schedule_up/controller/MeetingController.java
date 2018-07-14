@@ -303,26 +303,26 @@ public class MeetingController extends GenericController<Meeting, Integer> {
     @RequestMapping(value = "/full", method = RequestMethod.POST)
     public @ResponseBody
     MeetingDocumentParticipant insertFullMeeting(@RequestBody MeetingDocumentParticipant meeting) throws BadRequestException, ForbiddenException {
-        Meeting insertedMeeting= insert(meeting.getMeeting());
-        meeting.getMeeting().setId(insertedMeeting.getId());
+        meeting.setMeeting(insert(meeting.getMeeting()));
+        int participantNumber=meeting.getParticipants().size();
         meeting.getParticipants().forEach(participant -> participant.setMeetingId(meeting.getMeeting().getId()));
         meeting.getDocuments().forEach(document -> document.setMeetingId(meeting.getMeeting().getId()));
         meeting.setParticipants(participantRepository.saveAll(meeting.getParticipants()));
         meeting.setDocuments(documentRepository.saveAll(meeting.getDocuments()));
-        meeting.getMeeting().setParticipantsNumber(meeting.getMeeting().getParticipantsNumber()+meeting.getParticipants().size());
+        meeting.getMeeting().setParticipantsNumber(participantNumber+1);
         return meeting;
 
     }
 
     @Transactional
-    @RequestMapping(value = "/full", method = RequestMethod.PUT)
+    @RequestMapping(value = "/full/{id}", method = RequestMethod.PUT)
     public @ResponseBody
-    MeetingDocumentParticipant updateFullMeeting(@RequestBody MeetingDocumentParticipant meeting) throws BadRequestException, ForbiddenException {
-        update(meeting.getMeeting().getId(), meeting.getMeeting());
-        meeting.getParticipants().forEach(participant -> participant.setMeetingId(meeting.getMeeting().getId()));
+    MeetingDocumentParticipant updateFullMeeting(@PathVariable Integer id,@RequestBody MeetingDocumentParticipant meeting) throws BadRequestException, ForbiddenException {
+        update(id, meeting.getMeeting());
+        meeting.getParticipants().forEach(participant -> participant.setMeetingId(id));
         meeting.setParticipants(participantRepository.saveAll(meeting.getParticipants()));
         List<Document> documents = meeting.getDocuments();
-        List<Document> currentDocuments = documentRepository.getAllByMeetingId(meeting.getMeeting().getId());
+        List<Document> currentDocuments = documentRepository.getAllByMeetingId(id);
         for (Iterator<Document> it = currentDocuments.iterator(); it.hasNext(); ) {
             Document document = it.next();
             if (!documents.contains(document)) {
@@ -331,10 +331,10 @@ public class MeetingController extends GenericController<Meeting, Integer> {
             }
         }
         documents.removeAll(currentDocuments);
+        documents.forEach(document -> document.setMeetingId(id));
         documents = documentRepository.saveAll(documents);
         documents.addAll(currentDocuments);
         meeting.setDocuments(documents);
-
         meeting.getMeeting().setParticipantsNumber(meeting.getMeeting().getParticipantsNumber()+meeting.getParticipants().size());
         return meeting;
     }
