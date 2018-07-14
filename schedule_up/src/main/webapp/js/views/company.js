@@ -161,6 +161,7 @@ var companyView = {
         id: "addCompanyDialog",
         modal: true,
         position: "center",
+
         body: {
             id: "addCompanyInside",
             rows: [{
@@ -234,28 +235,97 @@ var companyView = {
                         name: "email",
                         label: "E-mail",
                         required: true
-                    },{
-                        view:"uploader",
-                        value:"Logo kompanije",
-                        accept:"image/jpeg, image/png",
-                        autosend:false,
-                        width:200,
-                        align:"center",
-                        multiple:false,
-                        on:{
-                            onBeforeFileAdd: function(upload){
-                                var file = upload.file;
-                                var reader = new FileReader();
-                                reader.onload = function(event) {
-                                    var form = $$("addCompanyForm");
-                                    form.elements.companyLogo.setValue(event.target.result.split("base64,")[1]);
+                    },
+                    {
+                        height:50,
+                        cols:[
+                            {
+                                view:"label",
+                                width:200,
+                                bottomPadding:18,
+                                leftPadding:3,
+                                required:true,
+                                label:"Logo kompanije <span style='color:#e32'>*</span>"
+                            },
+                            {
+                                view:"list",
+                                name:"companyLogoList",
+                                rules:{
+                                    content:webix.rules.isNotEmpty
+                                },
+                                scroll:false,
+                                id:"companyLogoList",
+                                width:290,
+                                type: {
+                                    height: "auto"
+                                },
+                                css:"relative image-upload",
+                                template:"<img src='data:image/jpg;base64,#content#'/> <span class='delete-file'><span class='webix fa fa-close'/></span>",
+                                onClick:{
+                                    'delete-file':function (e,id) {
+                                        this.remove(id);
+                                        return false;
+                                    }
+                                }
+                            },{},
+                            {
+                                view:"uploader",
+                                id:"photoUploader",
+                                width:24,
+                                height:24,
+                                css:"upload-photo",
+                                template:"<span class='webix fa fa-upload' /></span>",
+                                on: {
+                                    onBeforeFileAdd: function (upload) {
+                                        var type = upload.type.toLowerCase();
+                                        if (type != "jpg" && type != "png"){
+                                            util.messages.showErrorMessage("Dozvoljene ekstenzije  su jpg i png!")
+                                            return false;
+                                        }
+                                        var file = upload.file;
+                                        var reader = new FileReader();
+                                        reader.onload = function (event) {
+                                            var img=new Image();
+                                            img.onload=function (ev) {
+                                                if (img.width===220&& img.height===50) {
+                                                    var newDocument = {
+                                                        name: file['name'],
+                                                        content: event.target.result.split("base64,")[1],
+                                                    };
+                                                    $$("companyLogoList").clearAll();
+                                                    $$("companyLogoList").add(newDocument);
+                                                }else{
+                                                    util.messages.showErrorMessage("Dimenzije logoa moraju biti 220x50 px!")
+                                                }
+                                            };
+                                            img.src=event.target.result;
+                                        };
+                                        reader.readAsDataURL(file);
+                                        return false;
+                                    }
+                                }
+                            },
+                        ]
+                    },
+                    {
+                        height:18,
+                        cols:[
 
-                                };
-                                reader.readAsDataURL(file);
-                                return false;
-                            }
-                        }
-                    }, {
+                            {},
+                            {
+                                id:"invalidLabel",
+                                view:"label",
+                                label:"Odaberite logo kompanije!",
+                                css:" invalid-message-photo-alignment",
+                                hidden:true
+
+                            },
+                            {}
+                        ]
+                    }
+                    ,
+
+                    {
                         margin: 5,
                         cols: [{}, {
                             id: "saveCompany",
@@ -292,6 +362,18 @@ var companyView = {
                         }
 
                         return true;
+                    },
+                    "timeTo":function (value) {
+                        if (!value) {
+                            $$('addCompanyForm').elements.timeTo.config.invalidMessage = 'Unesite kraj radnog vremena';
+                            return false;
+                        }
+
+                        if (value <= $$('addCompanyForm').getValues().timeFrom){
+                            $$('addCompanyForm').elements.timeTo.config.invalidMessage = 'Kraj radnog vremena mora biti poslije početka!    ';
+                            return false;
+                        }
+                        return true;
                     }
                 }
             }]
@@ -305,13 +387,23 @@ var companyView = {
 
     save: function () {
         var form = $$("addCompanyForm");
-        if (form.validate()) {
+        var logo=$$("companyLogoList");
+        var photoValidation=logo.count()===1;
+        if (!photoValidation){
+            webix.html.addCss(logo.getNode(),"image-upload-invalid");
+            $$("invalidLabel").show();
+        }else{
+           webix.html.removeCss(logo.getNode(),"image-upload-invalid");
+            $$("invalidLabel").hide();
+        }
+        var validation=form.validate();
+        if (validation && photoValidation) {
             var newCompany = {
                 name: form.getValues().name,
                 timeFrom: form.getValues().timeFrom + ":00",
                 timeTo: form.getValues().timeTo + ":00",
                 email: form.getValues().email,
-                companyLogo: form.getValues().companyLogo
+                companyLogo: logo.getItem(logo.getLastId()).content
             };
             $$("companyDT").add(newCompany);
             util.dismissDialog('addCompanyDialog');

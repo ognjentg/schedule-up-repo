@@ -40,10 +40,10 @@ var buildingView = {
 
             }, {
                 id: "name",
-                editable: false,
                 fillspace: true,
                 editor: "text",
                 sort: "string",
+                editable:true,
                 header: [
                     "Naziv", {
                         content: "textFilter"
@@ -54,7 +54,7 @@ var buildingView = {
                 fillspace: true,
                 editor: "text",
                 sort: "text",
-                editable: false,
+                editable: true,
                 header: [
                     "Opis", {
                         content: "textFilter"
@@ -64,7 +64,8 @@ var buildingView = {
                 {
                     id: "address",
                     fillspace: true,
-                    editor: "text",
+
+                    editable:false,
                     sort: "text",
                     header: [
                         "Adresa", {
@@ -97,7 +98,8 @@ var buildingView = {
             ],
             select: "row",
             navigation: true,
-            editable: false,
+            editable: true,
+            editaction: "dblclick",
             url: "building/",
             on: {
 

@@ -137,14 +137,14 @@ var connection = {
                         }
                         connection.reload();
                     } else {
-                        util.messages.showErrorMessage("An error occurred while adding data.");
+                        util.messages.showErrorMessage(text);
                     }
                     util.preloader.dec();
                 },
                 success: function (text, data, xhr) {
                     var retVal = data.json();
                     if (!retVal) {
-                        util.messages.showErrorMessage("An error occurred while adding data.");
+                        util.messages.showErrorMessage("Greška prilikom dodavanja podataka!");
                         return false;
                     }
 
@@ -198,7 +198,7 @@ var connection = {
                                 }
                                 connection.reload();
                             } else {
-                                util.messages.showErrorMessage("Greška pri izmjeni podataka");
+                                util.messages.showErrorMessage(text);
                                 data[column] = oldValue;
                                 try {
                                     $$(dtId).updateItem(id, data);
@@ -209,7 +209,7 @@ var connection = {
                         }, success: function (text, data) {
                             //if (!data.json()) {
                             if(text!="Success")
-                            {  util.messages.showErrorMessage("Greška pri izmjeni podataka");
+                            {  util.messages.showErrorMessage("Greška pri izmjeni podataka!");
                                 data[column] = oldValue;
                                 try {
                                     $$(dtId).updateItem(id, data);
