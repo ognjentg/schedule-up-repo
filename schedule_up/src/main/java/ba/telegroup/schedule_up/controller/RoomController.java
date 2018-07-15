@@ -12,10 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -78,6 +76,7 @@ public class RoomController extends GenericController<Room, Integer> {
         return roomRepository.getAllExtendedByCompanyId(userBean.getUser().getCompanyId());
     }
 
+    @Transactional
     @RequestMapping(value = "/addGearUnit/{roomId}/{gearUnitId}", method = RequestMethod.GET)
     public @ResponseBody
     String addGearUnit(@PathVariable Integer roomId, @PathVariable Integer gearUnitId)throws BadRequestException {
@@ -147,5 +146,17 @@ public class RoomController extends GenericController<Room, Integer> {
             throw new BadRequestException(badRequestNoBuilding);
         }
         throw new BadRequestException(badRequestNoRoom);
+    }
+
+    @Transactional
+    @RequestMapping(value = "/addGearUnits/{roomId}", method = RequestMethod.POST)
+    public @ResponseBody
+    String addGearUnits(@PathVariable Integer roomId, @RequestBody List<Integer> gearIds)throws BadRequestException {
+        Room room = roomRepository.getRoomById(roomId);
+        if(room == null)
+            throw new BadRequestException(badRequestNoRoom);
+      for(Integer gearId:gearIds)
+          addGearUnit(roomId,gearId);
+        return "Success";
     }
 }

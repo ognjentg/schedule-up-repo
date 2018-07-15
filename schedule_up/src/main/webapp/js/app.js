@@ -106,6 +106,11 @@ var menuAdvancedUser = [
         id: "dashboard",
         value: "Početna",
         icon: "home"
+    },
+    {
+        id: "room",
+        value: "Sale",
+        icon: "cube"
     }
 
 ];
