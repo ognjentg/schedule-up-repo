@@ -590,7 +590,16 @@ var buildingView = {
 
             var broj = filtered_array4.length ? filtered_array4[0].long_name: "";
             var broj2 = filtered_array4.length ? filtered_array4[0].short_name: "";
-            $$("adresa").setValue(adresa+" "+broj);
+            if(broj!=null){
+                $$("adresa").setValue(adresa+" "+broj);
+
+            }else if(broj2!=null){
+                $$("adresa").setValue(adresa+" "+broj2);
+
+            }else{
+                $$("adresa").setValue(adresa);
+
+            }
             $$("combo").setValue(country_long + " : " + country_short);
             $$("grad").setValue(city);
             
@@ -636,8 +645,47 @@ var buildingView = {
             $$("map").attachEvent("onAfterDrop", function(id, item){
                 lat=item.lat;
                 lng=item.lng;
-            });
+                var url="https://maps.googleapis.com/maps/api/geocode/json?latlng="+lat+","+lng+"+&key=AIzaSyBExEHqJmRKJoRhWOT6Ok3fLR5QMGIZ_eg&language=hr";
+                fetch(url).then(function(result) {
+                    if(result.ok) {
+                        return result.json();
+                    }
+                    throw new Error('Neuspješno dobavljanje tačne lokacije.');
+                }).then(function(json) {
+                    var place=json['results'][0];
 
+                    var filtered_array3 = place.address_components.filter(function(address_component){
+                        return address_component.types.includes("route");
+                    });
+                    var adresa = filtered_array3.length ? filtered_array3[0].long_name: "";
+                    var filtered_array4 = place.address_components.filter(function(address_component){
+                        return address_component.types.includes("street_number");
+                    });
+
+                    var broj = filtered_array4.length ? filtered_array4[0].long_name: "";
+                    var broj2 = filtered_array4.length ? filtered_array4[0].short_name: "";
+                    var infowindow;
+                    var marker= $$("map").getItem(id).$marker;
+                    if(marker.infowindow!=null) marker.infowindow.close();
+                    if(broj!=null){
+                        marker.infowindow = new google.maps.InfoWindow({
+                            content: adresa+" "+broj
+                        });
+                    }else if(broj2!=null){
+                        marker.infowindow = new google.maps.InfoWindow({
+                            content: adresa+" "+broj2
+                        });
+                    }else{
+                        marker.infowindow = new google.maps.InfoWindow({
+                            content: adresa
+                        });
+                    }
+                    marker.infowindow.open($$("map").getMap(), marker);
+                    // setTimeout(function () { infowindow.close(); }, 5000);
+                });
+
+
+            });
         }).catch(function(error) {
             util.messages.showErrorMessage("Nije moguće prikazati mapu.")
         });

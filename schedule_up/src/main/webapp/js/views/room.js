@@ -121,17 +121,60 @@ var roomView = {
         }]
     },
 
-    showMapDetailsDialog: function(latitude,longitude){
-        tableCentar[0]=latitude;
-        tableCentar[1]=longitude;
-        var mapaObjekat={
-            id:1,lat:tableCentar[0],  lng:tableCentar[1]
-        };
-        tableData[0]=mapaObjekat;
-        webix.ui(webix.copy(roomView.showMapDialog));
-        $$("mapLabel").data.label="<span class='webix_icon fa fa-map-marker '></span> Lokacija sale";
-        $$("showMapDialog").show();
-    },
+        showMapDetailsDialog: function(latitude,longitude){
+            var url="https://maps.googleapis.com/maps/api/geocode/json?latlng="+latitude+","+longitude+"+&key=AIzaSyBExEHqJmRKJoRhWOT6Ok3fLR5QMGIZ_eg&language=hr";
+            fetch(url).then(function(result) {
+                if(result.ok) {
+                    return result.json();
+                }
+                throw new Error('Neuspješno dobavljanje tačne lokacije.');
+            }).then(function(json) {
+                tableCentar[0]=latitude;
+                tableCentar[1]=longitude;
+                var mapaObjekat={
+                    id:1,lat:tableCentar[0],  lng:tableCentar[1]
+                };
+                tableData[0]=mapaObjekat;
+                webix.ui(webix.copy(roomView.showMapDialog));
+                $$("mapLabel").data.label="<span class='webix_icon fa fa-map-marker '></span> Lokacija sale";
+                $$("map").add({ id:2, lat: latitude, lng: longitude})
+
+                $$("showMapDialog").show();
+
+                var place=json['results'][0];
+
+                var filtered_array3 = place.address_components.filter(function(address_component){
+                    return address_component.types.includes("route");
+                });
+                var adresa = filtered_array3.length ? filtered_array3[0].long_name: "";
+                var filtered_array4 = place.address_components.filter(function(address_component){
+                    return address_component.types.includes("street_number");
+                });
+
+                var broj = filtered_array4.length ? filtered_array4[0].long_name: "";
+                var broj2 = filtered_array4.length ? filtered_array4[0].short_name: "";
+
+                var infowindow;
+                var item = $$("map").getItem(2);
+                var marker = item.$marker;
+                if(broj!=null){
+                    marker.infowindow = new google.maps.InfoWindow({
+                        content: adresa+" "+broj
+                    });
+                }else if(broj2!=null){
+                    marker.infowindow = new google.maps.InfoWindow({
+                        content: adresa+" "+broj2
+                    });
+                }else{
+                    marker.infowindow = new google.maps.InfoWindow({
+                        content: adresa
+                    });
+                }
+                marker.infowindow.open($$("map").getMap(), marker);
+                // setTimeout(function () { infowindow.close(); }, 5000);
+            });
+
+        },
 
 
     showMapDialog:{
