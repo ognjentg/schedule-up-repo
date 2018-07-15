@@ -434,6 +434,13 @@ var mainLayout = {
                         view: "label",
                         css: "appNameLabel",
                         label: "Schedule Up"
+                    },{   id: "profileBtn",
+                        view: "button",
+                        type: "iconButton",
+                        label: "Profil",
+                        click: "clickProfile",
+                        icon: "user",
+                        autowidth: true
                     }, {
                         id: "logoutBtn",
                         view: "button",
@@ -470,7 +477,9 @@ var mainLayout = {
         }
     ]
 };
-
+var clickProfile=function(){
+    profileView.selectPanel();
+};
 var menuEvents = {
     onItemClick: function (item) {
         menuActions(item);
