@@ -114,6 +114,34 @@ public class UserController extends GenericController<User, Integer> {
         }
     }
 
+    @Override
+    @Transactional
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    public @ResponseBody
+    String update(@PathVariable Integer id, @RequestBody User user) throws BadRequestException {
+        if(userBean.getUser().getId().equals(id)){
+            if (Validator.stringMaxLength(user.getFirstName(), 100)) {
+                if (Validator.stringMaxLength(user.getLastName(), 100)) {
+                    if(Validator.binaryMaxLength(user.getPhoto(), longblobLength)){
+                        User userTemp = userRepository.findById(id).orElse(null);
+                        User oldUser = cloner.deepClone(repo.findById(id).orElse(null));
+
+                        userTemp.setFirstName(user.getFirstName());
+                        userTemp.setLastName(user.getLastName());
+                        userTemp.setPhoto(user.getPhoto());
+                        logUpdateAction(user, oldUser);
+
+                        return "Success";
+                    }
+                    throw new BadRequestException(badRequestBinaryLength.replace("{tekst}", "slike"));
+                }
+                throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "prezimena").replace("{broj}", String.valueOf(100)));
+            }
+            throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "imena").replace("{broj}", String.valueOf(100)));
+        }
+        throw new BadRequestException(badRequestUpdate);
+    }
+
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public @ResponseBody
     User login(@RequestBody LoginInformation loginInformation) throws ForbiddenException {
