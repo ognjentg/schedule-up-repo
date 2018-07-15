@@ -179,12 +179,9 @@ var roomView = {
         connection.attachAjaxEvents("roomDT", "room", false, false, editValidationRules);
         $$("roomDT").detachEvent("onBeforeDelete");
 
-
-        webix.ui({
-            view: "contextmenu",
-            id: "roomContextMenu",
-            width: 200,
-            data: [{
+        var roomContextMenu;
+        if (userData.roleId==2){
+            roomContextMenu=[{
                 id: "1",
                 value: "Izmjenite",
                 icon: "pencil-square-o"
@@ -210,7 +207,31 @@ var roomView = {
                     value: "Oprema u sali",
                     icon: "hdd-o"
                 }
-            ],
+            ];
+        }else{
+            roomContextMenu=[{
+                id: "3",
+                value: "Prikaz rezervacija",
+                icon: "calendar"
+            },
+                {
+                    $template:"Separator"
+                },
+                {
+                    id: "4",
+                    value: "Oprema u sali",
+                    icon: "hdd-o"
+                }];
+            $$("addRoomBtn").hide();
+            $$("roomDT").define("editaction","none");
+            $$("roomDT").refresh();
+        }
+
+        webix.ui({
+            view: "contextmenu",
+            id: "roomContextMenu",
+            width: 200,
+            data: roomContextMenu,
             master: $$("roomDT"),
             on: {
                 onItemClick: function (id) {
@@ -241,7 +262,7 @@ var roomView = {
                             webix.confirm(delBox);
                             break;
                         case "3":
-                            meetingView.selectPanel($$("roomDT").getItem(context.id.row));
+                            meetingView.selectPanel($$("roomDT").getItem(context.id.row),$$("roomDT").getItem(context.id.row).name);
                             break;
                         case "4":
                             roomView.showGearDialog($$("roomDT").getItem(context.id.row).id);
@@ -668,6 +689,7 @@ var roomView = {
                     cols:[
                         {},
                         {
+                            id:"addGearBtn",
                             view:"button",
                             icon:"plus-circle",
                             type:"iconButton",
@@ -708,7 +730,7 @@ var roomView = {
     showGearDialog:function (roomId) {
         var dialog=webix.ui(webix.copy(this.gearDialog));
         this.gearDialog.roomId=roomId;
-        webix.ui({
+        var gearContext=webix.ui({
             view: "contextmenu",
             id: "gearContextMenu",
             width: 200,
@@ -718,7 +740,7 @@ var roomView = {
                 icon: "trash"
             }
             ],
-            master: $$("gearList"),
+
             on: {
                 onItemClick: function (id) {
                     var context = this.getContext();
@@ -751,7 +773,11 @@ var roomView = {
                 }
             }
         });
-
+        if (userData.roleId===2){
+            $$("gearContextMenu").attachTo($$("gearList"));
+        }else{
+            $$("addGearBtn").hide();
+        }
         $$("gearList").load("gear-unit/custom/byRoom/"+roomId).then(function (response){
             if (response)
                 dialog.show();

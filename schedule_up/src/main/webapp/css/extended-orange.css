@@ -112,3 +112,12 @@
     alignment: right;
     max-height:100%;
 }
+
+.room-name-scheduler{
+    font-size: 20px !important;
+    font-weight: 500 !important;
+    font-family: Roboto,Arial !important;
+    width: 100% !important;
+    margin-left: 15px !important;
+    margin-top: 5px !important;
+}

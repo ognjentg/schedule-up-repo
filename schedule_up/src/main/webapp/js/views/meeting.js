@@ -438,7 +438,7 @@ var meetingView = {
         adjust: true,
         rows: [{
             view: "template",
-            template: "<div id='scheduler_there' class='dhx_cal_container' style='width:100%; height:100%;'><div class='dhx_cal_navline'><div class='dhx_cal_prev_button'>&nbsp;</div><div class='dhx_cal_next_button'>&nbsp;</div><div class='dhx_cal_today_button'></div><div class='dhx_cal_date'></div><div class=\"dhx_cal_tab\" name=\"day_tab\" style=\"right:204px;\"></div>\n" +
+            template: "<div id='scheduler_room_name' class='room-name-scheduler'>ZENA BEZ IMENA malina hahaha </div><div id='scheduler_there' class='dhx_cal_container' style='width:100%; height:100%;'><div class='dhx_cal_navline'><div class='dhx_cal_prev_button'>&nbsp;</div><div class='dhx_cal_next_button'>&nbsp;</div><div class='dhx_cal_today_button'></div><div class='dhx_cal_date'></div><div class=\"dhx_cal_tab\" name=\"day_tab\" style=\"right:204px;\"></div>\n" +
             "        <div class=\"dhx_cal_tab\" name=\"week_tab\" style=\"right:140px;\"></div>\n" +
             "        <div class=\"dhx_cal_tab\" name=\"month_tab\" style=\"right:76px;\"></div></div><div class='dhx_cal_header'></div><div id='scheduler_data' class='dhx_cal_data'></div></div>",
         }
@@ -524,7 +524,7 @@ var meetingView = {
 
     },
 
-    selectPanel: function (room) {
+    selectPanel: function (room,roomName) {
         detachAllEvents();
         webix.protoUI({
             name: "activeList"
@@ -536,6 +536,7 @@ var meetingView = {
         var panelCopy = webix.copy(this.panel);
         $$("main").addView(webix.copy(panelCopy));
         scheduler.clearAll();
+        document.getElementById("scheduler_room_name").innerHTML=roomName;
         var event = scheduler.attachEvent("onEmptyClick", function (date, e) {
             if (date>new Date()&&checkIfNotHoliday(date)) {
                 webix.ui(webix.copy(meetingView.addMeetingDialog)).show();
