@@ -133,31 +133,23 @@ public class MeetingController extends GenericController<Meeting, Integer> {
         throw new BadRequestException(badRequest);
     }
 
-    @RequestMapping(value = "/cancel/", method = RequestMethod.PUT)
+    @RequestMapping(value = "/cancel/{id}", method = RequestMethod.PUT)
     public @ResponseBody
-    String cancel(@RequestBody Meeting meeting) throws BadRequestException, ForbiddenException {
-        Meeting dbMeeting = meetingRepository.findById(meeting.getId()).orElse(null);
-        if (userBean.getUser().getId().equals(meeting.getUserId())
-                && dbMeeting != null
-                && dbMeeting.getStartTime() != null
-                && dbMeeting.getEndTime() != null
-                && dbMeeting.getStartTime().equals(meeting.getStartTime())
-                && dbMeeting.getEndTime().equals(meeting.getEndTime())
-                && dbMeeting.getStatus().equals(meeting.getStatus())
+    String cancel(@PathVariable Integer id) throws BadRequestException, ForbiddenException {
+        Meeting meeting = meetingRepository.findById(id).orElse(null);
+        if (meeting!=null&&
+                (userBean.getUser().getRoleId().equals(admin) || userBean.getUser().getId().equals(meeting.getUserId()))
                 && meeting.getStatus().equals(scheduled)
-                && meeting.getUserId().equals(dbMeeting.getUserId())) {
+                ) {
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             Timestamp minimalCancelTime = new Timestamp(meeting.getStartTime().getTime() + settingsRepository.getByCompanyId(meeting.getCompanyId()).getCancelTime().getTime());
-            if(meeting.getDescription()!=null && !Validator.stringMaxLength(meeting.getDescription(),500)){
-                throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}","description-a").replace("{broj}",String.valueOf(500)));
-            }
             if (currentTime.before(minimalCancelTime) && Validator.timestampCompare(currentTime,minimalCancelTime)!=null
                     && Validator.timestampCompare(currentTime,minimalCancelTime)==-1) {
-                if(meeting.getCancelationReason() != null && Validator.stringMaxLength(meeting.getCancelationReason(),500)
-                        && Validator.stringMaxLength(meeting.getTopic(),500)) {
+                //if(meeting.getCancelationReason() != null && Validator.stringMaxLength(meeting.getCancelationReason(),500)
+                //        && Validator.stringMaxLength(meeting.getTopic(),500)) {
                     return updateStatus(meeting, canceled);
-                }
-                throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}","topic-a").replace("{broj}",String.valueOf(500)));
+                //}
+                //throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}","topic-a").replace("{broj}",String.valueOf(500)));
             }
             throw new BadRequestException(badRequestMinimalCancelTime);
         }

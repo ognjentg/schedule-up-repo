@@ -1,4 +1,5 @@
 var contextMenu;
+var holidays;
 var formatter = webix.Date.dateToStr("%d-%m-%Y %H:%i");
 var parser = webix.Date.strToDate("%d-%m-%Y %H:%i");
 var meetingView = {
@@ -536,26 +537,23 @@ var meetingView = {
         $$("main").addView(webix.copy(panelCopy));
         scheduler.clearAll();
         var event = scheduler.attachEvent("onEmptyClick", function (date, e) {
-            webix.ui(webix.copy(meetingView.addMeetingDialog)).show();
-            $$("startTime").setValue(date);
-            $$("endTime").setValue(date);
-            $$("userList").load("user");
-            $$("userGroupList").load("user-group");
-
-            $$("userList").attachEvent("onAfterLoad", function () {
-
-                $$("userList").filter(function (obj) {
-                    return (obj.firstName != null && obj.id != userData.id);
+            if (date>new Date()&&checkIfNotHoliday(date)) {
+                webix.ui(webix.copy(meetingView.addMeetingDialog)).show();
+                $$("startTime").setValue(date);
+                $$("endTime").setValue(date);
+                $$("userList").load("user");
+                $$("userGroupList").load("user-group");
+                $$("userList").attachEvent("onAfterLoad", function () {
+                    $$("userList").filter(function (obj) {
+                        return (obj.firstName != null && obj.id != userData.id);
+                    });
                 });
-            });
-
-            $$("userGroupList").attachEvent("onAfterLoad", function () {
-
-                $$("userGroupList").filter(function (obj) {
-                    return obj.name != null;
+                $$("userGroupList").attachEvent("onAfterLoad", function () {
+                    $$("userGroupList").filter(function (obj) {
+                        return obj.name != null;
+                    });
                 });
-            });
-
+            }
         });
         schedulerEvents.push(event);
 
@@ -569,7 +567,6 @@ var meetingView = {
                 function (results) {
                     event1.creatorUsername = JSON.parse(results[0].text()).username;
                     //alert(JSON.parse(results[0].text()).username);
-
                     event1.meetingParticipants = JSON.parse(results[1].text());
                     event1.meetingDocuments = JSON.parse(results[2].text());
                     meetingView.showEventPopup(event1);
@@ -581,16 +578,48 @@ var meetingView = {
         scheduler.config.readonly = true;
         scheduler.config.first_hour = parseInt(companyData.timeFrom.substr(0, 2));
 
-        scheduler.init('scheduler_there', new Date(), "week");
         schedulerEvents.push(scheduler.attachEvent("onEventLoading", function (ev) {
             if (ev.status !== 0)
                 ev.color = "#bdd5ff";
             return true;
         }));
-        scheduler.load("meeting/getByRoom/" + room.id, "json");
+        webix.ajax("holiday").then(function (result) {
+            holidays=JSON.parse(result.text());
+            for (var i=0;i<holidays.length;i++){
+                var holiday=holidays[i];
+                scheduler.blockTime(
+                    new Date(holiday.date),
+                    "fullday"
+                );
+
+            }
+            scheduler.init('scheduler_there', new Date(), "week");
+            scheduler.load("meeting/getByRoom/" + room.id, "json");
+        });
+
 
         schedulerEvents.push(scheduler.attachEvent("onContextMenu", function (id, e) {
-            if (id != null && scheduler.getEvent(id).status === 0) {
+            var activeEventMenu=[
+                {
+                    id: 1,
+                    value: "Izmijenite"
+                },
+                {
+                    id: 2,
+                    value: "Zatvorite"
+                },
+                {
+                    id:4,
+                    value: "Otkažite"
+                }
+            ];
+            var finishedEventMenu=[
+                {
+                    id:3,
+                    value: "Dodajte izvještaj"
+                }
+            ];
+            if (id != null &&(userData.roleId===2 || scheduler.getEvent(id).userId === userData.id) ) {
                 meetingView.contextMenuEventId = id;
                 var posx = 0;
                 var posy = 0;
@@ -605,20 +634,6 @@ var meetingView = {
 
                     contextMenu = webix.ui({
                         view: "contextmenu",
-                        data: [
-                            {
-                                id: 1,
-                                value: "Izmijenite"
-                            },
-                            {
-                                id: 2,
-                                value: "Otkažite"
-                            },
-                            {
-                                id:3,
-                                value: "Dodajte izvještaj"
-                            }
-                        ],
                         on: {
                             onItemClick: function (id) {
                                 // Property meetingView.contextMenuEventId je id eventa na koji smo kliknuli.
@@ -632,7 +647,7 @@ var meetingView = {
                                             if (result==1){
                                                 webix.ajax().put("meeting/finish/"+meetingView.contextMenuEventId).
                                                     then(function(result){
-                                                        if (result.text()=="Success"){
+                                                        if (result.text()){
                                                             var ev=scheduler.getEvent(meetingView.contextMenuEventId);
                                                             ev.status=1;
                                                             ev.color = "#bdd5ff";
@@ -640,7 +655,7 @@ var meetingView = {
                                                             util.messages.showMessage("Sastanak uspješno zatvoren");
                                                         }
                                                 }).fail(function (err) {
-                                                        util.messages.showErrorMessage("Zatvaranje sastanka nije uspjelo");
+                                                        util.messages.showErrorMessage(err.text());
                                                 })
                                             }
                                         };
@@ -649,15 +664,41 @@ var meetingView = {
                                     case "3":
                                         meetingView.showAddReportDialog(meetingView.contextMenuEventId);
                                         break;
+                                    case "4":
+                                        var delBox = (webix.copy(meetingView.cancelMeetingDialog));
+                                        delBox.callback = function (result) {
+                                            if (result==1){
+                                                webix.ajax().put("meeting/cancel/"+meetingView.contextMenuEventId).
+                                                then(function(result){
+                                                    if (result.text()){
+                                                        scheduler.deleteEvent(meetingView.contextMenuEventId);
+                                                        util.messages.showMessage("Sastanak uspješno otkazan");
+                                                    }
+                                                }).fail(function (err) {
+                                                    if (err.responseText) {
+                                                        util.messages.showErrorMessage(err.responseText);
+                                                    }else{
+                                                        util.messages.showErrorMessage("Otkazivanje sastanka nije uspjelo!");
+                                                    }
+                                                });
+                                            }
+                                        };
+                                        webix.confirm(delBox);
+                                        break;
                                 }
                             }
                         }
                     });
+                    contextMenu.define("data",scheduler.getEvent(id).status===0?activeEventMenu:finishedEventMenu);
+                    contextMenu.refresh();
                     contextMenu.show({
                         x: posx,
                         y: posy
                     });
                 } else {
+                    contextMenu.clearAll();
+                    contextMenu.define("data",scheduler.getEvent(id).status===0?activeEventMenu:finishedEventMenu);
+                    contextMenu.refresh();
                     contextMenu.show({
                         x: posx,
                         y: posy
@@ -1199,6 +1240,13 @@ var meetingView = {
         width: 500,
         text: "Da li ste sigurni da želite da zatvorite sastanak?"
     },
+    cancelMeetingDialog:{
+        title: "Otkazivanje sastanka",
+        ok: "Da",
+        cancel: "Ne",
+        width: 500,
+        text: "Da li ste sigurni da želite da otkažete sastanak?"
+    },
     addReportDialog:{
         view:"popup",
         id: "addReportDialog",
@@ -1312,6 +1360,15 @@ var meetingView = {
 
 
 
+};
+
+var checkIfNotHoliday=function(date){
+
+    var probe = {
+        start_date: new Date(date),
+        end_date: scheduler.date.add(date, scheduler.config.time_step, "minute")
+    };
+    return scheduler.checkLimitViolation(probe);
 };
 webix.ui({
     view: "popup",

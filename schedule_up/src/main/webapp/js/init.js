@@ -7,7 +7,7 @@ var scriptsToLoad = [
     {
         "section": "extensions",
         "path": "webix/extensions/",
-        "files": ["sidebar/sidebar", "dhtmlxscheduler_readonly"]
+        "files": ["sidebar/sidebar", "dhtmlxscheduler_readonly", "dhtmlxscheduler_limit"]
     },
     {
         "section": "common",
