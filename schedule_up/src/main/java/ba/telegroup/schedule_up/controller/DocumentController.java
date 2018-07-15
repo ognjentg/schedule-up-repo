@@ -5,7 +5,9 @@ import ba.telegroup.schedule_up.common.exceptions.ForbiddenException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.model.Document;
 import ba.telegroup.schedule_up.repository.DocumentRepository;
+import ba.telegroup.schedule_up.util.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -24,6 +26,24 @@ public class DocumentController extends GenericController<Document, Integer> {
 
     private final DocumentRepository documentRepository;
 
+    @Value("${badRequest.insert}")
+    private String badRequestInsert;
+
+    @Value("${badRequest.stringMaxLength}")
+    private String badRequestStringMaxLength;
+
+    @Value("${longblob.length}")
+    private Long longblobLength;
+
+    @Value("${badRequest.binaryLength}")
+    private String badRequestBinaryLength;
+
+    @Value("${badRequest.numberNotNegative}")
+    private String badRequestNumberNotNegative;
+
+    @Value("${badRequest.update}")
+    private String badRequestUpdate;
+
     @Autowired
     public DocumentController(DocumentRepository repo) {
         super(repo);
@@ -37,10 +57,20 @@ public class DocumentController extends GenericController<Document, Integer> {
     List<Document> insertDocuments(@RequestBody List<Document> documents) throws BadRequestException {
         List<Document> retDocuments = new ArrayList<>();
         if (documents == null || documents.size() == 0) {
-            throw new BadRequestException("Bad request");
+            throw new BadRequestException(badRequestInsert);
         } else {
             for (Document document : documents) {
-                retDocuments.add(documentRepository.saveAndFlush(document));
+                if(Validator.stringMaxLength(document.getName(), 100)) {
+                    if(Validator.binaryMaxLength(document.getContent(), longblobLength)) {
+                        if(Validator.integerNotNegative((int)document.getReport())) {
+                            retDocuments.add(documentRepository.saveAndFlush(document));
+                            continue;
+                        }
+                        throw new BadRequestException(badRequestNumberNotNegative.replace("{tekst}", "izvjestaj"));
+                    }
+                    throw new BadRequestException(badRequestBinaryLength.replace("{tekst}", "sadrzaja"));
+                }
+                throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "naziva").replace("{broj}", String.valueOf(100)));
             }
             return retDocuments;
         }
@@ -77,17 +107,32 @@ public class DocumentController extends GenericController<Document, Integer> {
     @RequestMapping(value = "/updateAll/{id}", method = RequestMethod.PUT)
     public @ResponseBody
     List<Document> updateDocuments(@RequestBody List<Document> documents, @PathVariable Integer id) throws ForbiddenException, BadRequestException {
-        List<Document> currentDocuments = getAllByMeetingId(id);
-        for (Iterator<Document> it = currentDocuments.iterator(); it.hasNext(); ) {
+        for(Iterator<Document> it = documents.iterator(); it.hasNext();) {
             Document document = it.next();
-            if (!documents.contains(document)) {
-                delete(document.getId());
-                it.remove();
+            if(Validator.stringMaxLength(document.getName(), 100)) {
+                if (Validator.binaryMaxLength(document.getContent(), longblobLength)) {
+                    if (Validator.integerNotNegative((int) document.getReport())) {
+                        continue;
+                    }
+                    throw new BadRequestException(badRequestNumberNotNegative.replace("{tekst}", "izvjestaj"));
+                }
+                throw new BadRequestException(badRequestBinaryLength.replace("{tekst}", "sadrzaja"));
             }
+            throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "naziva").replace("{broj}", String.valueOf(100)));
         }
-        documents.removeAll(currentDocuments);
-        documents = insertDocuments(documents);
-        documents.addAll(currentDocuments);
-        return documents;
+
+            List<Document> currentDocuments = getAllByMeetingId(id);
+            for (Iterator<Document> it = currentDocuments.iterator(); it.hasNext(); ) {
+                Document document = it.next();
+                if (!documents.contains(document)) {
+                    delete(document.getId());
+                    it.remove();
+                }
+            }
+
+            documents.removeAll(currentDocuments);
+            documents = insertDocuments(documents);
+            documents.addAll(currentDocuments);
+            return documents;
     }
 }

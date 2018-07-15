@@ -6,6 +6,7 @@ import ba.telegroup.schedule_up.model.UserGroupHasUser;
 import ba.telegroup.schedule_up.model.UserGroupHasUserPK;
 import ba.telegroup.schedule_up.repository.UserGroupHasUserRepository;
 import ba.telegroup.schedule_up.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +22,9 @@ import java.util.List;
 public class UserGroupHasUserController extends GenericController<UserGroupHasUser, UserGroupHasUserPK> {
 
     private final UserGroupHasUserRepository userGroupHasUserRepository;
+
+    @Value("${badRequest.delete}")
+    private String badRequestDelete;
 
     public UserGroupHasUserController(UserGroupHasUserRepository repo, UserRepository userRepository) {
         super(repo);
@@ -40,7 +44,7 @@ public class UserGroupHasUserController extends GenericController<UserGroupHasUs
             logDeleteAction(userGroupHasUser);
             return "Success";
         }
-        throw new BadRequestException("Bad Request");
+        throw new BadRequestException(badRequestDelete);
     }
 
     @RequestMapping(value={"/custom/{groupId}"}, method =  RequestMethod.GET)
