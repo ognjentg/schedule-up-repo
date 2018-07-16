@@ -717,9 +717,8 @@ var meetingView = {
     },
 
     showEventPopup: function (event) {
-        //alert("show event popup function"+event.meetingParticipantsExtended[0].name);
         webix.ui(webix.copy(meetingView.eventDialog));
-        //
+
         var formRight = $$("rightForm");
         var format = webix.Date.dateToStr("%d.%m.%Y. %H:%i");
 
@@ -742,6 +741,22 @@ var meetingView = {
             //meetingView.showDocumentDetailsDialog(id);
             return false;
             });
+
+        $$("listParticipants_input").attachEvent("onTimedKeyPress",function(){
+            var value = this.getValue().toLowerCase();
+            $$("list").filter(function(obj){
+                var firstLastName=obj.firstName+" "+obj.lastName;
+                return firstLastName.toLowerCase().indexOf(value)>-1;
+            })
+        });
+
+        $$("listDocuments_input").attachEvent("onTimedKeyPress",function(){
+            var value = this.getValue().toLowerCase();
+            $$("listDocuments").filter(function(obj){
+                return obj.name.toLowerCase().indexOf(value)>-1;
+            })
+        });
+
         $$("eventDialog").show();
     },
 
