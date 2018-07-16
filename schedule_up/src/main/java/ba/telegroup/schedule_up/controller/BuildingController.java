@@ -34,9 +34,6 @@ public class BuildingController extends GenericController<Building, Integer> {
     @Value("${badRequest.stringMaxLength}")
     private String badRequestStringMaxLength;
 
-    @Value("${badRequest.numberNotNegative}")
-    private String badRequestNumberNotNegative;
-
     @Autowired
     public BuildingController(BuildingRepository repo) {
         super(repo);
@@ -73,18 +70,12 @@ public class BuildingController extends GenericController<Building, Integer> {
         if (Validator.stringMaxLength(building.getName(), 100)) {
             if (Validator.stringMaxLength(building.getDescription(), 500)) {
                 if (Validator.stringMaxLength(building.getAddress(), 500)) {
-                    if (Validator.doubleNotNegative(building.getLongitude())) {
-                        if (Validator.doubleNotNegative(building.getLatitude())) {
-                            if (repo.saveAndFlush(building) != null) {
-                                logCreateAction(building);
+                    if (repo.saveAndFlush(building) != null) {
+                        logCreateAction(building);
 
-                                return building;
-                            }
-                            throw new BadRequestException(badRequestInsert);
-                        }
-                        throw new BadRequestException(badRequestNumberNotNegative.replace("{tekst}", "Latituda"));
+                        return building;
                     }
-                    throw new BadRequestException(badRequestNumberNotNegative.replace("{tekst}", "Longituda"));
+                    throw new BadRequestException(badRequestInsert);
                 }
                 throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "adrese").replace("{broj}", String.valueOf(500)));
             }
@@ -100,18 +91,12 @@ public class BuildingController extends GenericController<Building, Integer> {
     String update(@PathVariable Integer id, @RequestBody Building building) throws BadRequestException {
         if (Validator.stringMaxLength(building.getName(), 100)) {
             if (Validator.stringMaxLength(building.getDescription(), 500)) {
-                if (Validator.doubleNotNegative(building.getLongitude())) {
-                    if (Validator.doubleNotNegative(building.getLatitude())) {
-                        Building oldObject = cloner.deepClone(repo.findById(id).orElse(null));
-                        if (repo.saveAndFlush(building) != null) {
-                            logUpdateAction(building, oldObject);
-                            return "Success";
-                        }
-                        throw new BadRequestException(badRequestUpdate);
-                    }
-                    throw new BadRequestException(badRequestNumberNotNegative.replace("{tekst}", "Latituda"));
+                Building oldObject = cloner.deepClone(repo.findById(id).orElse(null));
+                if (repo.saveAndFlush(building) != null) {
+                    logUpdateAction(building, oldObject);
+                    return "Success";
                 }
-                throw new BadRequestException(badRequestNumberNotNegative.replace("{tekst}", "Longituda"));
+                throw new BadRequestException(badRequestUpdate);
             }
             throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "opisa").replace("{broj}", String.valueOf(500)));
         }
