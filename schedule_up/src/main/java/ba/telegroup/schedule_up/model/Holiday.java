@@ -44,7 +44,7 @@ public class Holiday {
     }
 
     @Basic
-    @Column(name = "name", nullable = true, length = 100)
+    @Column(name = "name", nullable = false, length = 100)
     public String getName() {
         return name;
     }
