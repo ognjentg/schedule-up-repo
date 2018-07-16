@@ -2,7 +2,7 @@ var tableData=[];
 var tableCentar=[];
 
 var roomView = {
-
+    roomId:null,
     panel: {
         id: "roomPanel",
         adjust: true,
@@ -737,7 +737,7 @@ var roomView = {
                             icon:"plus-circle",
                             type:"iconButton",
                             label:"Dodajte opremu",
-
+                            click: "roomView.showAddGearDialog",
                             autowidth:true
                         }
                     ]
@@ -770,8 +770,281 @@ var roomView = {
         }
     },
 
+    showAddGearDialog: function () {
+        webix.ui(webix.copy(roomView.addGearDialog));
+        connection.sendAjax("GET", "/gear-unit" ,
+            function (text, data, xhr) {
+                if (text ) {
+                    $$("addGearList").clearAll();
+                    var listAll=data.json();
+                    var listAvailable=[];
+                    for(var i=0;i<listAll.length;i++){
+                        if(listAll[i].available===1){
+                            listAvailable.push(listAll[i]);
+                        }
+                    }
+                    $$("addGearList").parse(listAvailable);
+
+                    $$("listNewGear_input").attachEvent("onTimedKeyPress",function(){
+                        var value = this.getValue().toLowerCase();
+                        $$("addGearList").filter(function(obj){
+                            var text=obj.name+" "+obj.description;
+                            return text.toLowerCase().indexOf(value)>-1;
+                        })
+                    });
+                    $$("addGearDialog").show();
+                } else {
+                    util.messages.showErrorMessage("Greška pri učitavanju opreme.");
+                }
+            }, function (text, data, xhr) {
+                util.messages.showErrorMessage("Greška pri učitavanju opreme.");
+
+            }
+            , null);
+        webix.UIManager.setFocus("name");
+
+    },
+
+    addGearDialog: {
+        view: "popup",
+        id: "addGearDialog",
+        modal: true,
+        position: "center",
+        body: {
+            id: "addGearInside",
+            rows: [{
+                view: "toolbar",
+                cols: [{
+                    view: "label",
+                    label: "<span class='fa fa-wrench'></span> Dodavanje opreme",
+                    width: 400
+                }, {}, {
+                    hotkey: 'esc',
+                    view: "icon",
+                    icon: "close",
+                    align: "right",
+                    click: "util.dismissDialog('addGearDialog');"
+                }]
+            }, {
+                view: "form",
+                id: "addGearDialog",
+                width: 600,
+                height:500,
+                elementsConfig: {
+                    labelWidth: 200,
+                    bottomPadding: 5
+                },
+                elements: [
+                    {
+                        rows: [
+                            {
+                                height: 38,
+                                cols: [{
+                                    view:"search",
+                                    id:"listNewGear_input",
+                                    name: "listNewGear_input",
+                                }, {}, {
+                                    id: "addNewGear",
+                                    view: "button",
+                                    type: "iconButton",
+                                    click: "roomView.showAddNewGearDialog",
+                                    icon: "plus-circle",
+                                    label: "Dodajte novu opremu",
+                                    width: 200,
+                                }]
+                            },
+                            {
+                                view: "list",
+                                id: "addGearList",
+                                width: 200,
+                                type: {
+                                    markCheckbox: function (obj) {
+                                        return "<span class='check webix_icon fa-" + (obj.markCheckbox ? "check-" : "") + "square-o'></span>";
+                                    }
+                                },
+                                onClick: {
+                                    "check": function (e, id) {
+                                        var item = this.getItem(id);
+                                        item.markCheckbox = item.markCheckbox ? 0 : 1;
+                                        this.updateItem(id, item);
+                                    }
+                                },
+                                template: "#name# #description#  {common.markCheckbox()}",
+
+                            }]
+                    },
+                    {
+                        margin: 5,
+                        cols: [{}, {
+                            id: "saveGearButton",
+                            view: "button",
+                            value: "Dodajte opremu",
+                            type: "form",
+                            click: "roomView.saveGear",
+                            hotkey: "enter",
+                            width: 150
+                        }]
+                    }],
+            }]
+        }
+    },
+
+    saveGear: function () {
+        //var form = $$("addGearForm");
+        var gearIds = [];
+        var names=[];
+        var descriptions=[];
+
+        $$("addGearList").data.each(function (obj) {
+                if (obj.markCheckbox == 1) {
+                    gearIds.push(obj.id);
+                    names.push(obj.name);
+                    descriptions.push(obj.description);
+                }
+            }
+        );
+
+        if(gearIds.length===0){
+            util.messages.showErrorMessage("Niste označili opremu koju želite da dodate!");
+        }else{
+
+            connection.sendAjax("POST", "/room/addGearUnits/"+roomView.roomId,
+                function (text, data, xhr) {
+                    if (text==="Success" ) {
+                        for(var i=0;i<gearIds.length;i++)
+                        {
+                            $$("gearList").add({
+                                name: names[i],
+                                description: descriptions[i]
+                            });
+                        }
+                        util.messages.showMessage("Uspješno dodavanje opreme u salu.");
+                    } else {
+                        util.messages.showErrorMessage("Greška pri dodavanju opreme u salu.");
+                    }
+                }, function (text, data, xhr) {
+                    util.messages.showErrorMessage("Greška pri dodavanju opreme u salu.");
+
+                }
+                , gearIds);
+            util.dismissDialog('addGearDialog');
+        }
+    },
+
+    showAddNewGearDialog: function () {
+        webix.ui(webix.copy(roomView.addNewGearDialog)).show();
+        webix.UIManager.setFocus("name");
+    },
+
+    addNewGearDialog: {
+        view: "popup",
+        id: "addNewGearDialog",
+        modal: true,
+        position: "center",
+        body: {
+            id: "addNewGearInside",
+            rows: [{
+                view: "toolbar",
+                cols: [{
+                    view: "label",
+                    label: "<span class='fa fa-wrench'></span> Dodavanje opreme",
+                    width: 400
+                }, {}, {
+                    hotkey: 'esc',
+                    view: "icon",
+                    icon: "close",
+                    align: "right",
+                    click: "util.dismissDialog('addNewGearDialog');"
+                }]
+            }, {
+                view: "form",
+                id: "addNewGearForm",
+                width: 600,
+                elementsConfig: {
+                    labelWidth: 200,
+                    bottomPadding: 18
+                },
+                elements: [{
+                    view: "text",
+                    id: "name",
+                    name: "name",
+                    label: "Naziv opreme",
+                    invalidMessage: "Unesite validan naziv opreme!",
+                    required: true,
+                    suggest: {
+                        id: "gearSuggest",
+                        url: "gear/getAllNames"
+                    }
+
+                },
+                    {
+                        id: "description",
+                        name: "description",
+                        view: "text",
+                        label: "Opis",
+                        required: false
+                    }, {
+                        margin: 5,
+                        cols: [{}, {
+                            id: "saveNewGearButton",
+                            view: "button",
+                            value: "Dodajte opremu",
+                            type: "form",
+                            click: "roomView.saveNewGear",
+                            hotkey: "enter",
+                            width: 150
+                        }]
+                    }],
+                rules: {
+                    "name": function (value) {
+                        if (!value)
+                            return false;
+                        if (value.length > 100) {
+                            $$('addNewGearForm').elements.name.config.invalidMessage = 'Maksimalan broj karaktera je 100!';
+                            return false;
+                        }
+                        return true;
+                    },
+                    "description": function (value) {
+                        if (value.length > 500) {
+                            $$('addNewGearForm').elements.email.config.invalidMessage = 'Maksimalan broj karaktera je 500';
+                            return false;
+                        }
+                        return true;
+                    }
+                }
+            }]
+        }
+    },
+
+    saveNewGear: function () {
+        var form = $$("addNewGearForm");
+        if (form.validate()) {
+            var newItem = {
+                name: $$("addNewGearForm").getValues().name,
+                description: $$("addNewGearForm").getValues().description,
+                available: 1,
+                companyId: userData.companyId,
+                gearId: null
+            };
+
+            connection.sendAjax("POST", "gear-unit/custom/",
+                function (text, data, xhr) {
+                    if (text) {
+                        util.messages.showMessage("Oprema je uspješno kreirana.");
+                        $$("addGearList").add(JSON.parse(text));
+                        util.dismissDialog('addNewGearDialog');
+                    } else
+                        util.messages.showErrorMessage("Oprema nije kreirana.");
+                }, function () {
+                    util.messages.showErrorMessage("Oprema nije kreirana.");
+                }, newItem);
+        }
+    },
+
     showGearDialog:function (roomId) {
         var dialog=webix.ui(webix.copy(this.gearDialog));
+        roomView.roomId=roomId;
         this.gearDialog.roomId=roomId;
         var gearContext=webix.ui({
             view: "contextmenu",
