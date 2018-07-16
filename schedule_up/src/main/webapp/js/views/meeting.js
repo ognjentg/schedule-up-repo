@@ -1110,8 +1110,7 @@ var meetingView = {
             util.dismissDialog('editMeetingDialog')
 
         }
-    },
-    saveMeeting: function () {
+    },saveMeeting: function () {
         var file = meetingView.files[0];
 
         var participants = [];
@@ -1125,9 +1124,7 @@ var meetingView = {
                 if (obj.markCheckbox == 1) {
                     var participant = {
                         userId: obj.id,
-                        deleted: 0,
                         companyId: companyData.id,
-                        meetingId: 1
                     };
                     participants.push(participant);
                 }
@@ -1138,9 +1135,7 @@ var meetingView = {
                 if (obj.markCheckbox == 1) {
                     var group = {
                         userGroupId: obj.id,
-                        deleted: 0,
                         companyId: companyData.id,
-                        meetingId: 1
                     };
                     participants.push(group);
                 }
@@ -1151,9 +1146,7 @@ var meetingView = {
 
                 var participantOutside = {
                     email: obj.name,
-                    deleted: 0,
                     companyId: companyData.id,
-                    meetingId: 1
                 };
                 participants.push(participantOutside);
 
@@ -1176,70 +1169,46 @@ var meetingView = {
                     end_date: formatter(form.getValues().endTime),
                     description: form.getValues().description,
                     text: form.getValues().topic,
-                    participantsNumber: 0,
                     status: 0,
                     companyId: companyData.id,
                     userId: userData.id,
                     roomId: meetingView.roomId.id
 
                 };
-                var insertedMeeting;
-                var pro = webix.ajax().headers({
-                    "Content-type": "application/json"
-                }).post("meeting", newMeeting).then(function (realData) {
-                    insertedMeeting=realData.json();
-                    for (var i = 0; i < participants.length; i++) {
-                        participants[i].meetingId = realData.json().id;
-
+                if (meetingView.files.length > 0) {
+                    for (var j = 0; j < meetingView.files.length; j++) {
+                        var file = meetingView.files[j];
+                        var doc = {
+                            name: file['name'],
+                            content: file['content'],
+                            report: file['report'],
+                        };
+                        documents.push(doc);
                     }
 
-                    connection.sendAjax("POST", "participant/insertAll",
-                        function (text, data, xhr) {
-
-                            if (data) {
-                                if (meetingView.files.length > 0) {
-                                    for (var j = 0; j < meetingView.files.length; j++) {
-                                        var file = meetingView.files[j];
-                                        var doc = {
-                                            name: file['name'],
-                                            content: file['content'],
-                                            report: file['report'],
-                                            meetingId: realData.json().id
-                                        };
-                                        documents.push(doc);
-                                    }
-                                    connection.sendAjax("POST", "document/list/",
-                                        function (text, data, xhr) {
-
-                                            if (data) {
-                                                meetingView.files = [];
-                                                $$("fileList").clearAll();
-                                                util.messages.showMessage("Uspješno kreirana rezervacija.");
-                                                scheduler.addEvent(insertedMeeting);
-
-                                            } else
-                                                util.messages.showErrorMessage("Neuspješno kreiranje rezervacije.");
-                                        }, function () {
-                                            util.messages.showErrorMessage("Neuspješno kreiranje rezervacije.");
-                                        }, documents);
-                                } else {
-                                    scheduler.addEvent(insertedMeeting);
-                                    util.messages.showMessage("Uspješno kreirana rezervacija.");
-                                }
-                            } else
-                                util.messages.showErrorMessage("Neuspješno kreiranje rezervacije.");
-                        }, function () {
+                }
+                var meetingParticipantsDocuments={
+                    "meeting":newMeeting,
+                    "participants":participants,
+                    "documents":documents
+                };
+                connection.sendAjax("POST", "meeting/full",
+                    function (text, data, xhr) {
+                        if (text) {
+                            util.messages.showMessage("Uspješno kreirana rezervacija.");
+                            scheduler.addEvent(newMeeting);
+                        } else
                             util.messages.showErrorMessage("Neuspješno kreiranje rezervacije.");
-                        }, participants);
+                    }, function () {
+                        util.messages.showErrorMessage("Neuspješno kreiranje rezervacije.");
+                    }, meetingParticipantsDocuments);
 
-                });
-                pro.fail(function (err) {
-                    util.messages.showErrorMessage("Neuspješno kreiranje rezervacije.");
-                });
-                util.dismissDialog('addMeetingDialog')
+
+                util.dismissDialog('addMeetingDialog');
+                //  }
             }
-        }
-    }, hide: function () {
+        }}
+    , hide: function () {
         $$("tmpFile").hide();
     },
     showFile: function () {
