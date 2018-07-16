@@ -54,7 +54,7 @@ public class Notification {
         }
     }
 
-    public static void sendRegistrationLink(String recipientMail, String registrationLink) throws BadRequestException {
+    public static void sendRegistrationLink(String recipientMail, String registrationToken) throws BadRequestException {
         Properties properties = getTLSSetProperty();
 
         Session session = Session.getDefaultInstance(properties, new Authenticator() {
@@ -68,7 +68,30 @@ public class Notification {
             message.setFrom(new InternetAddress(SENDER_MAIL, "TeleGroup ScheduleUp"));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientMail));
             message.setSubject("Registration");
-            message.setText("Potvrdite registraciju klikom na sljedeći link: " + registrationLink + ".");
+            message.setText("Registraciju možete izvršiti na slijedećem linku http://localhost:8020 klikom na dugme registraciju. Vaš token je " + registrationToken + ".");
+
+            Transport.send(message);
+
+        } catch (MessagingException | UnsupportedEncodingException e) {
+            throw new BadRequestException("Recipient mail not found.");
+        }
+    }
+
+    public static void sendNewPassword(String recipientMail, String newPassword) throws BadRequestException {
+        Properties properties = getTLSSetProperty();
+
+        Session session = Session.getDefaultInstance(properties, new Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(SENDER_MAIL, PASSWORD);
+            }
+        });
+
+        try {
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(SENDER_MAIL, "TeleGroup ScheduleUp"));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientMail));
+            message.setSubject("Registration");
+            message.setText("Vaša nova lozinka je " + newPassword + ". Molimo Vas da odmah poslije prvog prijavljivanja na sistem promijenite lozinku.");
 
             Transport.send(message);
 

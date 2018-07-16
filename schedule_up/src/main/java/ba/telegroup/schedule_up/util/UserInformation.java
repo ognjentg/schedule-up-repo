@@ -1,13 +1,13 @@
 package ba.telegroup.schedule_up.util;
 
-public class LoginInformation {
+public class UserInformation {
     private String username;
     private String password;
     private String companyName;
 
-    public LoginInformation(){}
+    public UserInformation(){}
 
-    public LoginInformation(String username, String password, String companyName) {
+    public UserInformation(String username, String password, String companyName) {
         this.username = username;
         this.password = password;
         this.companyName = companyName;

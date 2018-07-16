@@ -6,7 +6,8 @@ import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.interaction.Notification;
 import ba.telegroup.schedule_up.model.*;
 import ba.telegroup.schedule_up.repository.*;
-import ba.telegroup.schedule_up.util.LoginInformation;
+import ba.telegroup.schedule_up.util.PasswordInformation;
+import ba.telegroup.schedule_up.util.UserInformation;
 import ba.telegroup.schedule_up.util.Util;
 import ba.telegroup.schedule_up.util.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,6 +79,15 @@ public class UserController extends GenericController<User, Integer> {
     @Value("${badRequest.validateEmail}")
     private String badRequestValidateEmail;
 
+    @Value("${badRequest.oldPassword}")
+    private String badRequestOldPassword;
+
+    @Value("${badRequest.repeatedNewPassword}")
+    private String badRequestRepeatedNewPassword;
+
+    @Value("${badRequest.resetPassword}")
+    private String badRequestResetPassword;
+
     @Autowired
     public UserController(UserRepository repo, CompanyRepository companyRepository, ParticipantRepository participantRepository, UserGroupHasUserRepository userGroupHasUserRepository) {
         super(repo);
@@ -144,20 +154,20 @@ public class UserController extends GenericController<User, Integer> {
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public @ResponseBody
-    User login(@RequestBody LoginInformation loginInformation) throws ForbiddenException {
+    User login(@RequestBody UserInformation userInformation) throws ForbiddenException {
         Boolean successLogin = false;
-        User user = userRepository.getByUsername(loginInformation.getUsername());
+        User user = userRepository.getByUsername(userInformation.getUsername());
         if (user == null) {
             throw new ForbiddenException("Forbidden");
         }
 
         if (Integer.valueOf(1).equals(user.getRoleId())) {
-            if (user.getPassword().trim().equals(Util.hashPassword(loginInformation.getPassword().trim()))) {
+            if (user.getPassword().trim().equals(Util.hashPassword(userInformation.getPassword().trim()))) {
                 successLogin = true;
             }
         } else {
             String companyName = companyRepository.getById(user.getCompanyId()).getName();
-            if (companyName != null && companyName.equals(loginInformation.getCompanyName().trim()) && user.getPassword().trim().equals(Util.hashPassword(loginInformation.getPassword().trim()))) {
+            if (companyName != null && companyName.equals(userInformation.getCompanyName().trim()) && user.getPassword().trim().equals(Util.hashPassword(userInformation.getPassword().trim()))) {
                 successLogin = true;
             }
         }
@@ -186,16 +196,16 @@ public class UserController extends GenericController<User, Integer> {
         return "Success";
     }
 
-    @SuppressWarnings("SameReturnValue")
-    @RequestMapping(value = "/invitationToRegistration", method = RequestMethod.POST)
+    @Override
+    @RequestMapping(method = RequestMethod.POST)
     @Transactional
     @ResponseStatus(HttpStatus.CREATED)
     public @ResponseBody
-    String invitationToRegistration(@RequestParam("mail") String mail, @RequestParam("role") Integer roleId, @RequestParam("company") Integer companyId) throws BadRequestException {
-        if(Validator.validateEmail(mail)){
+    User insert(@RequestBody User user) throws BadRequestException {
+        if(Validator.validateEmail(user.getEmail())){
             String randomToken = Util.randomString(randomStringLength);
             User newUser = new User();
-            newUser.setEmail(mail);
+            newUser.setEmail(user.getEmail());
             newUser.setUsername(null);
             newUser.setPassword(null);
             newUser.setPin(null);
@@ -207,14 +217,14 @@ public class UserController extends GenericController<User, Integer> {
             newUser.setDeactivationReason(null);
             newUser.setToken(randomToken);
             newUser.setTokenTime(new Timestamp(System.currentTimeMillis()));
-            newUser.setCompanyId(companyId);
-            newUser.setRoleId(roleId);
+            newUser.setCompanyId(user.getCompanyId());
+            newUser.setRoleId(user.getRoleId());
             if(repo.saveAndFlush(newUser) != null){
                 entityManager.refresh(newUser);
                 logCreateAction(newUser);
-                Notification.sendRegistrationLink(mail.trim(), "http://127.0.0.1:8020/user/registration/" + randomToken);
+                Notification.sendRegistrationLink(user.getEmail().trim(), randomToken);
 
-                return "Success";
+                return newUser;
             }
             throw new BadRequestException(badRequestInsert);
         }
@@ -234,6 +244,51 @@ public class UserController extends GenericController<User, Integer> {
         } else {
             return null;
         }
+    }
+
+    @RequestMapping(value = "/updatePassword", method = RequestMethod.POST)
+    public @ResponseBody
+    String updatePassword(@RequestBody PasswordInformation passwordInformation) throws BadRequestException{
+        User user = userRepository.findById(userBean.getUser().getId()).orElse(null);
+        if(user != null){
+            if(passwordInformation.getOldPassword() != null && user.getPassword().trim().equals(Util.hashPassword(passwordInformation.getOldPassword().trim()))){
+                if(passwordInformation.getNewPassword() != null && Validator.passwordChecking(passwordInformation.getNewPassword())){
+                    if(passwordInformation.getRepeatedNewPassword() != null && passwordInformation.getNewPassword().trim().equals(passwordInformation.getRepeatedNewPassword().trim())){
+                        user.setPassword(Util.hashPassword(passwordInformation.getNewPassword()));
+                        if(repo.saveAndFlush(user) != null){
+                            return "Success";
+                        }
+                        throw new BadRequestException(badRequestUpdate);
+                    }
+                    throw new BadRequestException(badRequestRepeatedNewPassword);
+                }
+                throw new BadRequestException(badRequestPasswordStrength);
+            }
+            throw new BadRequestException(badRequestOldPassword);
+        }
+        throw new BadRequestException(badRequestNoUser);
+    }
+
+    @RequestMapping(value = "/resetPassword", method = RequestMethod.POST)
+    public @ResponseBody
+    String resetPassword(@RequestBody UserInformation userInformation) throws BadRequestException {
+        User userTemp = userRepository.getByUsername(userInformation.getUsername());
+        if (userTemp != null) {
+            String companyName = companyRepository.getById(userTemp.getCompanyId()).getName();
+            if (companyName != null && userInformation.getCompanyName() != null && companyName.equals(userInformation.getCompanyName().trim())) {
+                User user = userRepository.findById(userTemp.getId()).orElse(null);
+                String newPassword = Util.randomString(randomStringLength);
+                user.setPassword(Util.hashPassword(newPassword));
+                if(repo.saveAndFlush(user) != null){
+                    Notification.sendNewPassword(user.getEmail().trim(), newPassword);
+
+                    return "Success";
+                }
+                throw new BadRequestException(badRequestResetPassword);
+            }
+            throw new BadRequestException(badRequestNoUser);
+        }
+        throw new BadRequestException(badRequestNoUser);
     }
 
     @SuppressWarnings("SameReturnValue")
