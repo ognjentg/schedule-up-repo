@@ -145,7 +145,7 @@ var meetingView = {
                             label: "<span class='webix_icon fa fa-user'></span> Učesnici",
                             width: 200
 
-                        }, {
+                        }, {view:"search",name:"userList_input",id:"userList_input", width:200} ,{
                             view: "list",
                             id: "userList",
                             width: 200,
@@ -172,6 +172,10 @@ var meetingView = {
                             width: 200
 
                         }, {
+                            view: "search",
+                            id: "userGroupList_input",
+                            name: "userGroupList_input"
+                        },{
                             view: "list",
                             id: "userGroupList",
                             width: 200,
@@ -554,6 +558,23 @@ var meetingView = {
                         return obj.name != null;
                     });
                 });
+                $$("userList_input").attachEvent("onTimedKeyPress",function(){
+                    //get user input value
+                    var value = this.getValue().toLowerCase();
+                    $$("userList").filter(function(obj){
+                        var firstLastName2=obj.firstName+" "+obj.lastName;
+                        return firstLastName2.toLowerCase().indexOf(value)>-1 && obj.firstName != null && obj.id != userData.id;
+                    })
+                });
+
+                $$("userGroupList_input").attachEvent("onTimedKeyPress", function () {
+                    var value = this.getValue().toLowerCase();
+                    $$("userGroupList").filter(function (obj) {
+
+                        return obj.name.toLowerCase().indexOf(value)>-1 && obj.name != null;
+                    });
+                });
+
             }
         });
         schedulerEvents.push(event);
