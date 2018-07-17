@@ -292,6 +292,24 @@ public class MeetingController extends GenericController<Meeting, Integer> {
         }
     }
 
+    @RequestMapping(value = "/full/{id}", method = RequestMethod.GET)
+    public @ResponseBody
+    MeetingDocumentParticipant getFullMeeting(@PathVariable Integer id) throws BadRequestException {
+        MeetingDocumentParticipant meetingDocumentParticipant = new MeetingDocumentParticipant();
+        Meeting meeting = meetingRepository.getOne(id);
+        if(meeting != null && meeting.getCompanyId().equals(userBean.getUser().getCompanyId())){
+            List<Document> documents = documentRepository.getAllByMeetingId(id);
+            List<Participant> participants = participantRepository.getAllByMeetingIdAndDeletedIs(id, (byte)0);
+
+            meetingDocumentParticipant.setMeeting(meeting);
+            meetingDocumentParticipant.setDocuments(documents);
+            meetingDocumentParticipant.setParticipants(participants);
+
+            return meetingDocumentParticipant;
+        }
+        throw new BadRequestException(badRequestMeetingNotExist);
+    }
+
     @Transactional
     @RequestMapping(value = "/full", method = RequestMethod.POST)
     public @ResponseBody

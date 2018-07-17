@@ -100,6 +100,9 @@ public class UserController extends GenericController<User, Integer> {
     @Value("${badRequest.deactivateUser}")
     private String badRequestDeactivateUser;
 
+    @Value("${badRequest.emailExists}")
+    private String badRequestEmailExists;
+
     @Autowired
     public UserController(UserRepository repo, CompanyRepository companyRepository, ParticipantRepository participantRepository, UserGroupHasUserRepository userGroupHasUserRepository) {
         super(repo);
@@ -214,32 +217,35 @@ public class UserController extends GenericController<User, Integer> {
     @ResponseStatus(HttpStatus.CREATED)
     public @ResponseBody
     User insert(@RequestBody User user) throws BadRequestException {
-        if(Validator.validateEmail(user.getEmail())){
-            String randomToken = Util.randomString(randomStringLength);
-            User newUser = new User();
-            newUser.setEmail(user.getEmail());
-            newUser.setUsername(null);
-            newUser.setPassword(null);
-            newUser.setPin(null);
-            newUser.setFirstName(null);
-            newUser.setLastName(null);
-            newUser.setPhoto(null);
-            newUser.setActive((byte) 0);
-            newUser.setDeleted((byte) 0);
-            newUser.setToken(randomToken);
-            newUser.setTokenTime(new Timestamp(System.currentTimeMillis()));
-            newUser.setCompanyId(user.getCompanyId());
-            newUser.setRoleId(user.getRoleId());
-            if(repo.saveAndFlush(newUser) != null){
-                entityManager.refresh(newUser);
-                logCreateAction(newUser);
-                Notification.sendRegistrationLink(user.getEmail().trim(), randomToken);
+        if(userRepository.countAllByCompanyIdAndEmail(userBean.getUser().getCompanyId(), user.getEmail()).compareTo(Integer.valueOf(0)) == 0){
+            if(Validator.validateEmail(user.getEmail())){
+                String randomToken = Util.randomString(randomStringLength);
+                User newUser = new User();
+                newUser.setEmail(user.getEmail());
+                newUser.setUsername(null);
+                newUser.setPassword(null);
+                newUser.setPin(null);
+                newUser.setFirstName(null);
+                newUser.setLastName(null);
+                newUser.setPhoto(null);
+                newUser.setActive((byte) 0);
+                newUser.setDeleted((byte) 0);
+                newUser.setToken(randomToken);
+                newUser.setTokenTime(new Timestamp(System.currentTimeMillis()));
+                newUser.setCompanyId(user.getCompanyId());
+                newUser.setRoleId(user.getRoleId());
+                if(repo.saveAndFlush(newUser) != null){
+                    entityManager.refresh(newUser);
+                    logCreateAction(newUser);
+                    Notification.sendRegistrationLink(user.getEmail().trim(), randomToken);
 
-                return newUser;
+                    return newUser;
+                }
+                throw new BadRequestException(badRequestInsert);
             }
-            throw new BadRequestException(badRequestInsert);
+            throw new BadRequestException(badRequestValidateEmail);
         }
-        throw new BadRequestException(badRequestValidateEmail);
+        throw new BadRequestException(badRequestEmailExists);
     }
 
     @RequestMapping(value = "/registration/{token}", method = RequestMethod.GET)

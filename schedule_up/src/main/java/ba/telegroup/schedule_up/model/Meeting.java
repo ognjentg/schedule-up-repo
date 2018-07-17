@@ -1,6 +1,7 @@
 package ba.telegroup.schedule_up.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
@@ -8,6 +9,7 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Objects;
 
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
 public class Meeting {
     private Integer id;
