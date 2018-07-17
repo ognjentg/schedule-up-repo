@@ -114,6 +114,7 @@ public class CompanyController extends GenericController<Company, Integer> {
                         company.setTimeTo(companyUser.getTimeTo());
                         company.setTimeFrom(companyUser.getTimeFrom());
                         company.setDeleted((byte) 0);
+                        company.setCompanyLogo(companyUser.getCompanyLogo());
                         if(repo.saveAndFlush(company) != null){
                             entityManager.refresh(company);
                             logCreateAction(company);
