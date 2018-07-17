@@ -207,14 +207,14 @@ var noteView = {
                     view: "text",
                     id: "name",
                     name: "name",
-                    label: "Naslov",
+                    label: "Naslov:",
                     invalidMessage: "Unesite naslov oglasa!",
                     required: true
                 }, {
                     view: "textarea",
                     id: "description",
                     name: "description",
-                    label: "Tekst",
+                    label: "Tekst:",
                     height: 200,
                     invalidMessage: "Unesite tekst oglasa!",
                     required: true
@@ -224,7 +224,7 @@ var noteView = {
                     timepicker: true,
                     id: "expiredTime",
                     name: "expiredTime",
-                    label: "Datum isteka",
+                    label: "Datum isteka:",
                     required: true
                 }, {
                     margin: 5,
@@ -272,8 +272,10 @@ var noteView = {
     },
 
     showAddDialog: function () {
-        webix.ui(webix.copy(noteView.addDialog)).show();
-        webix.UIManager.setFocus("name");
+        if (util.popupIsntAlreadyOpened("addNoteDialog")) {
+            webix.ui(webix.copy(noteView.addDialog)).show();
+            webix.UIManager.setFocus("name");
+        }
     },
 
     save: function () {
@@ -314,7 +316,7 @@ var noteView = {
             }, {
                 view: "form",
                 id: "changeNoteForm",
-                width: 600,
+                width: 500,
                 elementsConfig: {
                     labelWidth: 200,
                     bottomPadding: 18

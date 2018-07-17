@@ -1359,9 +1359,11 @@ var meetingView = {
         }
     },
     showAddReportDialog: function (meetingId) {
-        var dialog=webix.ui(webix.copy(meetingView.addReportDialog));
-        meetingView.addReportDialog.meetingId=meetingId;
-        dialog.show();
+        if (util.popupIsntAlreadyOpened("addReportDialog")) {
+            var dialog = webix.ui(webix.copy(meetingView.addReportDialog));
+            meetingView.addReportDialog.meetingId = meetingId;
+            dialog.show();
+        }
     }
 
 

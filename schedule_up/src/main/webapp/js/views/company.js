@@ -189,7 +189,7 @@ var companyView = {
                     view: "text",
                     id: "name",
                     name: "name",
-                    label: "Naziv",
+                    label: "Naziv:",
                     invalidMessage: "Unesite naziv kompanije!",
                     required: true
                 }, {
@@ -198,7 +198,7 @@ var companyView = {
                     name: "timeFrom",
                     view: "datepicker",
                     stringResult: true,
-                    label: "Početak radnog vremena",
+                    label: "Početak radnog vremena:",
                     timepicker: true,
                     type: "time",
                     required: true,
@@ -216,7 +216,7 @@ var companyView = {
                     view: "datepicker",
                     invalidMessage: "Unesite kraj radnog vremena!",
                     stringResult: true,
-                    label: "Kraj radnog vremena",
+                    label: "Kraj radnog vremena:",
                     timepicker: true,
                     type: "time",
                     required: true,
@@ -233,7 +233,7 @@ var companyView = {
                         view: "text",
                         id: "email",
                         name: "email",
-                        label: "E-mail",
+                        label: "E-mail:",
                         required: true
                     },
                     {
@@ -245,7 +245,7 @@ var companyView = {
                                 bottomPadding:18,
                                 leftPadding:3,
                                 required:true,
-                                label:"Logo kompanije <span style='color:#e32'>*</span>"
+                                label:"Logo kompanije: <span style='color:#e32'>*</span>"
                             },
                             {
                                 view:"list",
@@ -381,8 +381,10 @@ var companyView = {
     },
 
     showAddDialog: function () {
-        webix.ui(webix.copy(companyView.addDialog)).show();
-        webix.UIManager.setFocus("name");
+        if (util.popupIsntAlreadyOpened("addCompanyDialog")) {
+            webix.ui(webix.copy(companyView.addDialog)).show();
+            webix.UIManager.setFocus("name");
+        }
     },
 
     save: function () {

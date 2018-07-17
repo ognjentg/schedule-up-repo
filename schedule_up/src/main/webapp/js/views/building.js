@@ -44,6 +44,7 @@ var buildingView = {
                 editor: "text",
                 sort: "string",
                 editable:true,
+                tooltip:false,
                 header: [
                     "Naziv", {
                         content: "textFilter"
@@ -55,6 +56,8 @@ var buildingView = {
                 editor: "text",
                 sort: "text",
                 editable: true,
+
+
                 header: [
                     "Opis", {
                         content: "textFilter"
@@ -62,6 +65,7 @@ var buildingView = {
                 ]
             },
                 {
+                    tooltip:false,
                     id: "address",
                     fillspace: true,
 
@@ -99,6 +103,7 @@ var buildingView = {
             select: "row",
             navigation: true,
             editable: true,
+            tooltip:true,
             editaction: "dblclick",
             url: "building/",
             on: {

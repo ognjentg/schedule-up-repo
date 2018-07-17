@@ -1043,67 +1043,69 @@ var roomView = {
     },
 
     showGearDialog:function (roomId) {
-        var dialog=webix.ui(webix.copy(this.gearDialog));
-        roomView.roomId=roomId;
-        this.gearDialog.roomId=roomId;
-        var gearContext=webix.ui({
-            view: "contextmenu",
-            id: "gearContextMenu",
-            width: 200,
-            data: [{
-                id: "1",
-                value: "Obrišite",
-                icon: "trash"
-            }
-            ],
+        if (util.popupIsntAlreadyOpened("gearDialog")) {
+            var dialog = webix.ui(webix.copy(this.gearDialog));
+            roomView.roomId = roomId;
+            this.gearDialog.roomId = roomId;
+            var gearContext = webix.ui({
+                view: "contextmenu",
+                id: "gearContextMenu",
+                width: 200,
+                data: [{
+                    id: "1",
+                    value: "Obrišite",
+                    icon: "trash"
+                }
+                ],
 
-            on: {
-                onItemClick: function (id) {
-                    var context = this.getContext();
-                    switch (id) {
-                        case "1":
-                            var delBox = (webix.copy(commonViews.brisanjePotvrda("opreme", "opremu")));
-                            console.log(context.id);
-                            var newItem = $$("gearList").getItem(context.id);
-                            delBox.callback = function (result) {
-                                if (result == 1) {
+                on: {
+                    onItemClick: function (id) {
+                        var context = this.getContext();
+                        switch (id) {
+                            case "1":
+                                var delBox = (webix.copy(commonViews.brisanjePotvrda("opreme", "opremu")));
+                                console.log(context.id);
+                                var newItem = $$("gearList").getItem(context.id);
+                                delBox.callback = function (result) {
+                                    if (result == 1) {
                                         console.log(roomId);
-                                    console.log(newItem.id);
-                                    connection.sendAjax("DELETE", "room-has-gear-unit/"+roomId+"/" + newItem.id,
-                                        function (text, data, xhr) {
-                                            if (text) {
-                                                util.messages.showMessage("Oprema uspješno obrisana.");
-                                                $$("gearList").remove(context.id);
-                                            } else
+                                        console.log(newItem.id);
+                                        connection.sendAjax("DELETE", "room-has-gear-unit/" + roomId + "/" + newItem.id,
+                                            function (text, data, xhr) {
+                                                if (text) {
+                                                    util.messages.showMessage("Oprema uspješno obrisana.");
+                                                    $$("gearList").remove(context.id);
+                                                } else
+                                                    util.messages.showErrorMessage("Neuspješno brisanje.");
+                                            }, function () {
                                                 util.messages.showErrorMessage("Neuspješno brisanje.");
-                                        }, function () {
-                                            util.messages.showErrorMessage("Neuspješno brisanje.");
-                                        }, null);
+                                            }, null);
 
-                                }
-                            };
-                            webix.confirm(delBox);
-                            break;
+                                    }
+                                };
+                                webix.confirm(delBox);
+                                break;
 
+                        }
                     }
                 }
-            }
-        });
-        if (userData.roleId===2){
-            $$("gearContextMenu").attachTo($$("gearList"));
-        }else{
-            $$("addGearBtn").hide();
-        }
-        $$("gearList").load("gear-unit/custom/byRoom/"+roomId).then(function (response){
-            if (response)
-                dialog.show();
-            else
-                util.messages.showErrorMessage("Nemoguće učitati opremu iz sale!");
-        }).fail(function (error) {
-            util.messages.showErrorMessage("Nemoguće učitati opremu iz sale!");
-        });
-    }
 
+            });
+            if (userData.roleId === 2) {
+                $$("gearContextMenu").attachTo($$("gearList"));
+            } else {
+                $$("addGearBtn").hide();
+            }
+            $$("gearList").load("gear-unit/custom/byRoom/" + roomId).then(function (response) {
+                if (response)
+                    dialog.show();
+                else
+                    util.messages.showErrorMessage("Nemoguće učitati opremu iz sale!");
+            }).fail(function (error) {
+                util.messages.showErrorMessage("Nemoguće učitati opremu iz sale!");
+            });
+        }
+    }
 };
 
 var editValidationRules = [

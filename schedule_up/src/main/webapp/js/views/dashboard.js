@@ -142,13 +142,13 @@ var dashboardView = {
                         view: "text",
                         id: "text",
                         name: "text",
-                        label: "Naziv",
+                        label: "Naziv:",
                         readonly: true
                     }, {
                         view: "text",
                         id: "start_date",
                         name: "start_date",
-                        label: "Početak",
+                        label: "Početak:",
 
                         readonly: true
                     },
@@ -156,28 +156,28 @@ var dashboardView = {
                             view: "text",
                             id: "end_date",
                             name: "end_date",
-                            label: "Kraj",
+                            label: "Kraj:",
                             readonly: true
                         },
                         {
                             view: "text",
                             id: "roomName",
                             name: "roomName",
-                            label: "Sala",
+                            label: "Sala:",
                             readonly: true
                         },
                         {
                             view: "text",
                             id: "participantNumber",
                             name: "participantNumber",
-                            label: "Broj učesnika",
+                            label: "Broj učesnika:",
                             readonly: true
                         },
                         {
                             view: "textarea",
                             id: "description",
                             name: "description",
-                            label: "Opis",
+                            label: "Opis:",
                             readonly: true,
                             height: 100
                         },
@@ -191,7 +191,7 @@ var dashboardView = {
                         {
                             id: "creatorNameLbl",
                             view: "label",
-                            label: "Autor"
+                            label: "Autor:"
                         }
                         , {}, {
                             id: "eventDetailsBtn",
@@ -448,20 +448,22 @@ var dashboardView = {
     },
 
     showEventPopup: function (event) {
-        webix.ui(webix.copy(dashboardView.eventDialog));
-        var form = $$("eventDialogForm");
-        var format = webix.Date.dateToStr("%d.%m.%Y. %H:%i");
+        if (util.popupIsntAlreadyOpened("eventDialog")) {
+            webix.ui(webix.copy(dashboardView.eventDialog));
+            var form = $$("eventDialogForm");
+            var format = webix.Date.dateToStr("%d.%m.%Y. %H:%i");
 
-        form.elements.roomId.setValue(event.roomId);
-        form.elements.id.setValue(event.id);
-        form.elements.text.setValue(event.text);
-        form.elements.start_date.setValue(format(event.start_date));
-        form.elements.end_date.setValue(format(event.end_date));
-        form.elements.participantNumber.setValue(event.participantsNumber);
-        form.elements.description.setValue(event.description);
-        form.elements.roomName.setValue(event.roomName);
-        $$("creatorNameLbl").data.label = "Autor: " + event.creatorUsername;
-        $$("eventDialog").show();
+            form.elements.roomId.setValue(event.roomId);
+            form.elements.id.setValue(event.id);
+            form.elements.text.setValue(event.text);
+            form.elements.start_date.setValue(format(event.start_date));
+            form.elements.end_date.setValue(format(event.end_date));
+            form.elements.participantNumber.setValue(event.participantsNumber);
+            form.elements.description.setValue(event.description);
+            form.elements.roomName.setValue(event.roomName);
+            $$("creatorNameLbl").data.label = "Autor: " + event.creatorUsername;
+            $$("eventDialog").show();
+        }
     },
 
     noteDialog: {
