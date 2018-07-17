@@ -23,7 +23,6 @@ import java.util.Objects;
                         @ColumnResult(name="last_name"),
                         @ColumnResult(name="photo"),
                         @ColumnResult(name="active"),
-                        @ColumnResult(name="deactivation_reason"),
                         @ColumnResult(name="token"),
                         @ColumnResult(name="company_id"),
                         @ColumnResult(name="role_id"),
@@ -44,7 +43,6 @@ public class User {
     private byte[] photo;
     private Byte active;
     private Byte deleted;
-    private String deactivationReason;
     private String token;
     private Timestamp tokenTime;
     private Integer companyId;
@@ -54,7 +52,7 @@ public class User {
 
     }
     public User(Integer id, String email, String username, String password, String pin, String first_name, String last_name,
-                byte[] photo, Byte active, String deactivation_reason, String token,
+                byte[] photo, Byte active, String token,
                 Integer company_id, Integer role_id, Date token_time, Byte deleted)
     {
         this.id = id;
@@ -66,7 +64,6 @@ public class User {
         this.lastName = last_name;
         this.photo = photo;
         this.active = active;
-        this.deactivationReason = deactivation_reason;
         this.token = token;
         this.companyId = company_id;
         this.roleId = role_id;
@@ -176,16 +173,6 @@ public class User {
     }
 
     @Basic
-    @Column(name = "deactivation_reason", nullable = true, length = 500)
-    public String getDeactivationReason() {
-        return deactivationReason;
-    }
-
-    public void setDeactivationReason(String deactivationReason) {
-        this.deactivationReason = deactivationReason;
-    }
-
-    @Basic
     @Column(name = "token", nullable = true, length = 16)
     public String getToken() {
         return token;
@@ -240,7 +227,6 @@ public class User {
                 Arrays.equals(photo, user.photo) &&
                 Objects.equals(active, user.active) &&
                 Objects.equals(deleted, user.deleted) &&
-                Objects.equals(deactivationReason, user.deactivationReason) &&
                 Objects.equals(token, user.token) &&
                 Objects.equals(tokenTime, user.tokenTime) &&
                 Objects.equals(companyId, user.companyId) &&
@@ -250,7 +236,7 @@ public class User {
     @Override
     public int hashCode() {
 
-        int result = Objects.hash(id, email, username, password, pin, firstName, lastName, active, deleted, deactivationReason, token, tokenTime, companyId, roleId);
+        int result = Objects.hash(id, email, username, password, pin, firstName, lastName, active, deleted, token, tokenTime, companyId, roleId);
         result = 31 * result + Arrays.hashCode(photo);
         return result;
     }

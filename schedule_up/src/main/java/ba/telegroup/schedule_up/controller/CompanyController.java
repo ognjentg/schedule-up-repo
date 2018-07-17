@@ -123,7 +123,6 @@ public class CompanyController extends GenericController<Company, Integer> {
                             user.setActive((byte) 0);
                             user.setUsername(null);
                             user.setCompanyId(company.getId());
-                            user.setDeactivationReason(null);
                             user.setDeleted((byte) 0);
                             user.setEmail(companyUser.getEmail());
                             user.setFirstName(null);
@@ -188,7 +187,6 @@ public class CompanyController extends GenericController<Company, Integer> {
                                     newAdminUser.setId(null);
                                     newAdminUser.setActive((byte) 0);
                                     newAdminUser.setCompanyId(company.getId());
-                                    newAdminUser.setDeactivationReason(null);
                                     newAdminUser.setDeleted((byte) 0);
                                     newAdminUser.setEmail(companyUser.getEmail());
                                     newAdminUser.setFirstName(null);

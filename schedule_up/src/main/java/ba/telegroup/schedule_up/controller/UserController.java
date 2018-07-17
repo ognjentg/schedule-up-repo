@@ -43,6 +43,15 @@ public class UserController extends GenericController<User, Integer> {
     @Value("${randomString.length}")
     private Integer randomStringLength;
 
+    @Value("${admin.id}")
+    private Integer admin;
+    @Value("${superAdmin.id}")
+    private Integer superAdmin;
+    @Value("${advancedUser.id}")
+    private Integer advancedUser;
+    @Value("${user.id}")
+    private Integer user;
+
     @Value("${badRequest.noUser}")
     private String badRequestNoUser;
 
@@ -87,6 +96,9 @@ public class UserController extends GenericController<User, Integer> {
 
     @Value("${badRequest.resetPassword}")
     private String badRequestResetPassword;
+
+    @Value("${badRequest.deactivateUser}")
+    private String badRequestDeactivateUser;
 
     @Autowired
     public UserController(UserRepository repo, CompanyRepository companyRepository, ParticipantRepository participantRepository, UserGroupHasUserRepository userGroupHasUserRepository) {
@@ -161,7 +173,7 @@ public class UserController extends GenericController<User, Integer> {
             throw new ForbiddenException("Forbidden");
         }
 
-        if (Integer.valueOf(1).equals(user.getRoleId())) {
+        if (superAdmin.equals(user.getRoleId())) {
             if (user.getPassword().trim().equals(Util.hashPassword(userInformation.getPassword().trim()))) {
                 successLogin = true;
             }
@@ -214,7 +226,6 @@ public class UserController extends GenericController<User, Integer> {
             newUser.setPhoto(null);
             newUser.setActive((byte) 0);
             newUser.setDeleted((byte) 0);
-            newUser.setDeactivationReason(null);
             newUser.setToken(randomToken);
             newUser.setTokenTime(new Timestamp(System.currentTimeMillis()));
             newUser.setCompanyId(user.getCompanyId());
@@ -291,6 +302,20 @@ public class UserController extends GenericController<User, Integer> {
         throw new BadRequestException(badRequestNoUser);
     }
 
+    @RequestMapping(value = "/deactivate/{id}", method = RequestMethod.GET)
+    public @ResponseBody
+    String deactivate(@PathVariable Integer id) throws BadRequestException {
+        User user = userRepository.findById(id).orElse(null);
+        if(user != null && userBean.getUser().getRoleId().equals(admin) && !user.getRoleId().equals(superAdmin) && userBean.getUser().getCompanyId().equals(user.getCompanyId()) && userBean.getUser().getRoleId().compareTo(user.getRoleId()) < 0){
+            user.setActive((byte)0);
+            if(repo.saveAndFlush(user) != null){
+                return "Success";
+            }
+            throw new BadRequestException(badRequestDeactivateUser);
+        }
+        throw new BadRequestException(badRequestNoUser);
+    }
+
     @SuppressWarnings("SameReturnValue")
     @RequestMapping(value = "/registration", method = RequestMethod.POST)
     public @ResponseBody
@@ -336,8 +361,7 @@ public class UserController extends GenericController<User, Integer> {
 
 
     @RequestMapping(value = {"/state"}, method = RequestMethod.GET)
-    public
-    @ResponseBody
+    public @ResponseBody
     User checkState() throws ForbiddenException {
         System.out.println("LOGGED" + userBean.getLoggedIn() + " user:" + userBean.getUser().getUsername());
         if (userBean.getLoggedIn()) {
