@@ -1,9 +1,11 @@
 package ba.telegroup.schedule_up.controller;
 
+import ba.telegroup.schedule_up.common.exceptions.BadRequestException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.model.Settings;
 import ba.telegroup.schedule_up.repository.SettingsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Controller;
@@ -19,7 +21,10 @@ import java.util.List;
 @Scope("request")
 public class SettingsController extends GenericController<Settings, Integer> {
     private SettingsRepository settingsRepository;
-    
+
+    @Value("${badRequest.noSettings}")
+    private String badRequestNoSettings;
+
     @Autowired
     public SettingsController(SettingsRepository repo) {
         super(repo);
@@ -28,8 +33,11 @@ public class SettingsController extends GenericController<Settings, Integer> {
 
     @RequestMapping(value = "/getByCompanyId/{id}", method = RequestMethod.GET)
     public @ResponseBody
-    Settings getByCompanyId(@PathVariable Integer id) {
-        return settingsRepository.getByCompanyId(id);
+    Settings getByCompanyId(@PathVariable Integer id) throws BadRequestException {
+        Settings settings = settingsRepository.getByCompanyId(id);
+        if(settings == null)
+            throw new BadRequestException(badRequestNoSettings+id);
+        return settings;
     }
 
     @RequestMapping(value = "/getAllByReminderTimeAfter/{time}", method = RequestMethod.GET)
