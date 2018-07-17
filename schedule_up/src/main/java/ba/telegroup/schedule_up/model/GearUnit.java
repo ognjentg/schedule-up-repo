@@ -13,6 +13,7 @@ public class GearUnit {
     private String description;
     private Integer gearId;
     private Integer companyId;
+    private String inventoryNumber;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -75,6 +76,16 @@ public class GearUnit {
         this.companyId = companyId;
     }
 
+    @Basic
+    @Column(name = "inventory_number", nullable = false, length = 100)
+    public String getInventoryNumber() {
+        return inventoryNumber;
+    }
+
+    public void setInventoryNumber(String inventoryNumber) {
+        this.inventoryNumber = inventoryNumber;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -85,12 +96,13 @@ public class GearUnit {
                 Objects.equals(deleted, gearUnit.deleted) &&
                 Objects.equals(description, gearUnit.description) &&
                 Objects.equals(gearId, gearUnit.gearId) &&
-                Objects.equals(companyId, gearUnit.companyId);
+                Objects.equals(companyId, gearUnit.companyId) &&
+                Objects.equals(inventoryNumber, gearUnit.inventoryNumber);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(id, available, deleted, description, gearId, companyId);
+        return Objects.hash(id, available, deleted, description, gearId, companyId, inventoryNumber);
     }
 }

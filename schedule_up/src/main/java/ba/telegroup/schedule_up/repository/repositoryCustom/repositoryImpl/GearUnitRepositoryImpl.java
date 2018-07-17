@@ -15,11 +15,11 @@ import java.util.List;
 
 public class GearUnitRepositoryImpl implements GearUnitRepositoryCustom {
 
-    private static final String SQL_GET_ALL_EXTENDED = "SELECT gu.id, gu.available, gu.deleted, gu.description, gu.company_id, gu.gear_id, g.name FROM gear_unit gu JOIN gear g ON g.id=gu.gear_id WHERE gu.deleted=0 AND gu.company_id=?";
-    private static final String SQL_GET_ALL_EXTENDED_BY_ROOM_ID = "SELECT gu.id, gu.available, gu.description, gu.gear_id, gu.company_id, g.name FROM gear_unit gu JOIN gear g ON g.id=gu.gear_id JOIN room_has_gear_unit rhgu ON rhgu.gear_unit_id=gu.id WHERE gu.deleted=0 AND gu.available=0 AND gu.company_id=? AND rhgu.room_id=?";
+    private static final String SQL_GET_ALL_EXTENDED = "SELECT gu.id, gu.available, gu.deleted, gu.description, gu.company_id, gu.gear_id, gu.inventory_number, g.name FROM gear_unit gu JOIN gear g ON g.id=gu.gear_id WHERE gu.deleted=0 AND gu.company_id=?";
+    private static final String SQL_GET_ALL_EXTENDED_BY_ROOM_ID = "SELECT gu.id, gu.available, gu.description, gu.gear_id, gu.company_id, gu.inventory_number, g.name FROM gear_unit gu JOIN gear g ON g.id=gu.gear_id JOIN room_has_gear_unit rhgu ON rhgu.gear_unit_id=gu.id WHERE gu.deleted=0 AND gu.available=0 AND gu.company_id=? AND rhgu.room_id=?";
 
 
-    private static final String SQL_GET_ALL_EXTENDED_BY_ID = "SELECT gu.id, gu.available, gu.deleted, gu.description, gu.company_id, gu.gear_id, g.name FROM gear_unit gu JOIN gear g ON g.id=gu.gear_id WHERE gu.id=? AND gu.deleted=0";
+    private static final String SQL_GET_ALL_EXTENDED_BY_ID = "SELECT gu.id, gu.available, gu.deleted, gu.description, gu.company_id, gu.gear_id, gu.inventory_number, g.name FROM gear_unit gu JOIN gear g ON g.id=gu.gear_id WHERE gu.id=? AND gu.deleted=0";
     private static final String SQL_GET_GEAR_BY_NAME = "SELECT * FROM gear WHERE name = ?";
     @PersistenceContext
     private EntityManager entityManager;
@@ -69,6 +69,7 @@ public class GearUnitRepositoryImpl implements GearUnitRepositoryCustom {
         gearUnit.setAvailable(gearUnitGear.getAvailable());
         gearUnit.setCompanyId(gearUnitGear.getCompanyId());
         gearUnit.setDescription(gearUnitGear.getDescription());
+        gearUnit.setInventoryNumber(gearUnitGear.getInventoryNumber());
 
         entityManager1.persist(gearUnit);
 
@@ -104,6 +105,7 @@ public class GearUnitRepositoryImpl implements GearUnitRepositoryCustom {
         gearUnit.setGearId(gearUnitGear.getGearId());
         gearUnit.setAvailable(gearUnitGear.getAvailable());
         gearUnit.setDescription(gearUnitGear.getDescription());
+        gearUnit.setInventoryNumber(gearUnitGear.getInventoryNumber());
 
         transaction.commit();
         entityManager1.close();

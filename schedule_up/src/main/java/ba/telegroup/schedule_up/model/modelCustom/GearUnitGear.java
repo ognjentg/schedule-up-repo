@@ -11,13 +11,14 @@ import javax.persistence.*;
         classes = @ConstructorResult(
                 targetClass = GearUnitGear.class,
                 columns = {
-                        @ColumnResult(name = "id"),
-                        @ColumnResult(name = "available"),
-                      //  @ColumnResult(name = "deleted"),
-                        @ColumnResult(name = "description"),
-                        @ColumnResult(name = "gear_id"),
-                        @ColumnResult(name = "company_id"),
-                        @ColumnResult(name = "name")
+                        @ColumnResult(name = "id", type = Integer.class),
+                        @ColumnResult(name = "available", type = Byte.class),
+//                        @ColumnResult(name = "deleted", type = Byte.class),
+                        @ColumnResult(name = "description", type = String.class),
+                        @ColumnResult(name = "gear_id", type = Integer.class),
+                        @ColumnResult(name = "company_id", type = Integer.class),
+                        @ColumnResult(name = "inventory_number", type = String.class),
+                        @ColumnResult(name = "name", type = String.class)
                 }
         )
 )
@@ -30,7 +31,7 @@ public class GearUnitGear extends GearUnit {
     }
 
     @SuppressWarnings("WeakerAccess")
-    public GearUnitGear(Integer id, Byte available, String description, Integer gear_id, Integer company_id,
+    public GearUnitGear(Integer id, Byte available, String description, Integer gear_id, Integer company_id, String inventory_number,
                         String name) {
         setId(id);
         setAvailable(available);
@@ -38,6 +39,7 @@ public class GearUnitGear extends GearUnit {
         setDescription(description);
         setGearId(gear_id);
         setCompanyId(company_id);
+        setInventoryNumber(inventory_number);
         this.name = name;
     }
 

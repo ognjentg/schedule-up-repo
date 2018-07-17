@@ -71,7 +71,10 @@ public class GearUnitController extends GenericController<GearUnit, Integer> {
     GearUnitGear insertExtended(@RequestBody GearUnitGear gearUnitGear) throws BadRequestException {
         if(Validator.stringMaxLength(gearUnitGear.getName(),100)) {
             if(Validator.stringMaxLength(gearUnitGear.getDescription(), 500)) {
-                return gearUnitRepository.insertExtended(gearUnitGear);
+                if(Validator.stringMaxLength(gearUnitGear.getInventoryNumber(), 100)) {
+                    return gearUnitRepository.insertExtended(gearUnitGear);
+                }
+                throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "inventarnog broja").replace("{broj}", String.valueOf(100)));
             }
             throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "opisa").replace("{broj}", String.valueOf(500)));
         }
@@ -85,7 +88,10 @@ public class GearUnitController extends GenericController<GearUnit, Integer> {
     GearUnitGear updateExtended(@RequestBody GearUnitGear gearUnitGear) throws BadRequestException {
         if(Validator.stringMaxLength(gearUnitGear.getName(),100)) {
             if(Validator.stringMaxLength(gearUnitGear.getDescription(), 500)) {
-                return gearUnitRepository.updateExtended(gearUnitGear);
+                if(Validator.stringMaxLength(gearUnitGear.getInventoryNumber(), 100)) {
+                    return gearUnitRepository.updateExtended(gearUnitGear);
+                }
+                throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "inventarnog broja").replace("{broj}", String.valueOf(100)));
             }
             throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "opisa").replace("{broj}", String.valueOf(500)));
         }
