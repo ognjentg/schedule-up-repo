@@ -456,31 +456,28 @@ var buildingView = {
                     label: "Opis:",
                     required: false
                 },
-                    {
-                        view: "label",
-                        label: "Unesite lokaciju zgrade: ",
-                        inputWidth: 100,
-                    },
-                    {
-                        view: "select", options: countries, label: "Drzava:", id: "combo"
+                    { view:"fieldset", label:"Odaberite lokaciju", body:{
+                            rows:[
+                                {
+                                    view: "select", options: countries, label: "Država:", id: "combo"
 
-                    },
-                    {
-                        view: "text",
-                        id: "grad",
-                        name: "grad",
-                        label: "Grad:",
-                        invalidMessage: "Unesite naziv grada!",
-                        required: true
-                    },
-                    {
-                        view: "text",
-                        id: "adresa",
-                        name: "adresa",
-                        label: "Adresa:",
-                        invalidMessage: "Unesite adresu zgrade!",
-                        required: true
-                    },
+                                },
+                                {
+                                    view: "text",
+                                    id: "grad",
+                                    name: "grad",
+                                    label: "Grad:",
+                                    invalidMessage: "Unesite naziv grada!",
+                                    required: true
+                                },
+                                {
+                                    view: "text",
+                                    id: "adresa",
+                                    name: "adresa",
+                                    label: "Adresa:",
+                                    invalidMessage: "Unesite adresu zgrade!",
+                                    required: true
+                                }]}},
                     {
                         margin: 5,
                         cols: [{
@@ -522,6 +519,7 @@ var buildingView = {
             }]
         }
     }
+
     ,
     showMapDialog: {
         view: "popup",
@@ -559,7 +557,7 @@ var buildingView = {
                 cols: [{}, {
                     id: "saveMap",
                     view: "button",
-                    value: "Sacuvajte lokaciju",
+                    value: "Sačuvajte lokaciju",
                     click: "buildingView.saveLocation",
                     hotkey: "enter",
                     width: 150
@@ -620,6 +618,8 @@ var buildingView = {
 
         webix.ui(webix.copy(buildingView.addDialog)).show();
         webix.UIManager.setFocus("name");
+        $$("combo").setValue("Bosna i Hercegovina : BA");
+
     },
 
     showMap:function(){
