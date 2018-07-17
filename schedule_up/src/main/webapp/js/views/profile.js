@@ -1,173 +1,153 @@
 var profileView={
-    change:0,
-    panel: {
-        id: "profilePanel",
-        adjust: true,
-        rows: [{
-            view: "toolbar",
-            padding: 8,
-            css: "panelToolbar",
-            cols: [{
-                view: "label",
-                template: "<span class='fa fa-user'></span> Profil"
-            },{}, {
-                id: "editUserButton",
-                view: "button",
-                type: "iconButton",
-                alignment:'right',
-                label: "Izmjena",
-                click: "profileView.changeProfile",
-                icon: "id-badge",
-                inputWidth:100
+    changeProfileDialog: {
+        view: "popup",
+        id: "changeProfileDialog",
+        modal: true,
+        position: "center",
+        body: {
+            rows: [{
+                view: "toolbar",
+                padding: 8,
+                cols: [{
+                    view: "label",
+                    label: "<span class='fa fa-user'></span> Profil"
+                },{}, {
+                    view: "icon",
+                    icon: "close",
+                    align: "right",
+                    click: "util.dismissDialog('changeProfileDialog');"
 
-            }]
-        }, {
-            cols: [{"view": "template",
-                borderless:true,
-                width: 200,
-                height: 200,
-                "template": "<p></p>"},{rows:[{"view": "template",
+                }]
+            }, {
+                cols: [{"view": "template",
                     borderless:true,
-                    height: 50,
-                    "template": "<p>Korisnička slika</p>"},
-                    {
-                        "view": "template",
+                    width: 30,
+                    height: 30,
+                    "template": "<p></p>"},{rows:[{"view": "template",
                         borderless:true,
-                        id: "photo",
-                        name: "photo",
-                        width: 200,
-                        height: 200,
-                        "template": "<img src='#src#' class='photo-alignment'/>",
-                        onClick:{
-                            "photo-alignment":function(e, id, trg){
-                                if(profileView.change==1) {
-                                    $$("tmpUser").show();
-                                    var source = $$("photo").getValues()['src'];
-                                    $$("tmp").setValues({src: source});
-                                    return false; // here it blocks the default behavior
-                                }
-                            }
-                        },},{}
-                ]
-            },{"view": "template",
-                borderless:true,
-                width: 50,
-                "template": "<p></p>"}
-                ,
-                {
-                    view: "form",
-                    borderless:true,
-                    width:x,
-                    height:y,
-                    id: "profileForm",
-                    elementsConfig: {
-                        bottomPadding: 20
-                    },
-                    elements: [{
-                        view: "text",
-                        width:400,
-                        align:"left",
-                        id: "username",
-                        name: "username",
-                        readonly:true,
-                        label: "Korisničko ime:",
-                        labelWidth:118,
-                        labelAlign:'left',
-                        invalidMessage: "Unesite korisničko ime!",
-                        //required: true
-                    },{
-                        view: "text",
-                        name: "base64ImageUser",
-                        hidden: true
-                    },
-                        {view: "text",
-                            id: "firstname",
-                            name: "firstName",
-                            width:400,
-                            align:"left",
-                            label: "Ime:",
-                            readonly:true,
-
-                            invalidMessage: "Unesite ime!",
-                            labelAlign:'right',
-                            //required: true
-                        },
-                        {view: "text",
-                            id: "lastname",
-                            name: "lastName",
-                            width:400,
-                            align:"left",
-                            label: "Prezime:",
-                            readonly:true,
-                            editaction:"dblclick",
-                            invalidMessage: "Unesite prezime!",
-                            labelAlign:'right',
-                            // required: true
-                        },
+                        height: 50,
+                        "template": "<p>Korisnička slika</p>"},
                         {
+                            "view": "template",
+                            borderless:true,
+                            id: "photo",
+                            name: "photo",
+                            width: 200,
+                            height: 200,
+                            "template": "<img src='#src#' class='photo-alignment'/>",
+                            onClick:{
+                                "photo-alignment":function(e, id, trg){
+                                    $$("uploadAPI").fileDialog();
+                                    return false; // here it blocks the default behavior
+
+                                }
+                            },},{}
+                    ]
+                },{"view": "template",
+                    borderless:true,
+                    width: 30,
+                    "template": "<p></p>"}
+                    ,
+                    {
+                        view: "form",
+                        borderless:true,
+                        id: "profileForm",
+                        elementsConfig: {
+                            bottomPadding: 20
+                        },
+                        elements: [{
                             view: "text",
-                            id: "email",
-                            name: "email",
                             width:400,
                             align:"left",
-                            label: "E-mail:",
+                            id: "username",
+                            name: "username",
                             readonly:true,
-                            invalidMessage: "Unesite prezime!",
-                            labelAlign:'right',
-                            // required: true
+                            label: "Korisničko ime:",
+                            labelWidth:118,
+                            labelAlign:'left',
+                            invalidMessage: "Unesite korisničko ime!",
+                            //required: true
                         },{
-                            cols:[
-                                {width:150},
-                                {
-                                    margin:5,
-                                    id: "saveProfile",
-                                    view: "button",
-                                    align:"right",
-                                    value: "Sačuvajte",
-                                    type: "form",
-                                    click: "profileView.saveChanges",
-                                    hotkey: "enter",
-                                    width:200,
-                                    hidden:true
+                            view: "text",
+                            name: "base64ImageUser",
+                            hidden: true
+                        },
+                            {view: "text",
+                                id: "firstname",
+                                name: "firstName",
+                                width:400,
+                                align:"left",
+                                label: "Ime:",
+                                readonly:false,
 
-                                },{
-                                    width:500
+                                invalidMessage: "Unesite ime!",
+                                labelAlign:'right',
+                                required: true
+                            },
+                            {view: "text",
+                                id: "lastname",
+                                name: "lastName",
+                                width:400,
+                                align:"left",
+                                label: "Prezime:",
+                                readonly:false,
+                                editaction:"dblclick",
+                                invalidMessage: "Unesite prezime!",
+                                labelAlign:'right',
+                                required: true
+                            },
+                            {
+                                view: "text",
+                                id: "email",
+                                name: "email",
+                                width:400,
+                                align:"left",
+                                label: "E-mail:",
+                                readonly:true,
+                                invalidMessage: "Unesite prezime!",
+                                labelAlign:'right',
+                                // required: true
+                            },{
+                                cols:[
+
+                                    {
+                                        margin:5,
+                                        id: "saveProfile",
+                                        view: "button",
+                                        align:"right",
+                                        value: "Sačuvajte",
+                                        type: "form",
+                                        click: "profileView.saveChanges",
+                                        hotkey: "enter",
+                                        width:200,
+                                        //  hidden:true
+
+                                    }
+
+                                ]}],
+                        rules: {
+
+                            "firstName": function (value) {
+                                if (!value)
+                                {return false;}
+                                if (value.length > 100) {
+                                    $$('profileForm').elements.firstname.config.invalidMessage = 'Maksimalan broj karaktera je 100!';
+                                    return false;
                                 }
+                                return true;
+                            },
+                            "lastName": function (value) {
+                                if (!value)
+                                {return false;}
+                                if (value.length > 100) {
+                                    $$('profileForm').elements.lastname.config.invalidMessage = 'Maksimalan broj karaktera je 100!';
+                                    return false;
+                                }
+                                return true;
+                            },
 
-                            ]}],
-                    rules: {
-
-                        "firstName": function (value) {
-                            if (!value)
-                            {return false;}
-                            if (value.length > 100) {
-                                $$('profileForm').elements.firstname.config.invalidMessage = 'Maksimalan broj karaktera je 100!';
-                                return false;
-                            }
-                            return true;
-                        },
-                        "lastName": function (value) {
-                            if (!value)
-                            {return false;}
-                            if (value.length > 100) {
-                                $$('profileForm').elements.lastname.config.invalidMessage = 'Maksimalan broj karaktera je 100!';
-                                return false;
-                            }
-                            return true;
-                        },
-
-                    }}]}]
-    },
-    changeProfile:function(){
-        profileView.change=1;
-        $$("profileForm").elements["firstName"].config.readonly = false;
-        $$("profileForm").elements["firstName"].config.required = true;
-        $$("profileForm").elements["firstName"].refresh();
-        $$("profileForm").elements["lastName"].config.readonly = false;
-        $$("profileForm").elements["lastName"].config.required = true;
-        $$("profileForm").elements["lastName"].refresh();
-        $$("saveProfile").show();
-    },
+                        }}]}]
+        }},
     saveChanges:function() {
         if ($$("profileForm").validate()) {
 
@@ -175,21 +155,19 @@ var profileView={
             helpUser.firstName = $$("profileForm").getValues().firstName;
             helpUser.lastName = $$("profileForm").getValues().lastName;
             helpUser.photo = $$("photo").getValues()['src'].split("base64,")[1];
-
             connection.sendAjax("PUT", "user/" + helpUser.id,
                 function (text, data, xhr) {
                     if (text) {
+                        util.dismissDialog('changeProfileDialog');
                         util.messages.showMessage("Podaci su uspješno izmijenjeni.");
                         userData = helpUser;
-                        profileView.change = 0;
-                        $$("profileForm").elements["firstName"].config.readonly = true;
-                        $$("profileForm").elements["firstName"].config.required = false;
-                        $$("profileForm").elements["firstName"].refresh();
-                        $$("profileForm").elements["lastName"].config.readonly = true;
-                        $$("profileForm").elements["lastName"].config.required = false;
-                        $$("profileForm").elements["lastName"].refresh();
-                        $$("saveProfile").hide();
-
+                        if(userData.roleId===1)
+                        $$("userInfo").setHTML("<p style='display: table-cell;line-height: 13px;height:75px;vertical-align: middle;font-size: 14px;}'>"+userData.firstName+" "+userData.lastName+"<br> super admin</p>");
+                        else if(userData.roleId===2)
+                            $$("userInfo").setHTML("<p style='display: table-cell;line-height: 13px;vertical-align:text-top;font-size: 14px;}'>"+userData.firstName+" "+userData.lastName+"<br> administrator</p>");
+                        else if(userData.roleId===3)
+                            $$("userInfo").setHTML("<p style='display: table-cell;line-height: 13px;vertical-align:text-top;font-size: 14px;}'>"+userData.firstName+" "+userData.lastName+"<br> napredni korisnik</p>");
+                        else $$("userInfo").setHTML("<p style='display: table-cell;line-height: 13px;vertical-align:text-top;font-size: 14px;}'>"+userData.firstName+" "+userData.lastName+"<br> korisnik</p>");
                     } else
                         util.messages.showErrorMessage("Podaci nisu izmijenjeni.");
                 }, function () {
@@ -197,71 +175,146 @@ var profileView={
                 }, helpUser);
         }
     },
-    selectPanel: function(){
-        $$("main").removeView(rightPanel);
-        rightPanel = "profilePanel";
+    changePasswordDialog: {
+        view: "popup",
+        id: "changePasswordDialog",
+        modal: true,
+        position: "center",
+        body: {
+            id: "changePasswordInside",
+            rows: [{
+                view: "toolbar",
+                cols: [{
+                    view: "label",
+                    label: "<span class='fa fa-key'></span> Izmjena lozinke",
+                    width: 400
+                }, {}, {
+                    hotkey: 'esc',
+                    view: "icon",
+                    icon: "close",
+                    align: "right",
+                    click: "util.dismissDialog('changePasswordDialog');"
+                }]
+            }, {
+                view: "form",
+                id: "changePasswordForm",
+                width: 600,
+                elementsConfig: {
+                    labelWidth: 200,
+                    bottomPadding: 18
+                },
+                elements: [{
+                    view: "text",
+                    type:"password",
+                    id: "oldPassword",
+                    name: "oldPassword",
+                    label: "Lozinka: ",
+                    invalidMessage: "Unesite lozinku!",
+                    required: true
 
-        var panelCopy = webix.copy(this.panel);
+                },
+                    {
+                        id: "newPassword1",
+                        name: "newPassword1",
+                        view: "text",
+                        type:"password",
+                        label: "Nova lozinka: ",
+                        invalidMessage: "Unesite lozinku!",
+                        required: true
+                    }, {
+                        id: "newPassword2",
+                        name: "newPassword2",
+                        view: "text",
+                        type:"password",
+                        label: "Potvrdite novu lozinku: ",
+                        invalidMessage: "Unesite lozinku!",
+                        required: true
+                    }, {
+                        margin: 5,
+                        cols: [{}, {
+                            id: "savePassword",
+                            view: "button",
+                            value: "Sačuvajte",
+                            type: "form",
+                            click: "profileView.save",
+                            hotkey: "enter",
+                            width: 150
+                        }]
+                    }],
+                rules: {
+                    "oldPassword":function (value) {
+                        if (!value)
+                            return false;
+                        return true;
+                    },
+                    "newPassword1":function (value) {
+                        if (!value)
+                            return false;
 
-        $$("main").addView(webix.copy(panelCopy));
-        $$("profileForm").load("user/"+userData.id);
-        $$("photo").setValues({src:"data:image/png;base64,"+userData.photo});
+                        return true;
+                    },
+                    "newPassword2":function (value) {
+                        if (!value)
+                            return false;
+                        if(value!=$$("changePasswordForm").getValues().newPassword1)
+                        {
+                            $$('changePasswordForm').elements.newPassword2.config.invalidMessage = 'Unešene lozinke nisu iste!';
+                            return false;}
 
-
+                        return true;
+                    },
+                }
+            }]
+        }
     },
+
+
     hide:function(){
         $$("tmpUser").hide();
     }
+    ,
+    save:function(){
+        if ($$("changePasswordForm").validate()) {
+            var passwordInformation={
+                oldPassword:$$("changePasswordForm").getValues().oldPassword,
+                newPassword:$$("changePasswordForm").getValues().newPassword1,
+                repeatedNewPassword:$$("changePasswordForm").getValues().newPassword2,
+            };
 
+            connection.sendAjax("POST", "user/updatePassword",
+                function (text, data, xhr) {
+                    if (text) {
+                        util.messages.showMessage("Uspješna izmjena lozinke.");
+                    } else
+                        util.messages.showErrorMessage("Neuspješna izmjena lozinke.");
+                }, function () {
+                    util.messages.showErrorMessage("Neuspješna izmjena lozinke.");
+                }, passwordInformation);
+
+        }
+    }
 };
-webix.ui({
-    view:"popup",
-    id:"tmpUser",
-    position:"center",
-    close:true,
-    body:{
-        rows: [{
-            view: "toolbar",
-            cols: [{
-                view: "label",
-                label: "<span class='webix_icon fa fa-image'></span> Korisnička slika",
-                width: 400
-            }, {}, {
-                hotkey: 'esc',
-                view: "icon",
-                icon: "close",
-                align: "right",
-                click: "profileView.hide",
-            }]
-        }, {
-            id:"tmp",
-            view:"template",
-            template:"<img src='#src#' style='width: 100%;height: 100%; max-width:100%; alignment: center; max-height:100%'></img>",
-            width:500,
-            autoheight:true
-        },
-            {
-                view:"uploader",
-                value:"Izmjena fotografije",
-                accept:"image/jpeg, image/png",
-                autosend:false,
-                width:200,
-                align:"center",
-                multiple:false,
-                on:{
-                    onBeforeFileAdd: function(upload){
-                        var file = upload.file;
-                        var reader = new FileReader();
-                        reader.onload = function(event) {
-                            $$("photo").setValues({src:event.target.result});
-                            $$("tmp").setValues({src:event.target.result});
-                            //var form = $$("registrationForm");
-                            //  form.elements.base64ImageUser.setValue(event.target.result.split("base64,")[1]);
-                        };
-                        reader.readAsDataURL(file)
-                        return false;
-                    }
-                }
+webix.ui(
+    {
+        view:"uploader",
+        id:"uploadAPI",
+        accept:"image/jpeg, image/png",
+        autosend:false,
+        width:200,
+        apiOnly: true,
+        align:"center",
+        multiple:false,
+        on:{
+            onBeforeFileAdd: function(upload){
+                var file = upload.file;
+                var reader = new FileReader();
+                reader.onload = function(event) {
+                    $$("photo").setValues({src:event.target.result});
+
+                };
+                reader.readAsDataURL(file)
+                return false;
             }
-        ]}
-})
+        }
+    }
+)

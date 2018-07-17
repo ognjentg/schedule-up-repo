@@ -157,6 +157,12 @@ var init = function () {
                                     companyData = company;
                                     companyData.deleted = 0;
                                     showApp();
+                                    if(userData.roleId===2)
+                                    $$("userInfo").setHTML("<p style='display: table-cell;line-height: 13px;vertical-align:text-top;font-size: 14px;}'>"+userData.firstName+" "+userData.lastName+"<br> administrator</p>");
+                                    else if(userData.roleId===3)
+                                        $$("userInfo").setHTML("<p style='display: table-cell;line-height: 11px;vertical-align:text-top;font-size: 14px;}'>"+userData.firstName+" "+userData.lastName+"<br> napredni korisnik</p>");
+                                else $$("userInfo").setHTML("<p style='display: table-cell;line-height: 13px;vertical-align:text-top;font-size: 14px;}'>"+userData.firstName+" "+userData.lastName+"<br> korisnik</p>");
+
                                 } else {
                                     userData = null;
                                     showLogin();
@@ -170,6 +176,7 @@ var init = function () {
                         });
                     } else {
                         showApp();
+                        $$("userInfo").setHTML("<p style='display: table-cell;line-height: 13px;height:75px;vertical-align: middle;font-size: 14px;}'>"+userData.firstName+" "+userData.lastName+"<br> super admin</p>");
                     }
 
                 }
@@ -324,7 +331,6 @@ var registrationLayout={
 };
 var tokenConfirm = function () {
     var token=($$("tokenForm")).getValues().token;
-    var url="http://127.0.0.1:8020/user/registration/"+token;
     webix.ajax().get("user/registration/"+token, {
         success: function (text, data, xhr) {
             var jsonData = data.json();
@@ -375,6 +381,7 @@ var login = function () {
                         userData = user;
                         companyData = null;
                         showApp();
+                        $$("userInfo").setHTML("<p style='display: table-cell;line-height: 13px;height:75px;vertical-align: middle;font-size: 14px;}'>"+userData.firstName+" "+userData.lastName+"<br> super admin</p>");
 
                     } else {
                         webix.ajax().get("company/" + user.companyId, {
@@ -385,6 +392,12 @@ var login = function () {
                                     companyData = company;
                                     companyData.deleted = 0;
                                     showApp();
+                                    if(userData.roleId===2)
+                                        $$("userInfo").setHTML("<p style='display: table-cell;line-height: 13px;vertical-align:text-top;font-size: 14px;}'>"+userData.firstName+" "+userData.lastName+"<br> administrator</p>");
+                                    else if(userData.roleId===3)
+                                        $$("userInfo").setHTML("<p style='display: table-cell;line-height: 13px;vertical-align:text-top;font-size: 14px;}'>"+userData.firstName+" "+userData.lastName+"<br> napredni korisnik</p>");
+                                    else $$("userInfo").setHTML("<p style='display: table-cell;line-height: 13px;vertical-align:text-top;font-size: 14px;}'>"+userData.firstName+" "+userData.lastName+"<br> korisnik</p>");
+
                                 } else {
                                     util.messages.showErrorMessage("Prijavljivanje nije uspjelo!");
 
@@ -439,7 +452,7 @@ var mainLayout = {
                         view: "label",
                         css: "appNameLabel",
                         label: "Schedule Up"
-                    },{   id: "profileBtn",
+                    },/*{   id: "profileBtn",
                         view: "button",
                         type: "iconButton",
                         label: "Profil",
@@ -454,7 +467,46 @@ var mainLayout = {
                         click: "logout",
                         icon: "sign-out",
                         autowidth: true
-                    }
+                    }*/
+                    {},{},{
+                            id: "userInfo",
+                            view: "label",
+                            // height:100,
+                            align: "right",
+                        labelPosition:"top",
+
+                            // css: "userLabel-font-size",
+                            label: ""},
+                    {view:"menu",
+                        align:"right",
+                        width:50,
+                        //height:30,
+                        data:[
+                            {id:"1",value:"",icon:"cog",config:{  width:200  }, submenu:[
+
+                                    {value:"O aplikaciji", icon:"info",autowidth:true}, {value:"Izmjena profila", icon:"user",autowidth:true},{value:"Izmjena lozinke",icon:"key",width:400},{value:"Odjavite se", icon:"sign-out",width:400}
+
+                                ]}
+                        ],
+                        openAction:"click",
+                        on:{
+                            onMenuItemClick:function(id){
+                                switch (this.getMenuItem(id).value) {
+                                    case "Izmjena profila":
+                                        clickProfile();
+                                        break;
+                                    case "Izmjena lozinke":
+                                        clickPassword();
+                                        break;
+                                    case "Odjavite se":
+                                        logout();
+                                        break;
+                                }
+                            }
+                        },
+                        type:{
+                            subsign:true
+                        }}
                 ]
             }
             ]
@@ -483,7 +535,22 @@ var mainLayout = {
     ]
 };
 var clickProfile=function(){
-    profileView.selectPanel();
+    webix.ui(webix.copy(profileView.changeProfileDialog));
+    $$("profileForm").load("user/"+userData.id);
+    $$("photo").setValues({src:"data:image/png;base64,"+userData.photo});
+    setTimeout(function () {
+        $$("changeProfileDialog").show();
+    }, 0);
+};
+var clickPassword=function(){
+
+    webix.ui(webix.copy(profileView.changePasswordDialog));
+
+    setTimeout(function () {
+        $$("changePasswordDialog").show();
+    }, 0);
+
+
 };
 var menuEvents = {
     onItemClick: function (item) {
