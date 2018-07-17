@@ -1217,6 +1217,7 @@ var meetingView = {
                     function (text, data, xhr) {
                         if (text) {
                             util.messages.showMessage("Uspješno kreirana rezervacija.");
+                            newMeeting.id=data.json()['meeting'].id;
                             scheduler.addEvent(newMeeting);
                         } else
                             util.messages.showErrorMessage("Neuspješno kreiranje rezervacije.");
