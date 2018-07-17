@@ -1,9 +1,13 @@
 package ba.telegroup.schedule_up.controller;
 
+import ba.telegroup.schedule_up.common.exceptions.BadRequestException;
+import ba.telegroup.schedule_up.common.exceptions.ForbiddenException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.model.Holiday;
 import ba.telegroup.schedule_up.repository.HolidayRepository;
+import ba.telegroup.schedule_up.util.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Controller;
@@ -22,6 +26,13 @@ import java.util.Objects;
 public class HolidayController extends GenericController<Holiday, Integer> {
     private HolidayRepository holidayRepository;
 
+    @Value("${badRequest.noHoliday}")
+    private String badRequestNoHoliday;
+    @Value("${badRequest.alreadyDeleted}")
+    private String badRequestAlreadyDeleted;
+    @Value("${badRequest.badDate}")
+    private String badRequestBadDate;
+
     @Autowired
     public HolidayController(HolidayRepository repo) {
         super(repo);
@@ -39,23 +50,30 @@ public class HolidayController extends GenericController<Holiday, Integer> {
     @Override
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.DELETE)
     public @ResponseBody
-    String delete(@PathVariable Integer id) {
+    String delete(@PathVariable Integer id) throws BadRequestException, ForbiddenException{
         Holiday holiday = holidayRepository.findById(id).orElse(null);
+        if(holiday == null)
+            throw new BadRequestException(badRequestNoHoliday);
         Holiday oldObject = null;
         if (!userBean.getUser().getCompanyId().equals(Objects.requireNonNull(holiday).getCompanyId())) holiday = null;
         else {
             oldObject = cloner.deepClone(holiday);
+            if(holiday.getDeleted() == (byte)1)
+                throw new BadRequestException(badRequestAlreadyDeleted);
             holiday.setDeleted((byte) 1);
         }
 
-        holidayRepository.saveAndFlush(Objects.requireNonNull(holiday));
-        logUpdateAction(holiday, oldObject);
-        return "Success";
+        if(holiday != null) {
+            holidayRepository.saveAndFlush(Objects.requireNonNull(holiday));
+            logUpdateAction(holiday, oldObject);
+            return "Success";
+        } else
+            throw new ForbiddenException("Nije moguce pristupiti podacima druge kompanije");
     }
 
-    @RequestMapping(value = "/getAllByCompanyId/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/getAllByCompanyId", method = RequestMethod.GET)
     public @ResponseBody
-    List getAllByCompanyId(@PathVariable Integer id) {
+    List getAllByCompanyId() {
         return holidayRepository.getAllByCompanyIdAndDeletedEqualsAndCompanyIdOrderByDateAsc(userBean.getUser().getCompanyId(), (byte) 0, userBean.getUser().getCompanyId());
     }
 
@@ -79,7 +97,9 @@ public class HolidayController extends GenericController<Holiday, Integer> {
 
     @RequestMapping(value = "/getAllByDateBetween/{from}/{to}", method = RequestMethod.GET)
     public @ResponseBody
-    List getAllByDateBetween(@PathVariable java.sql.Date from, @PathVariable java.sql.Date to) {
-        return holidayRepository.getAllByDateBetweenAndDeletedEqualsAndCompanyIdOrderByDateAsc(from, to, (byte) 0, userBean.getUser().getCompanyId());
+    List getAllByDateBetween(@PathVariable java.sql.Date from, @PathVariable java.sql.Date to) throws Exception{
+        if (Validator.dateCompare(from, to) == -1 )
+          return holidayRepository.getAllByDateBetweenAndDeletedEqualsAndCompanyIdOrderByDateAsc(from, to, (byte) 0, userBean.getUser().getCompanyId());
+        throw new BadRequestException(badRequestBadDate);
     }
 }

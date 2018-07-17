@@ -2,7 +2,7 @@ package ba.telegroup.schedule_up.util;
 
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.Date;
+import java.sql.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
