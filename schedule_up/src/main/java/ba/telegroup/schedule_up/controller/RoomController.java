@@ -3,18 +3,23 @@ package ba.telegroup.schedule_up.controller;
 import ba.telegroup.schedule_up.common.exceptions.BadRequestException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.model.*;
+import ba.telegroup.schedule_up.model.modelCustom.RoomBuilding;
 import ba.telegroup.schedule_up.repository.BuildingRepository;
 import ba.telegroup.schedule_up.repository.GearUnitRepository;
 import ba.telegroup.schedule_up.repository.RoomHasGearUnitRepository;
 import ba.telegroup.schedule_up.repository.RoomRepository;
 import ba.telegroup.schedule_up.repository.repositoryCustom.GearUnitRepositoryCustom;
+import ba.telegroup.schedule_up.util.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
 
 @RequestMapping(value = "/room")
@@ -44,6 +49,16 @@ public class RoomController extends GenericController<Room, Integer> {
 
     @Value("${badRequest.noGearUnit}")
     private String badRequestNoGearUnit;
+
+    @Value("${badRequest.numberNotNegative}")
+    private String badRequestNumberNotNegative;
+
+    @Value("${badRequest.stringMaxLength}")
+    private String badRequestStringMaxLength;
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
 
 
     @Autowired
@@ -159,4 +174,47 @@ public class RoomController extends GenericController<Room, Integer> {
           addGearUnit(roomId,gearId);
         return "Success";
     }
+
+    @Transactional
+    @RequestMapping(method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.CREATED)
+    @Override
+    public @ResponseBody
+    RoomBuilding insert(@RequestBody Room room) throws BadRequestException {
+        if (Validator.stringMaxLength(room.getName(), 100)) {
+            if (Validator.stringMaxLength(room.getDescription(), 500)) {
+                if (Validator.integerNotNegative(room.getFloor())) {
+                    if(Validator.integerNotNegative(room.getCapacity())) {
+                        if (roomRepository.saveAndFlush(room) != null) {
+                            logCreateAction(room);
+                            entityManager.refresh(room);
+
+                            Building building = buildingRepository.getBuildingsById(room.getBuildingId());
+                            RoomBuilding roomBuilding = new RoomBuilding();
+
+                            roomBuilding.setId(room.getId());
+                            roomBuilding.setName(room.getName());
+                            roomBuilding.setFloor(room.getFloor());
+                            roomBuilding.setCapacity(room.getCapacity());
+                            roomBuilding.setPin(room.getPin());
+                            roomBuilding.setDeleted(room.getDeleted());
+                            roomBuilding.setDescription(room.getDescription());
+                            roomBuilding.setBuildingId(room.getBuildingId());
+                            roomBuilding.setCompanyId(room.getCompanyId());
+                            roomBuilding.setBuildingName(building.getName());
+                            roomBuilding.setLongitude(building.getLongitude());
+                            roomBuilding.setLatitude(building.getLatitude());
+
+                            return roomBuilding;
+                        }
+                    }
+                    throw new BadRequestException(badRequestNumberNotNegative.replace("{tekst}", "kapacitet"));
+                }
+                throw new BadRequestException(badRequestNumberNotNegative.replace("{tekst}", "sprat"));
+            }
+            throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "opisa").replace("{broj}", String.valueOf(500)));
+        }
+        throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "naziva").replace("{broj}", String.valueOf(100)));
+    }
+
 }
