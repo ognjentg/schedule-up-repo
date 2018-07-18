@@ -77,7 +77,16 @@ var loggerView = {
                     },
                     sort: "date",
                     header: ["Datum", {
-                        content: "textFilter"
+                        content: "datepickerFilter",
+                        compare: function customCompare(value, filter){
+                            // value - Date object (filter takes the real data)
+                            // filter - selected value
+                            // select the day you want to see
+                            var format= webix.Date.dateToStr("%d.%m.%Y");
+                            var tempFilter=format(filter);
+                            var tempValue=format(new Date(value));
+                            return tempFilter==tempValue;
+                        }
                     }],
                 }
             ],

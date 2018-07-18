@@ -88,7 +88,7 @@ var menuAdmin = [
         icon: "wrench"
     }, {
         id: "logger",
-        value: "Logovi",
+        value: "Logger korisničkih akcija",
         icon: "history"
     }, {
         id: "user",
