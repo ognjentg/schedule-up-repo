@@ -164,7 +164,7 @@ public class CompanyController extends GenericController<Company, Integer> {
     @Transactional
     @RequestMapping(value = "/custom/{id}", method = RequestMethod.PUT)
     public @ResponseBody
-    CompanyUser updateExtended(@PathVariable Integer id, @RequestBody CompanyUser companyUser) throws BadRequestException {
+    String updateExtended(@PathVariable Integer id, @RequestBody CompanyUser companyUser) throws BadRequestException {
         if (Validator.stringMaxLength(companyUser.getName(), 100)) {
             if(Validator.timeCompare(companyUser.getTimeFrom(), companyUser.getTimeTo()) <= 0){
                 if(Validator.binaryMaxLength(companyUser.getCompanyLogo(), longblobLength)){
@@ -203,14 +203,14 @@ public class CompanyController extends GenericController<Company, Integer> {
                                     if(userRepository.saveAndFlush(newAdminUser) != null){
                                         Notification.sendRegistrationLink(companyUser.getEmail().trim(), "http://127.0.0.1:8020/user/registration/" + randomToken);
 
-                                        return companyUser;
+                                        return "Success";
                                     }
                                     throw new BadRequestException(badRequestUpdate);
                                 }
                                 throw new BadRequestException(badRequestUpdate);
                             }
 
-                            return companyUser;
+                            return "Success";
                         }
                         throw new BadRequestException(badRequestUpdate);
                     }

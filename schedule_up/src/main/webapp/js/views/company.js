@@ -22,6 +22,8 @@ var companyView = {
         }, {
             view: "datatable",
             css: "webixDatatable",
+            editable:true,
+            editaction:"dblclick",
             multiselect: false,
             id: "companyDT",
             resizeColumn: true,
@@ -40,7 +42,6 @@ var companyView = {
 
             } ,{
                 id: "name",
-                editable: false,
                 fillspace: true,
                 editor: "text",
                 sort: "string",
@@ -52,7 +53,6 @@ var companyView = {
             }, {
                 id: "timeFrom",
                 fillspace: true,
-                editable: false,
                 editor: "text",
                 format: function (value) {
                     return value.substring(0, value.length - 3);
@@ -65,7 +65,6 @@ var companyView = {
                 {
                     id: "timeTo",
                     fillspace: true,
-                    editable: false,
                     editor: "text",
                     format: function (value) {
                         return value.substring(0, value.length - 3);
@@ -76,8 +75,6 @@ var companyView = {
                 }, {
                     id: "email",
                     fillspace: true,
-                    editable: false,
-                    editor: "text",
                     sort: "text",
                     header: [
                         "E-mail", {
@@ -88,7 +85,6 @@ var companyView = {
             ],
             select: "row",
             navigation: true,
-            editable: false,
             url: "company",
             on: {
 
