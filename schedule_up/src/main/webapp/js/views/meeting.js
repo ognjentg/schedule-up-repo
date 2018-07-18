@@ -630,21 +630,31 @@ var meetingView = {
             var activeEventMenu=[
                 {
                     id: 1,
-                    value: "Izmijenite"
+                    value: "Izmijenite",
+                    icon:"edit"
+                },
+                {
+                    $template:"Separator"
                 },
                 {
                     id: 2,
-                    value: "Zatvorite"
+                    value: "Zatvorite",
+                    icon:"check"
+                },
+                {
+                    $template:"Separator"
                 },
                 {
                     id:4,
-                    value: "Otkažite"
+                    value: "Otkažite",
+                    icon:"times"
                 }
             ];
             var finishedEventMenu=[
                 {
                     id:3,
-                    value: "Dodajte izvještaj"
+                    value: "Dodajte izvještaj",
+                    icon:"file"
                 }
             ];
             if (id != null &&(userData.roleId===2 || scheduler.getEvent(id).userId === userData.id) ) {
@@ -662,6 +672,7 @@ var meetingView = {
 
                     contextMenu = webix.ui({
                         view: "contextmenu",
+                        width:170,
                         on: {
                             onItemClick: function (id) {
                                 // Property meetingView.contextMenuEventId je id eventa na koji smo kliknuli.

@@ -1,4 +1,5 @@
 var schedulerEvents = [];
+var dotDateFormatter = webix.Date.dateToStr("%d.%m.%Y %H:%i");
 
 var detachAllEvents = function () {
     for(var i=0;i<schedulerEvents.length;i++){
@@ -509,6 +510,13 @@ var dashboardView = {
                     },
                         {
                             view: "text",
+                            id: "expiredTime",
+                            name: "expiredTime",
+                            label: "Datum isteka:",
+                            readonly: true
+                        },
+                        {
+                            view: "text",
                             id: "username",
                             name: "username",
                             label: "Korisnik",
@@ -531,20 +539,11 @@ var dashboardView = {
     showNotePopup: function (note) {
         webix.ui(webix.copy(dashboardView.noteDialog));
         var form = $$("noteDialogForm");
-
-        //formatiranje
-        var date = new Date(note.publishTime);
-        var hours = date.getHours();
-        var minutes = date.getMinutes();
-        minutes = minutes < 10 ? '0' + minutes : minutes;
-        var strTime = hours + ':' + minutes;
-        var formattedTime =  date.getDate() + "." + (date.getMonth() + 1) + "." + date.getFullYear() + ". " + strTime;
-
         form.elements.name.setValue(note.name);
-        form.elements.publishTime.setValue(formattedTime);
+        form.elements.publishTime.setValue(dotDateFormatter(new Date(note.publishTime)));
+        form.elements.expiredTime.setValue(dotDateFormatter(new Date(note.expiredTime)));
         form.elements.username.setValue(note.username);
         form.elements.description.setValue(note.description);
-
         $$("noteDialog").show();
     }
 
