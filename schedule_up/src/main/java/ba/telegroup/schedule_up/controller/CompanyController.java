@@ -137,7 +137,7 @@ public class CompanyController extends GenericController<Company, Integer> {
                             user.setRoleId(2);
 
                             if(userRepository.saveAndFlush(user) != null){
-                                Notification.sendRegistrationLink(companyUser.getEmail().trim(), "http://127.0.0.1:8020/user/registration/" + randomToken);
+                                Notification.sendRegistrationLink(user.getEmail().trim(), randomToken);
                                 companyUser.setId(company.getId());
 
                                 return companyUser;
