@@ -349,14 +349,14 @@ var roomView = {
                     view: "text",
                     id: "name",
                     name: "name",
-                    label: "Naziv sale",
+                    label: "Naziv sale:",
                     invalidMessage: "Unesite naziv sale!",
                     required: true
                 }, {
                     view: "combo",
                     id: "buildingName",
                     name: "buildingName",
-                    label: "Naziv zgrade",
+                    label: "Naziv zgrade:",
                     invalidMessage: "Unesite naziv zgrade!",
                     required: true,
                     options: {
@@ -375,21 +375,21 @@ var roomView = {
                     view: "counter",
                     id: "floor",
                     name: "floor",
-                    label: "Broj sprata",
+                    label: "Broj sprata:",
                     min: -1000,
                     value: 0
                 }, {
                     view: "counter",
                     id: "capacity",
                     name: "capacity",
-                    label: "Kapacitet sale",
+                    label: "Kapacitet sale:",
                     min: 1,
                     value: 1
                 }, {
                     view: "textarea",
                     id: "description",
                     name: "description",
-                    label: "Opis",
+                    label: "Opis:",
                     height: 90
 
                 }, {
@@ -513,14 +513,14 @@ var roomView = {
                     view: "text",
                     id: "name",
                     name: "name",
-                    label: "Naziv sale",
+                    label: "Naziv sale:",
                     invalidMessage: "Unesite naziv sale!",
                     required: true
                 }, {
                     view: "combo",
                     id: "buildingName",
                     name: "buildingName",
-                    label: "Naziv zgrade",
+                    label: "Naziv zgrade:",
                     invalidMessage: "Unesite naziv zgrade!",
                     required: true,
                     options: {
@@ -540,21 +540,21 @@ var roomView = {
                     view: "counter",
                     id: "floor",
                     name: "floor",
-                    label: "Broj sprata",
+                    label: "Broj sprata:",
                     min: -1000,
                     value: 0
                 }, {
                     view: "counter",
                     id: "capacity",
                     name: "capacity",
-                    label: "Kapacitet sale",
+                    label: "Kapacitet sale:",
                     min: 1,
                     value: 1
                 }, {
                     view: "textarea",
                     id: "description",
                     name: "description",
-                    label: "Opis",
+                    label: "Opis:",
                     height: 90
                 }, {
                     margin: 5,
@@ -939,7 +939,7 @@ var roomView = {
                         id: "description",
                         name: "description",
                         view: "text",
-                        label: "Opis",
+                        label: "Opis:",
                         required: false
                     }, {
                         margin: 5,
