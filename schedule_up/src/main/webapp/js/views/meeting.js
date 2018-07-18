@@ -694,7 +694,7 @@ var meetingView = {
                                                             util.messages.showMessage("Sastanak uspješno zatvoren");
                                                         }
                                                 }).fail(function (err) {
-                                                        util.messages.showErrorMessage(err.text());
+                                                        util.messages.showErrorMessage(err.responseText());
                                                 })
                                             }
                                         };

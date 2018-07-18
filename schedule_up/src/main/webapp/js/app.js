@@ -243,26 +243,40 @@ var loginLayout = {
                             label: "Kompanija"
                         }, {
                             margin: 5,
-                            cols: [{}, {
-                                id: "loginBtn",
-                                view: "button",
-                                value: "Prijavite se",
-                                type: "form",
-                                click: "login",
-                                hotkey: "enter",
-                                width: 150
-                            }]
+                            cols: [
+                                {
+                                    id: "registerBtn",
+                                    view: "button",
+                                    value: "Registrujte se",
+                                    type: "form",
+                                    click: "register",
+                                    width: 150
+                                },
+                                {},
+                                {
+                                    id: "loginBtn",
+                                    view: "button",
+                                    value: "Prijavite se",
+                                    type: "form",
+                                    click: "login",
+                                    align:"right",
+                                    hotkey: "enter",
+                                    width: 150
+                                }
+                                ]
                         },
                         {
                             margin: 5,
-                            cols: [{}, {
-                                id: "registerBtn",
-                                view: "button",
-                                value: "Registrujte se",
-                                type: "form",
-                                click: "register",
-                                width: 150
-                            }]
+                            cols:[
+                                {},
+                                {
+                                    width: 150,
+                                    align:"right",
+                                    view:"label",
+                                    label:"<a href='javascript:showForgottenPasswordPopup();'>Zaboravili ste lozinku?</a>"
+                                }
+
+                            ]
                         }
                     ]
                 }
@@ -632,6 +646,101 @@ var showApp = function () {
     }
 };
 
+var showForgottenPasswordPopup=function(){
+    if (util.popupIsntAlreadyOpened("forgottenPasswordPopup")){
+        webix.ui(webix.copy(forgottenPasswordPopup)).show();
+        $$("forgottenPasswordForm").focus();
+    }
+};
+
+var forgottenPasswordPopup={
+    view:"popup",
+    id:"forgottenPasswordPopup",
+    modal:true,
+    position:"center",
+    body:{
+        rows:[
+            {
+                view:"toolbar",
+                cols:[
+                    {
+                        view:"label",
+                        label:"Zaboravljena lozinka",
+                        width:400
+                    },
+                    {},
+                    {
+                        view:"icon",
+                        icon:"close",
+                        align:"right",
+                        hotkey:"esc",
+                        click:"util.dismissDialog('forgottenPasswordPopup');"
+                    }
+                ]
+            },
+            {
+                width:400,
+                view:"form",
+                id:"forgottenPasswordForm",
+                elementsConfig: {
+                    labelWidth: 150,
+                    bottomPadding: 18
+                },
+                elements:[
+                    {
+
+                        view:"text",
+                        id:"username",
+                        name:"username",
+                        required:"true",
+                        label:"Korisničko ime:",
+                        invalidMessage:"Korisničko ime je obavezno!"
+                    },
+                    {
+
+                        view:"text",
+                        id:"companyName",
+                        name:"companyName",
+                        required:"true",
+                        label:"Kompanija:",
+                        invalidMessage:"Kompanija je obavezna!"
+                    },
+                    {
+                        cols:[
+                            {},
+                            {
+                                view:"button",
+                                value:"Generišite lozinku",
+                                type:"form",
+                                click:"generatePassword();",
+                                hotkey: "enter",
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+};
+
+var generatePassword= function(){
+    var form=$$("forgottenPasswordForm");
+    if (form.validate()) {
+        var loginInformation = JSON.stringify(form.getValues());
+        webix.ajax().headers({
+            "Content-type": "application/json"
+        }).post("user/resetPassword", loginInformation).then(function (result) {
+            if (result.text()) {
+                util.messages.showMessage("Uspješno ste resetovali lozinku. Provjerite vaš e-mail.");
+            } else {
+                util.messages.showErrorMessage("Greška prilikom resetovanja lozinke!");
+            }
+        }).fail(function (error) {
+            util.messages.showErrorMessage(error.responseText);
+        });
+        util.dismissDialog("forgottenPasswordPopup");
+    }
+};
 
 //main call
 window.onload = function () {
