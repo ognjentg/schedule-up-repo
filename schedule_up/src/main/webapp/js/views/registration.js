@@ -50,18 +50,6 @@ var registrationView = {
                 invalidMessage: "Unesite šifru!",
                 required: true
             },
-                {
-                    view: "text",
-                    id: "pin",
-                    name: "pin",
-                    type:"password",
-                    width:400,
-                    align:"center",
-                    label: "PIN:",
-                    labelAlign:'right',
-                    invalidMessage: "Unesite PIN!",
-                    required: true
-                },
 
                 {view: "text",
                     id: "firstname",
@@ -136,19 +124,6 @@ var registrationView = {
                         return false;
 
                     return true;
-                },
-                "pin":function(value){
-                    if (!value)
-                        return false;
-                    if (value.length > 4) {
-                        $$('registrationForm').elements.pin.config.invalidMessage = 'Maksimalan broj karaktera je 4!';
-                        return false;
-                    }
-                    if (isNaN(value*1)) {
-                        $$('registrationForm').elements.pin.config.invalidMessage = 'Unos sadrži nenumeričke karaktere!';
-                        return false;
-                    }
-                    return true;
                 }
                 ,
                 "firstname": function (value) {
@@ -193,7 +168,6 @@ var registrationView = {
                 deleted:0,
                 companyId:userForRegistration['companyId'],
                 roleId:userForRegistration['roleId'],
-                pin:$$("registrationForm").getValues().pin,
                 username: $$("registrationForm").getValues().username,
                 password: $$("registrationForm").getValues().password,
                 firstName: $$("registrationForm").getValues().firstname,

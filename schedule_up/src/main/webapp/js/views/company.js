@@ -418,16 +418,17 @@ var companyView = {
         id: "changeCompanyDialog",
         modal: true,
         position: "center",
+
         body: {
             id: "changeCompanyInside",
             rows: [{
                 view: "toolbar",
                 cols: [{
                     view: "label",
-
-                    label: "<span class='webix_icon fa-book'></span> Izmjena podataka o kompaniji",
+                    label: "<span class='webix_icon fa-briefcase'></span> Izmjena kompanije",
                     width: 400
                 }, {}, {
+                    hotkey: 'esc',
                     view: "icon",
                     icon: "close",
                     align: "right",
@@ -446,10 +447,6 @@ var companyView = {
                     name: "id",
                     hidden: true
                 },{
-                    view: "text",
-                    name: "base64ImageCompany",
-                    hidden: true
-                }, {
                     view: "text",
                     id: "name",
                     name: "name",
@@ -499,36 +496,103 @@ var companyView = {
                         name: "email",
                         label: "E-mail:",
                         required: true
-                    },   {
-                        view:"uploader",
-                        value:"Logo kompanije",
-                        accept:"image/jpeg, image/png",
-                        autosend:false,
-                        width:200,
-                        align:"center",
-                        multiple:false,
-                        on:{
-                            onBeforeFileAdd: function(upload){
-                                var file = upload.file;
-                                var reader = new FileReader();
-                                reader.onload = function(event) {
-                                    var pomoc;
-                                    $$("logoPopup").show();
-                                    $$("template").setValues({src:event.target.result});
-                                    var form = $$("changeCompanyForm");
-                                    form.elements.base64ImageCompany.setValue(event.target.result.split("base64,")[1]);
+                    },
+                    {
+                        height:50,
+                        cols:[
+                            {
+                                view:"label",
+                                width:200,
+                                bottomPadding:18,
+                                leftPadding:3,
+                                required:true,
+                                label:"Logo kompanije: <span style='color:#e32'>*</span>"
+                            },
+                            {
+                                view:"list",
+                                id:"changeCompanyLogoList",
+                                name:"changeCompanyLogoList",
+                                rules:{
+                                    content:webix.rules.isNotEmpty
+                                },
+                                scroll:false,
+                                id:"changeCompanyLogoList",
+                                width:290,
+                                type: {
+                                    height: "auto"
+                                },
+                                css:"relative image-upload",
+                                template:"<img src='data:image/jpg;base64,#content#'/> <span class='delete-file'><span class='webix fa fa-close'/></span>",
+                                onClick:{
+                                    'delete-file':function (e,id) {
+                                        this.remove(id);
+                                        return false;
+                                    }
+                                }
+                            },{},
+                            {
+                                view:"uploader",
+                                id:"photoUploader",
+                                width:24,
+                                height:24,
+                                css:"upload-photo",
+                                template:"<span class='webix fa fa-upload' /></span>",
+                                on: {
+                                    onBeforeFileAdd: function (upload) {
+                                        var type = upload.type.toLowerCase();
+                                        if (type != "jpg" && type != "png"){
+                                            util.messages.showErrorMessage("Dozvoljene ekstenzije  su jpg i png!")
+                                            return false;
+                                        }
+                                        var file = upload.file;
+                                        var reader = new FileReader();
+                                        reader.onload = function (event) {
+                                            var img=new Image();
+                                            img.onload=function (ev) {
+                                                if (img.width===220&& img.height===50) {
+                                                    var newDocument = {
+                                                        name: file['name'],
+                                                        content: event.target.result.split("base64,")[1],
+                                                    };
+                                                    $$("changeCompanyLogoList").clearAll();
+                                                    $$("changeCompanyLogoList").add(newDocument);
+                                                }else{
+                                                    util.messages.showErrorMessage("Dimenzije logoa moraju biti 220x50 px!")
+                                                }
+                                            };
+                                            img.src=event.target.result;
+                                        };
+                                        reader.readAsDataURL(file);
+                                        return false;
+                                    }
+                                }
+                            },
+                        ]
+                    },
+                    {
+                        height:18,
+                        cols:[
 
-                                };
-                                reader.readAsDataURL(file)
-                                return false;
-                            }
-                        }
-                    }, {
+                            {},
+                            {
+                                id:"invalidLabel",
+                                view:"label",
+                                label:"Odaberite logo kompanije!",
+                                css:" invalid-message-photo-alignment",
+                                hidden:true
+
+                            },
+                            {}
+                        ]
+                    }
+                    ,
+
+                    {
                         margin: 5,
                         cols: [{}, {
-                            id: "saveChangedCompany",
+                            id: "changeCompany",
                             view: "button",
-                            value: "Sačuvajte",
+                            value: "Sačuvajte izmjene",
                             type: "form",
                             click: "companyView.saveChangedCompany",
                             hotkey: "enter",
@@ -551,20 +615,33 @@ var companyView = {
                             return false;
                         }
                         if (value.length > 100) {
-                            $$('changeCompanyForm').elements.email.config.invalidMessage = 'Maksimalan broj karaktera je 100';
+                            $$('addCompanyForm').elements.email.config.invalidMessage = 'Maksimalan broj karaktera je 100';
                             return false;
                         }
                         if (!webix.rules.isEmail(value)) {
-                            $$('changeCompanyForm').elements.email.config.invalidMessage = 'E-mail nije u validnom formatu.';
+                            $$('addCompanyForm').elements.email.config.invalidMessage = 'E-mail nije u validnom formatu.';
                             return false;
                         }
 
+                        return true;
+                    },
+                    "timeTo":function (value) {
+                        if (!value) {
+                            $$('changeCompanyForm').elements.timeTo.config.invalidMessage = 'Unesite kraj radnog vremena';
+                            return false;
+                        }
+
+                        if (value <= $$('changeCompanyForm').getValues().timeFrom){
+                            $$('changeCompanyForm').elements.timeTo.config.invalidMessage = 'Kraj radnog vremena mora biti poslije početka!    ';
+                            return false;
+                        }
                         return true;
                     }
                 }
             }]
         }
     },
+
 
     showChangeCompanyDialog: function (company) {
 
@@ -575,10 +652,16 @@ var companyView = {
         form.elements.timeFrom.setValue(company.timeFrom);
         form.elements.timeTo.setValue(company.timeTo);
         form.elements.email.setValue(company.email);
-        form.elements.base64ImageCompany.setValue(company.companyLogo);
+
         setTimeout(function () {
             $$("changeCompanyDialog").show();
             webix.UIManager.setFocus("name");
+            var newDocument = {
+                name: '',
+                content: company.companyLogo,
+            };
+            $$("changeCompanyLogoList").clearAll();
+            $$("changeCompanyLogoList").add(newDocument);
         }, 0);
 
 
@@ -586,86 +669,39 @@ var companyView = {
 
 
     saveChangedCompany: function () {
-
-        if ($$("changeCompanyForm").validate()) {
-            var newItem = {
-                id: $$("changeCompanyForm").getValues().id,
-                name: $$("changeCompanyForm").getValues().name,
-                timeFrom: $$("changeCompanyForm").getValues().timeFrom + ":00",
-                timeTo: $$("changeCompanyForm").getValues().timeTo + ":00",
-                email: $$("changeCompanyForm").getValues().email,
-                companyLogo:$$("changeCompanyForm").getValues().base64ImageCompany,
-
+        var form = $$("changeCompanyForm");
+        var logo=$$("changeCompanyLogoList");
+        var photoValidation=logo.count()===1;
+        if (!photoValidation){
+            webix.html.addCss(logo.getNode(),"image-upload-invalid");
+            $$("invalidLabel").show();
+        }else{
+            webix.html.removeCss(logo.getNode(),"image-upload-invalid");
+            $$("invalidLabel").hide();
+        }
+        var validation=form.validate();
+        if (validation && photoValidation) {
+            var newCompany = {
+                id: form.getValues().id,
+                name: form.getValues().name,
+                timeFrom: form.getValues().timeFrom + ":00",
+                timeTo: form.getValues().timeTo + ":00",
+                email: form.getValues().email,
+                companyLogo: logo.getItem(logo.getLastId()).content
             };
-            connection.sendAjax("PUT", "company/custom/" + newItem.id,
+            connection.sendAjax("PUT", "company/custom/" + newCompany.id,
                 function (text, data, xhr) {
                     if (text) {
                         util.messages.showMessage("Kompanija uspješno izmjenjena.");
-                        $$("companyDT").updateItem(newItem.id, newItem);
+                        $$("companyDT").updateItem(newCompany.id, newCompany);
                     } else
                         util.messages.showErrorMessage("Neuspješna izmjena.");
                 }, function () {
                     util.messages.showErrorMessage("Neuspješna izmjena.");
-                }, newItem);
+                }, newCompany);
 
             util.dismissDialog('changeCompanyDialog');
         }
-    },
-    hide:function(){
-        $$("logoPopup").hide();
+
     }
-
 };
-webix.ui({
-    view:"popup",
-    id:"logoPopup",
-    position:"center",
-    close:true,
-    body:{
-        rows: [{
-            view: "toolbar",
-            cols: [{
-                view: "label",
-                label: "<span class='webix_icon fa fa-image'></span> Logo kompanije",
-                width: 400
-            }, {}, {
-                hotkey: 'esc',
-                view: "icon",
-                icon: "close",
-                align: "right",
-                click: "companyView.hide",
-            }]
-        }, {
-            id:"template",
-            view:"template",
-            template:"<img src='#src#' style='width: 100%;height: 100%; max-width:100%; alignment: center; max-height:100%'></img>",
-            width:500,
-            autoheight:true
-        },
-            {
-                view:"uploader",
-                value:"Izmjena logoa",
-                accept:"image/jpeg, image/png",
-                autosend:false,
-                width:200,
-                align:"center",
-                multiple:false,
-                on:{
-                    onBeforeFileAdd: function(upload){
-                        var pomoc;
-                        var file = upload.file;
-                        var reader = new FileReader();
-                        reader.onload = function(event) {
-                            $$("template").setValues({src:event.target.result});
-                            var form = $$("changeCompanyForm");
-                            form.elements.base64ImageCompany.setValue(event.target.result.split("base64,")[1]);
-
-
-                        };
-                        reader.readAsDataURL(file)
-                        return false;
-                    }
-                }
-            }
-        ]}
-})
