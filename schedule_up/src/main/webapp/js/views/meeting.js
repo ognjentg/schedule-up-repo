@@ -601,10 +601,16 @@ var meetingView = {
         scheduler.config.first_hour = parseInt(companyData.timeFrom.substr(0, 2));
 
         schedulerEvents.push(scheduler.attachEvent("onEventLoading", function (ev) {
-            if (ev.status !== 0)
+            if (ev.status !== 0 && ev.userId===userData.id)
                 ev.color = "#bdd5ff";
+            else if(ev.status===0 && ev.userId!==userData.id)
+                ev.color="#3d454c";
+            else if(ev.status!==0 && ev.userId!==userData.id)
+                ev.color="#8798a8";
+
             return true;
         }));
+
         webix.ajax("holiday").then(function (result) {
             holidays=JSON.parse(result.text());
             for (var i=0;i<holidays.length;i++){

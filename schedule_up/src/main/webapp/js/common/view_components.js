@@ -23,7 +23,7 @@ var commonViews = {
             ok: "Da",
             cancel: "Ne",
             width: 500,
-            text: "Jeste li sigurni da želite da obrišete " + text + "?"
+            text: "Da li ste sigurni da želite da obrišete " + text + "?"
         };
     },
 

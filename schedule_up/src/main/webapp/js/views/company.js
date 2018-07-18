@@ -615,11 +615,11 @@ var companyView = {
                             return false;
                         }
                         if (value.length > 100) {
-                            $$('addCompanyForm').elements.email.config.invalidMessage = 'Maksimalan broj karaktera je 100';
+                            $$('changeCompanyForm').elements.email.config.invalidMessage = 'Maksimalan broj karaktera je 100';
                             return false;
                         }
                         if (!webix.rules.isEmail(value)) {
-                            $$('addCompanyForm').elements.email.config.invalidMessage = 'E-mail nije u validnom formatu.';
+                            $$('changeCompanyForm').elements.email.config.invalidMessage = 'E-mail nije u validnom formatu.';
                             return false;
                         }
 
