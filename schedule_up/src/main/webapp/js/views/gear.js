@@ -55,6 +55,18 @@ var gearView = {
                         content: "textFilter"
                     }
                 ]
+            },{
+                id: "inventoryNumber",
+                fillspace: true,
+                editor: "text",
+                sort: "text",
+                editable: false,
+                adjust: "data",
+                header: [
+                    "Inventarski broj", {
+                        content: "textFilter"
+                    }
+                ]
             }, {
                 id: "available",
                 fillspace: true,
@@ -181,17 +193,20 @@ var gearView = {
                     name: "name",
                     label: "Naziv:",
                     invalidMessage: "Unesite validan naziv opreme!",
-                    required: true,
-                    suggest: {
-                        id: "gearSuggest",
-                        url: "gear/getAllNames"
-                    }
+                    required: true
                 }, {
                     view: "text",
                     id: "description",
                     name: "description",
                     label: "Opis:",
                     required: false
+                },{
+                    view: "text",
+                    id: "inventoryNumber",
+                    name: "inventoryNumber",
+                    label: "Inventarski broj:",
+                    invalidMessage: "Unesite validan inventarski broj!",
+                    required: true
                 }, {
                     margin: 5,
                     cols: [{}, {
@@ -215,6 +230,12 @@ var gearView = {
                             return false;
                         }
                         return true;
+                    },
+                    "inventoryNumber": function (value) {
+                        if (!value || value.length>100) {
+                            return false;
+                        }
+                        return true;
                     }
                 }
             }]
@@ -227,6 +248,7 @@ var gearView = {
         form.elements.id.setValue(gear.id);
         form.elements.name.setValue(gear.name);
         form.elements.description.setValue(gear.description);
+        form.elements.inventoryNumber.setValue(gear.inventoryNumber);
 
         setTimeout(function () {
             $$("changeGearDialog").show();
@@ -243,21 +265,10 @@ var gearView = {
                 id: $$("changeGearForm").getValues().id,
                 available: oldItem.available,
                 description: $$("changeGearForm").getValues().description,
-                gearId: oldItem.gearId,
                 companyId: oldItem.companyId,
-                name: $$("changeGearForm").getValues().name
+                name: $$("changeGearForm").getValues().name,
+                inventoryNumber: $$("changeGearForm").getValues().inventoryNumber
             };
-            
-            //provjeriti da li je gear nov, ako jeste staviti gearId na null
-            var gearExists = false;
-            var allGearNames = $$("gearSuggest").getList().data;
-            allGearNames.each(
-                function (obj) {
-                    if (obj.value == newItem.name) gearExists = true;
-                }
-            );
-
-            if (!gearExists) newItem.gearId = null;
 
             connection.sendAjax("PUT", "gear-unit/custom/",
                 function (text, data, xhr) {
