@@ -181,6 +181,7 @@ userView = {
 
         $$("main").addView(webix.copy(panelCopy));
         connection.attachAjaxEvents("userDT", "user");
+        $$("userDT").detachEvent("onBeforeDelete");
 
         webix.ui({
             view: "contextmenu",
@@ -205,16 +206,14 @@ userView = {
                             var updateBox = (webix.copy(commonViews.deaktivacijaPotvrda("korisnika", "korisnika")));
                             updateBox.callback = function (result) {
                                 if (result == 1) {
-                                    item.active = 0;
-                                    //$$("userDT").detachEvent("onBeforeDelete");
-                                    connection.sendAjax("PUT", "/user/" + item.id, function (text, data, xhr) {
+                                    connection.sendAjax("GET", "/user/deactivate/" + item.id, function (text, data, xhr) {
                                         if (text) {
-                                            $$("userDT").updateItem(item.id, item);
+                                            $$("userDT").remove(item.id);
                                             util.messages.showMessage("Uspjesno deaktiviranje");
                                         }
                                     }, function (text, data, xhr) {
                                         util.messages.showErrorMessage("Neuspjesno deaktiviranje");
-                                    }, item);
+                                    });
                                 }
                             };
                             webix.confirm(updateBox);
