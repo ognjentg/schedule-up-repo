@@ -23,7 +23,7 @@ var noteView = {
             }]
         }, {
             view: "datatable",
-            css: "webixDatatable",
+            //css: "webixDatatable",
             multiselect: false,
             id: "noteDT",
             resizeColumn: true,
@@ -40,9 +40,10 @@ var noteView = {
                     fillspace: false,
                     width: 150,
                     editor: "date",
+                    sort: "string",
                     tooltip: false,
                     header: ["Datum objave", {
-                        content: "textFilter"
+                        content: "dateFilter"
                     }],
                     format: function (value) {
                         date = new Date(value);
@@ -67,11 +68,10 @@ var noteView = {
 
                 }, {
                     id: "name",
-                    editable: true,
                     fillspace: false, width: 400,
                     editor: "text",
                     tooltip: false,
-                    header: ["Naziv", {
+                    header: ["Naslov", {
                         content: "textFilter"
                     }],
 
@@ -80,7 +80,6 @@ var noteView = {
                     id: "description",
                     fillspace: true,
                     editor: "text",
-                    editable: true,
                     header: ["Opis", {
                         content: "textFilter"
                     }]
@@ -93,7 +92,7 @@ var noteView = {
                     tooltip: false,
                     editor: "date",
                     header: ["Datum isteka", {
-                        content: "textFilter"
+                        content: "dateFilter"
                     }],
                     format: function (value) {
                         date = new Date(value);
@@ -153,7 +152,9 @@ var noteView = {
                             noteView.showChangeNoteDialog($$("noteDT").getItem(context.id.row));
                             break;
                         case "2":
-                            var delBox = (webix.copy(commonViews.brisanjePotvrda("oglasa", "oglas")));
+                            var delBox = (webix.copy(commonViews.brisanjePotvrda("sale"," salu "+$$("roomDT").getItem(context.id.row).name)));
+
+                            var delBox = (webix.copy(commonViews.brisanjePotvrda("oglasa", "oglas"+$$("noteDT").getItem(context.id.row).name)));
                             var newItem = $$("noteDT").getItem(context.id.row);
                             delBox.callback = function (result) {
                                 if (result == 1) {

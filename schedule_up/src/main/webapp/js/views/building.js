@@ -168,7 +168,7 @@ var buildingView = {
                         inputWidth: 100,
                     },
                     {
-                        view: "select", options: countries, label: "Drzava:", value: countries[0], id: "combo"
+                        view: "select", options: countries, label: "Država:", value: countries[0], id: "combo"
 
                     },
                     {
@@ -198,7 +198,7 @@ var buildingView = {
                         }, {}, {
                             id: "saveBuilding",
                             view: "button",
-                            value: "Dodajte zgradu",
+                            value: "Sačuvajte",
                             type: "form",
                             click: "buildingView.saveChanges",
                             hotkey: "enter",
@@ -308,7 +308,9 @@ var buildingView = {
         $$("showMapDialog").show();
     },
     showChangeBuildingDialog: function (building) {
-        var url="https://maps.googleapis.com/maps/api/geocode/json?latlng="+building.latitude+","+building.longitude+"+&key=AIzaSyBExEHqJmRKJoRhWOT6Ok3fLR5QMGIZ_eg&language=hr";
+        if (util.popupIsntAlreadyOpened("changeNoteDialog")) {
+
+            var url="https://maps.googleapis.com/maps/api/geocode/json?latlng="+building.latitude+","+building.longitude+"+&key=AIzaSyBExEHqJmRKJoRhWOT6Ok3fLR5QMGIZ_eg&language=hr";
         fetch(url).then(function(result) {
             if(result.ok) {
                 return result.json();
@@ -353,7 +355,7 @@ var buildingView = {
             }, 0);
         });
 
-    },
+    }},
 
     saveChangedBuilding: function () {
         if ($$("changeBuildingForm").validate()) {
