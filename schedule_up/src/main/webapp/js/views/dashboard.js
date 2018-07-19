@@ -2,7 +2,7 @@ var schedulerEvents = [];
 var dotDateFormatter = webix.Date.dateToStr("%d.%m.%Y %H:%i");
 
 var detachAllEvents = function () {
-    for(var i=0;i<schedulerEvents.length;i++){
+    for (var i = 0; i < schedulerEvents.length; i++) {
         scheduler.detachEvent(schedulerEvents[i]);
     }
     schedulerEvents = [];
@@ -21,48 +21,49 @@ var dashboardView = {
             "        <div class=\"dhx_cal_tab\" name=\"week_tab\" style=\"right:140px;\"></div>\n" +
             "        <div class=\"dhx_cal_tab\" name=\"month_tab\" style=\"right:76px;\"></div></div><div" +
             " class='dhx_cal_header'></div><div class='dhx_cal_data'></div></div>",
-            },
+        },
             {
-                view:"accordion",
-                collapsed:true,
-                multi:true,
-                cols:[ //or rows
-                    { header:"<span class='fa fa-sticky-note'></span> Oglasi",
-                        width:400,
-                        body:{
-                                view: "list",
-                                multiselect: false,
-                                id: "noteList",
-                                onContext: {},
-                                select: "row",
-                                navigation: true,
-                                editable: false,
-                                type: {
-                                    height: "auto",
-                                    template: function (value) {
-                                        var name = value.name;
-                                        var date = new Date(value.publishTime);
-                                        var hours = date.getHours();
-                                        var minutes = date.getMinutes();
+                view: "accordion",
+                collapsed: true,
+                multi: true,
+                cols: [ //or rows
+                    {
+                        header: "<span class='fa fa-sticky-note'></span> Oglasi",
+                        width: 400,
+                        body: {
+                            view: "list",
+                            multiselect: false,
+                            id: "noteList",
+                            onContext: {},
+                            select: "row",
+                            navigation: true,
+                            editable: false,
+                            type: {
+                                height: "auto",
+                                template: function (value) {
+                                    var name = value.name;
+                                    var date = new Date(value.publishTime);
+                                    var hours = date.getHours();
+                                    var minutes = date.getMinutes();
 
-                                        minutes = minutes < 10 ? '0' + minutes : minutes;
-                                        var strTime = hours + ':' + minutes + "h";
-                                        var formattedTime =  date.getDate() + "." + (date.getMonth() + 1) + "." + date.getFullYear() + ".  " + strTime;
-                                        return "<div class='noteName'>" + name + "</div>" +
-                                            "<div class='notePublishTime'>"+ formattedTime + "</div>";
-                                    }
-                                },
-                                url: "note/",
-                                on: {
-                                    onItemClick: function(id) {
-                                        dashboardView.showNotePopup(this.getItem(id));
-                                    }
+                                    minutes = minutes < 10 ? '0' + minutes : minutes;
+                                    var strTime = hours + ':' + minutes + "h";
+                                    var formattedTime = date.getDate() + "." + (date.getMonth() + 1) + "." + date.getFullYear() + ".  " + strTime;
+                                    return "<div class='noteName'>" + name + "</div>" +
+                                        "<div class='notePublishTime'>" + formattedTime + "</div>";
+                                }
+                            },
+                            url: "note/",
+                            on: {
+                                onItemClick: function (id) {
+                                    dashboardView.showNotePopup(this.getItem(id));
                                 }
                             }
+                        }
                     },
                 ]
             },
-            ]
+        ]
     },
 
     selectPanel: function () {
@@ -72,26 +73,26 @@ var dashboardView = {
         var panelCopy = webix.copy(this.panel);
         $$("main").addView(webix.copy(panelCopy));
 
-        scheduler.config.xml_date="%d-%m-%Y %H:%i";
-        scheduler.config.readonly=true;
-        scheduler.config.first_hour=parseInt(companyData.timeFrom.substr(0,2));
-        scheduler.init("scheduler_here",new Date(),"week");
+        scheduler.config.xml_date = "%d-%m-%Y %H:%i";
+        scheduler.config.readonly = true;
+        scheduler.config.first_hour = parseInt(companyData.timeFrom.substr(0, 2));
+        scheduler.init("scheduler_here", new Date(), "week");
         scheduler.clearAll();
 
-       var onClick=scheduler.attachEvent("onClick", function (id, e) {
+        var onClick = scheduler.attachEvent("onClick", function (id, e) {
             var event = scheduler.getEvent(id);
             webix.promise.all([webix.ajax("user/" + event.userId), webix.ajax("room/" + event.roomId)]).then(
                 function (results) {
                     event.creatorUsername = JSON.parse(results[0].text()).username;
-                   event.roomName = JSON.parse(results[1].text()).name;
+                    event.roomName = JSON.parse(results[1].text()).name;
                     dashboardView.showEventPopup(event);
                 }
             );
         });
         schedulerEvents.push(onClick);
-        schedulerEvents.push(scheduler.attachEvent("onEventLoading", function(ev){
-            if (ev.status!==0)
-                ev.color="#bdd5ff";
+        schedulerEvents.push(scheduler.attachEvent("onEventLoading", function (ev) {
+            if (ev.status !== 0)
+                ev.color = "#bdd5ff";
             return true;
         }));
         scheduler.load("meeting/", "json");
@@ -201,7 +202,7 @@ var dashboardView = {
                             type: "form",
                             width: 150,
                             on: {
-                                'onItemClick': function(id){
+                                'onItemClick': function (id) {
                                     dashboardView.showMeetingDialog();
                                 }
                             },
@@ -213,8 +214,8 @@ var dashboardView = {
 
     },
 
-    showMeetingDialog: function(){
-        if(util.popupIsntAlreadyOpened("meetingDialog")){
+    showMeetingDialog: function () {
+        if (util.popupIsntAlreadyOpened("meetingDialog")) {
             webix.ui(webix.copy(dashboardView.meetingDialog));
             var formRight = $$("rightForm");
             var formBasic = $$("eventDialogForm");
@@ -226,30 +227,30 @@ var dashboardView = {
             formRight.elements.participantsNumber.setValue(formBasic.elements.participantNumber.getValue().toString());
             formRight.elements.description.setValue(formBasic.elements.description.getValue());
             formRight.elements.roomName.setValue(formBasic.elements.roomName.getValue());
-            var autor=$$("creatorNameLbl").data.label.substring("Autor: ".length);
+            var autor = $$("creatorNameLbl").data.label.substring("Autor: ".length);
             formRight.elements.creatorName.setValue(autor);
 
             $$("list").clearAll();
             $$("listDocuments").clearAll();
-            var id=formBasic.elements.id.getValue();
+            var id = formBasic.elements.id.getValue();
             webix.promise.all([webix.ajax("/user/participantsFor/" + id), webix.ajax("document/getAllByMeetingId/" + id)]).then(
                 function (results) {
                     $$("list").parse(JSON.parse(results[0].text()));
                     $$("listDocuments").parse(JSON.parse(results[1].text()));
                 });
 
-            $$("listParticipants_input").attachEvent("onTimedKeyPress",function(){
+            $$("listParticipants_input").attachEvent("onTimedKeyPress", function () {
                 var value = this.getValue().toLowerCase();
-                $$("list").filter(function(obj){
-                    var firstLastName=obj.firstName+" "+obj.lastName;
-                    return firstLastName.toLowerCase().indexOf(value)>-1;
+                $$("list").filter(function (obj) {
+                    var firstLastName = obj.firstName + " " + obj.lastName;
+                    return firstLastName.toLowerCase().indexOf(value) > -1;
                 })
             });
 
-            $$("listDocuments_input").attachEvent("onTimedKeyPress",function(){
+            $$("listDocuments_input").attachEvent("onTimedKeyPress", function () {
                 var value = this.getValue().toLowerCase();
-                $$("listDocuments").filter(function(obj){
-                    return obj.name.toLowerCase().indexOf(value)>-1;
+                $$("listDocuments").filter(function (obj) {
+                    return obj.name.toLowerCase().indexOf(value) > -1;
                 })
             });
 
@@ -285,7 +286,7 @@ var dashboardView = {
             },
                 {
 
-                    cols:[
+                    cols: [
                         {
                             view: "form",
                             id: "rightForm",
@@ -345,10 +346,10 @@ var dashboardView = {
                                     height: 100
                                 },
                                 {
-                                    view:"button",
-                                    width:356,
-                                    height:46,
-                                    value:"Pogledajte lokaciju sale",
+                                    view: "button",
+                                    width: 356,
+                                    height: 46,
+                                    value: "Pogledajte lokaciju sale",
                                     id: "location",
                                     name: "location",
                                     click: "dashboardView.showMap",
@@ -364,32 +365,37 @@ var dashboardView = {
                                 labelWidth: 120,
                                 bottomPadding: 8
                             },
-                            elements:[
+                            elements: [
                                 {
                                     id: "listToolbar",
                                     name: "listToolbar",
-                                    width:300,
-                                    rows:[
+                                    width: 300,
+                                    rows: [
                                         {
                                             height: 35,
-                                            view:"toolbar",
-                                            elements:[
-                                                {view:"text", id:"listParticipants_input",label:"Učesnici:", labelWidth:170}
+                                            view: "toolbar",
+                                            elements: [
+                                                {
+                                                    view: "text",
+                                                    id: "listParticipants_input",
+                                                    label: "Učesnici:",
+                                                    labelWidth: 170
+                                                }
                                             ]
                                         },
                                         {
-                                            id:"list",
+                                            id: "list",
                                             name: "list",
-                                            view:"list",
-                                            width:320,
-                                            height:200,
-                                            float:"left",
-                                            margin:"20px",
-                                            template:"#firstName# #lastName# <div style='padding-left:18px'> E-mail : #email#</div>",
-                                            type:{
-                                                height:62
+                                            view: "list",
+                                            width: 320,
+                                            height: 200,
+                                            float: "left",
+                                            margin: "20px",
+                                            template: "#firstName# #lastName# <div style='padding-left:18px'> E-mail : #email#</div>",
+                                            type: {
+                                                height: 62
                                             },
-                                            select:false,
+                                            select: false,
                                         }
                                     ]
                                 },
@@ -397,31 +403,41 @@ var dashboardView = {
                                 {
                                     id: "documentsListToolbar",
                                     name: "documentsListToolbar",
-                                    width:300,
-                                    rows:[
+                                    width: 300,
+                                    rows: [
                                         {
                                             height: 35,
-                                            view:"toolbar",
-                                            elements:[
-                                                {view:"text", id:"listDocuments_input",label:"Dokumenti:", labelWidth:170}
+                                            view: "toolbar",
+                                            elements: [
+                                                {
+                                                    view: "text",
+                                                    id: "listDocuments_input",
+                                                    label: "Dokumenti:",
+                                                    labelWidth: 170
+                                                }
                                             ]
                                         },
                                         {
-                                            id:"listDocuments",
+                                            id: "listDocuments",
                                             name: "listDocuments",
-                                            view:"list",
-                                            width:320,
-                                            height:200,
-                                            float:"left",
-                                            margin:"20px",
-                                            template:"#name# <div style='padding-left:18px'></div>",
-                                            type:{
-                                                height:32
+                                            view: "list",
+                                            width: 320,
+                                            height: 200,
+                                            margin: "20px",
+                                            template: "<div class='download'>#name#</div> ",
+                                            type: {
+                                                height: 32
                                             },
-                                            select: true,
+                                            onClick: {
+                                                'download': function (e, id) {
+                                                    var item = $$("listDocuments").getItem(id);
+                                                    var blob = util.b64toBlob(item.content);
+                                                    saveFileAs(blob, item.name);
+                                                    return false;
+                                                }
+                                            },
                                         }
                                     ]
-
 
 
                                 },
@@ -439,11 +455,11 @@ var dashboardView = {
 
     },
 
-    showMap: function(){
+    showMap: function () {
         webix.promise.all([webix.ajax("room/getBuildingByRoomId/" + $$("eventDialogForm").elements.roomId.getValue())]).then(
             function (results) {
                 var building = JSON.parse(results[0].text());
-                roomView.showMapDetailsDialog(building.latitude,building.longitude);
+                roomView.showMapDetailsDialog(building.latitude, building.longitude);
             }
         );
 

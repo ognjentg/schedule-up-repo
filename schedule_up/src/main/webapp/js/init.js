@@ -2,12 +2,12 @@ var scriptsToLoad = [
     {
         "section": "webix",
         "path": "webix/codebase/",
-        "files": ["webix","dhtmlxscheduler","i18n/sr","locale/locale_sr"]
+        "files": ["webix", "dhtmlxscheduler", "i18n/sr", "locale/locale_sr"]
     },
     {
         "section": "extensions",
         "path": "webix/extensions/",
-        "files": ["sidebar/sidebar", "dhtmlxscheduler_readonly", "dhtmlxscheduler_limit"]
+        "files": ["sidebar/sidebar", "dhtmlxscheduler_readonly", "dhtmlxscheduler_limit", "FileSaver"]
     },
     {
         "section": "common",
@@ -18,9 +18,9 @@ var scriptsToLoad = [
         "section": "views",
         "path": "js/views/",
 
-        "files": ["company", "building", "note", "company_settings", "room", "gear", "logger","dashboard","registration","user", "usergroup","meeting","profile"]
+        "files": ["company", "building", "note", "company_settings", "room", "gear", "logger", "dashboard", "registration", "user", "usergroup", "meeting", "profile"]
 
-        
+
     },
     {
         "section": "core",

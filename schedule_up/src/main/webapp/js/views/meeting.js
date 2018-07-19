@@ -4,10 +4,10 @@ var formatter = webix.Date.dateToStr("%d-%m-%Y %H:%i");
 var parser = webix.Date.strToDate("%d-%m-%Y %H:%i");
 var meetingView = {
 
-    room:null,
-    roomId:null,
-    newEventId:null,
-    files:[],
+    room: null,
+    roomId: null,
+    newEventId: null,
+    files: [],
     addMeetingDialog: {
         view: "popup",
         id: "addMeetingDialog",
@@ -145,7 +145,7 @@ var meetingView = {
                             label: "<span class='webix_icon fa fa-user'></span> Učesnici",
                             width: 200
 
-                        }, {view:"search",name:"userList_input",id:"userList_input", width:200} ,{
+                        }, {view: "search", name: "userList_input", id: "userList_input", width: 200}, {
                             view: "list",
                             id: "userList",
                             width: 200,
@@ -175,7 +175,7 @@ var meetingView = {
                             view: "search",
                             id: "userGroupList_input",
                             name: "userGroupList_input"
-                        },{
+                        }, {
                             view: "list",
                             id: "userGroupList",
                             width: 200,
@@ -462,16 +462,15 @@ var meetingView = {
 
     contextMenuEventId: null,
 
-    editMeeting:function(eventId) {
-        var form=$$("editMeetingForm")
-        if(Date.parse(scheduler.getEvent(eventId).start_date)<Date.now()) {
+    editMeeting: function (eventId) {
+        var form = $$("editMeetingForm")
+        if (Date.parse(scheduler.getEvent(eventId).start_date) < Date.now()) {
             util.messages.showErrorMessage("Nije moguće izmijeniti događaj koji je prošao.");
             return;
         }
 
 
-
-        newEventId=eventId;
+        newEventId = eventId;
         webix.ui(webix.copy(meetingView.editMeetingDialog)).show();
         var element = scheduler.getEvent(eventId);
         var form = $$("editMeetingForm");
@@ -501,7 +500,7 @@ var meetingView = {
         //popunjavanje korisnika
         connection.sendAjax("GET", "user/nonParticipantsFor/" + eventId,
             function (text, data, xhr) {
-                if (text ) {
+                if (text) {
                     $$("userList").clearAll();
                     $$("userList").parse(data.json());
                 } else {
@@ -514,13 +513,13 @@ var meetingView = {
             , null);
         connection.sendAjax("GET", "user-group/nonParticipantsFor/" + eventId,
             function (text, data, xhr) {
-                if (text ) {
+                if (text) {
                     $$("userGroupList").clearAll();
                     $$("userGroupList").parse(data.json());
                 } else {
                     util.messages.showErrorMessage("Greška pri učitavanju učesničkih grupa.");
                 }
-            }, function (text,data,xhr) {
+            }, function (text, data, xhr) {
                 util.messages.showErrorMessage("Greška pri učitavanju učesničkih grupa.");
 
             }
@@ -528,21 +527,21 @@ var meetingView = {
 
     },
 
-    selectPanel: function (room,roomName) {
+    selectPanel: function (room, roomName) {
         detachAllEvents();
         webix.protoUI({
             name: "activeList"
         }, webix.ui.list, webix.ActiveContent);
         $$("main").removeView(rightPanel);
-        meetingView.room=room;
+        meetingView.room = room;
         meetingView.roomId = room;
         rightPanel = "meetingPanel";
         var panelCopy = webix.copy(this.panel);
         $$("main").addView(webix.copy(panelCopy));
         scheduler.clearAll();
-        document.getElementById("scheduler_room_name").innerHTML=roomName;
+        document.getElementById("scheduler_room_name").innerHTML = roomName;
         var event = scheduler.attachEvent("onEmptyClick", function (date, e) {
-            if (date>new Date()&&checkIfNotHoliday(date)) {
+            if (date > new Date() && checkIfNotHoliday(date)) {
                 webix.ui(webix.copy(meetingView.addMeetingDialog)).show();
                 $$("startTime").setValue(date);
                 $$("endTime").setValue(date);
@@ -558,12 +557,12 @@ var meetingView = {
                         return obj.name != null;
                     });
                 });
-                $$("userList_input").attachEvent("onTimedKeyPress",function(){
+                $$("userList_input").attachEvent("onTimedKeyPress", function () {
                     //get user input value
                     var value = this.getValue().toLowerCase();
-                    $$("userList").filter(function(obj){
-                        var firstLastName2=obj.firstName+" "+obj.lastName;
-                        return firstLastName2.toLowerCase().indexOf(value)>-1 && obj.firstName != null && obj.id != userData.id;
+                    $$("userList").filter(function (obj) {
+                        var firstLastName2 = obj.firstName + " " + obj.lastName;
+                        return firstLastName2.toLowerCase().indexOf(value) > -1 && obj.firstName != null && obj.id != userData.id;
                     })
                 });
 
@@ -571,7 +570,7 @@ var meetingView = {
                     var value = this.getValue().toLowerCase();
                     $$("userGroupList").filter(function (obj) {
 
-                        return obj.name.toLowerCase().indexOf(value)>-1 && obj.name != null;
+                        return obj.name.toLowerCase().indexOf(value) > -1 && obj.name != null;
                     });
                 });
 
@@ -579,7 +578,7 @@ var meetingView = {
         });
         schedulerEvents.push(event);
 
-        var onClick=scheduler.attachEvent("onClick", function (id, e) {
+        var onClick = scheduler.attachEvent("onClick", function (id, e) {
             var event1 = scheduler.getEvent(id);
             event1.roomName = room.name;
             event1.meetingParticipantsExtended = [];
@@ -601,20 +600,20 @@ var meetingView = {
         scheduler.config.first_hour = parseInt(companyData.timeFrom.substr(0, 2));
 
         schedulerEvents.push(scheduler.attachEvent("onEventLoading", function (ev) {
-            if (ev.status !== 0 && ev.userId===userData.id)
+            if (ev.status !== 0 && ev.userId === userData.id)
                 ev.color = "#bdd5ff";
-            else if(ev.status===0 && ev.userId!==userData.id)
-                ev.color="#3d454c";
-            else if(ev.status!==0 && ev.userId!==userData.id)
-                ev.color="#8798a8";
+            else if (ev.status === 0 && ev.userId !== userData.id)
+                ev.color = "#3d454c";
+            else if (ev.status !== 0 && ev.userId !== userData.id)
+                ev.color = "#8798a8";
 
             return true;
         }));
 
         webix.ajax("holiday").then(function (result) {
-            holidays=JSON.parse(result.text());
-            for (var i=0;i<holidays.length;i++){
-                var holiday=holidays[i];
+            holidays = JSON.parse(result.text());
+            for (var i = 0; i < holidays.length; i++) {
+                var holiday = holidays[i];
                 scheduler.blockTime(
                     new Date(holiday.date),
                     "fullday"
@@ -627,37 +626,37 @@ var meetingView = {
 
 
         schedulerEvents.push(scheduler.attachEvent("onContextMenu", function (id, e) {
-            var activeEventMenu=[
+            var activeEventMenu = [
                 {
                     id: 1,
                     value: "Izmijenite",
-                    icon:"edit"
+                    icon: "edit"
                 },
                 {
-                    $template:"Separator"
+                    $template: "Separator"
                 },
                 {
                     id: 2,
                     value: "Zatvorite",
-                    icon:"check"
+                    icon: "check"
                 },
                 {
-                    $template:"Separator"
+                    $template: "Separator"
                 },
                 {
-                    id:4,
+                    id: 4,
                     value: "Otkažite",
-                    icon:"times"
+                    icon: "times"
                 }
             ];
-            var finishedEventMenu=[
+            var finishedEventMenu = [
                 {
-                    id:3,
+                    id: 3,
                     value: "Dodajte izvještaj",
-                    icon:"file"
+                    icon: "file"
                 }
             ];
-            if (id != null &&(userData.roleId===2 || scheduler.getEvent(id).userId === userData.id) ) {
+            if (id != null && (userData.roleId === 2 || scheduler.getEvent(id).userId === userData.id)) {
                 meetingView.contextMenuEventId = id;
                 var posx = 0;
                 var posy = 0;
@@ -672,7 +671,7 @@ var meetingView = {
 
                     contextMenu = webix.ui({
                         view: "contextmenu",
-                        width:170,
+                        width: 170,
                         on: {
                             onItemClick: function (id) {
                                 // Property meetingView.contextMenuEventId je id eventa na koji smo kliknuli.
@@ -683,18 +682,17 @@ var meetingView = {
                                     case "2":
                                         var delBox = (webix.copy(meetingView.finishMeetingDialog));
                                         delBox.callback = function (result) {
-                                            if (result==1){
-                                                webix.ajax().put("meeting/finish/"+meetingView.contextMenuEventId).
-                                                    then(function(result){
-                                                        if (result.text()){
-                                                            var ev=scheduler.getEvent(meetingView.contextMenuEventId);
-                                                            ev.status=1;
-                                                            ev.color = "#bdd5ff";
-                                                            scheduler.updateEvent(ev.id);
-                                                            util.messages.showMessage("Sastanak uspješno zatvoren");
-                                                        }
+                                            if (result == 1) {
+                                                webix.ajax().put("meeting/finish/" + meetingView.contextMenuEventId).then(function (result) {
+                                                    if (result.text()) {
+                                                        var ev = scheduler.getEvent(meetingView.contextMenuEventId);
+                                                        ev.status = 1;
+                                                        ev.color = "#bdd5ff";
+                                                        scheduler.updateEvent(ev.id);
+                                                        util.messages.showMessage("Sastanak uspješno zatvoren");
+                                                    }
                                                 }).fail(function (err) {
-                                                        util.messages.showErrorMessage(err.responseText());
+                                                    util.messages.showErrorMessage(err.responseText());
                                                 })
                                             }
                                         };
@@ -706,17 +704,16 @@ var meetingView = {
                                     case "4":
                                         var delBox = (webix.copy(meetingView.cancelMeetingDialog));
                                         delBox.callback = function (result) {
-                                            if (result==1){
-                                                webix.ajax().put("meeting/cancel/"+meetingView.contextMenuEventId).
-                                                then(function(result){
-                                                    if (result.text()){
+                                            if (result == 1) {
+                                                webix.ajax().put("meeting/cancel/" + meetingView.contextMenuEventId).then(function (result) {
+                                                    if (result.text()) {
                                                         scheduler.deleteEvent(meetingView.contextMenuEventId);
                                                         util.messages.showMessage("Sastanak uspješno otkazan");
                                                     }
                                                 }).fail(function (err) {
                                                     if (err.responseText) {
                                                         util.messages.showErrorMessage(err.responseText);
-                                                    }else{
+                                                    } else {
                                                         util.messages.showErrorMessage("Otkazivanje sastanka nije uspjelo!");
                                                     }
                                                 });
@@ -728,7 +725,7 @@ var meetingView = {
                             }
                         }
                     });
-                    contextMenu.define("data",scheduler.getEvent(id).status===0?activeEventMenu:finishedEventMenu);
+                    contextMenu.define("data", scheduler.getEvent(id).status === 0 ? activeEventMenu : finishedEventMenu);
                     contextMenu.refresh();
                     contextMenu.show({
                         x: posx,
@@ -736,7 +733,7 @@ var meetingView = {
                     });
                 } else {
                     contextMenu.clearAll();
-                    contextMenu.define("data",scheduler.getEvent(id).status===0?activeEventMenu:finishedEventMenu);
+                    contextMenu.define("data", scheduler.getEvent(id).status === 0 ? activeEventMenu : finishedEventMenu);
                     contextMenu.refresh();
                     contextMenu.show({
                         x: posx,
@@ -755,7 +752,7 @@ var meetingView = {
     },
 
     showEventPopup: function (event) {
-        if(util.popupIsntAlreadyOpened("eventDialog")) {
+        if (util.popupIsntAlreadyOpened("eventDialog")) {
             webix.ui(webix.copy(meetingView.eventDialog));
 
             var formRight = $$("rightForm");
@@ -776,23 +773,23 @@ var meetingView = {
             $$("list").parse(event.meetingParticipants);
             $$("listDocuments").clearAll();
             $$("listDocuments").parse(event.meetingDocuments);
-            $$("listDocuments").attachEvent("onItemClick", function(id, e, node) {
+            $$("listDocuments").attachEvent("onItemClick", function (id, e, node) {
                 //meetingView.showDocumentDetailsDialog(id);
                 return false;
             });
 
-            $$("listParticipants_input").attachEvent("onTimedKeyPress",function(){
+            $$("listParticipants_input").attachEvent("onTimedKeyPress", function () {
                 var value = this.getValue().toLowerCase();
-                $$("list").filter(function(obj){
-                    var firstLastName=obj.firstName+" "+obj.lastName;
-                    return firstLastName.toLowerCase().indexOf(value)>-1;
+                $$("list").filter(function (obj) {
+                    var firstLastName = obj.firstName + " " + obj.lastName;
+                    return firstLastName.toLowerCase().indexOf(value) > -1;
                 })
             });
 
-            $$("listDocuments_input").attachEvent("onTimedKeyPress",function(){
+            $$("listDocuments_input").attachEvent("onTimedKeyPress", function () {
                 var value = this.getValue().toLowerCase();
-                $$("listDocuments").filter(function(obj){
-                    return obj.name.toLowerCase().indexOf(value)>-1;
+                $$("listDocuments").filter(function (obj) {
+                    return obj.name.toLowerCase().indexOf(value) > -1;
                 })
             });
 
@@ -800,21 +797,21 @@ var meetingView = {
         }
     },
 
-    showDocumentDetailsDialog: function(id){
+    showDocumentDetailsDialog: function (id) {
         webix.ui(webix.copy(meetingView.showDocumentDialog));
         $$("pdf").clear();
         $$("pdf").define('scale', 'page-width');
-        var contentEncoded=$$("listDocuments").getItem(id).content;
-        var contentDecoded=window.atob(contentEncoded);
-        lcFileName = { "data": contentDecoded };
+        var contentEncoded = $$("listDocuments").getItem(id).content;
+        var contentDecoded = window.atob(contentEncoded);
+        lcFileName = {"data": contentDecoded};
 
         $$("pdf").load(lcFileName);
-        $$("documentLabel").data.label="<span class='webix_icon fa fa-file-pdf '></span> Pregled dokumenta: "+$$("listDocuments").getItem(id).name;
+        $$("documentLabel").data.label = "<span class='webix_icon fa fa-file-pdf '></span> Pregled dokumenta: " + $$("listDocuments").getItem(id).name;
         $$("showDocumentDialog").show();
     },
 
 
-    showDocumentDialog:{
+    showDocumentDialog: {
         view: "popup",
         id: "showDocumentDialog",
         modal: true,
@@ -824,7 +821,7 @@ var meetingView = {
             rows: [{
                 view: "toolbar",
                 cols: [{
-                    id:"documentLabel",
+                    id: "documentLabel",
                     view: "label",
                     label: "<span class='webix_icon fa fa-map-marker '></span> Pregled dokumenta",
                     width: 600,
@@ -836,20 +833,23 @@ var meetingView = {
                     click: "util.dismissDialog('showDocumentDialog');"
                 }]
             }, {
-                type:"space",
-                rows:[
-                    { view:"pdfbar",
-                        id:"toolbar"
+                type: "space",
+                rows: [
+                    {
+                        view: "pdfbar",
+                        id: "toolbar"
                     },
-                    { view:"pdfviewer",
-                        id:"pdf",
+                    {
+                        view: "pdfviewer",
+                        id: "pdf",
                         //url:"binary->files/WebixDocs.pdf",
-                        toolbar:"toolbar",
-                        on:{
-                            onDocumentReady:function(){
+                        toolbar: "toolbar",
+                        on: {
+                            onDocumentReady: function () {
                                 webix.message("Loaded and rendered")
                             }
-                        }}
+                        }
+                    }
                 ]
 
             },]
@@ -877,7 +877,7 @@ var meetingView = {
             },
                 {
 
-                    cols:[
+                    cols: [
                         {
                             view: "form",
                             id: "rightForm",
@@ -937,10 +937,10 @@ var meetingView = {
                                     height: 100
                                 },
                                 {
-                                    view:"button",
-                                    width:356,
-                                    height:46,
-                                    value:"Pogledajte lokaciju sale",
+                                    view: "button",
+                                    width: 356,
+                                    height: 46,
+                                    value: "Pogledajte lokaciju sale",
                                     id: "location",
                                     name: "location",
                                     click: "meetingView.showMap",
@@ -956,32 +956,37 @@ var meetingView = {
                                 labelWidth: 120,
                                 bottomPadding: 8
                             },
-                            elements:[
+                            elements: [
                                 {
                                     id: "listToolbar",
                                     name: "listToolbar",
-                                    width:300,
-                                    rows:[
+                                    width: 300,
+                                    rows: [
                                         {
                                             height: 35,
-                                            view:"toolbar",
-                                            elements:[
-                                                {view:"text", id:"listParticipants_input",label:"Učesnici:", labelWidth:170}
+                                            view: "toolbar",
+                                            elements: [
+                                                {
+                                                    view: "text",
+                                                    id: "listParticipants_input",
+                                                    label: "Učesnici:",
+                                                    labelWidth: 170
+                                                }
                                             ]
                                         },
                                         {
-                                            id:"list",
+                                            id: "list",
                                             name: "list",
-                                            view:"list",
-                                            width:320,
-                                            height:200,
-                                            float:"left",
-                                            margin:"20px",
-                                            template:"#firstName# #lastName# <div style='padding-left:18px'> E-mail : #email#</div>",
-                                            type:{
-                                                height:62
+                                            view: "list",
+                                            width: 320,
+                                            height: 200,
+                                            float: "left",
+                                            margin: "20px",
+                                            template: "#firstName# #lastName# <div style='padding-left:18px'> E-mail : #email#</div>",
+                                            type: {
+                                                height: 62
                                             },
-                                            select:false,
+                                            select: false,
                                         }
                                     ]
                                 },
@@ -989,38 +994,42 @@ var meetingView = {
                                 {
                                     id: "documentsListToolbar",
                                     name: "documentsListToolbar",
-                                    width:300,
-                                    rows:[
+                                    width: 300,
+                                    rows: [
                                         {
                                             height: 35,
-                                            view:"toolbar",
-                                            elements:[
-                                                {view:"text", id:"listDocuments_input",label:"Dokumenti:", labelWidth:170}
+                                            view: "toolbar",
+                                            elements: [
+                                                {
+                                                    view: "text",
+                                                    id: "listDocuments_input",
+                                                    label: "Dokumenti:",
+                                                    labelWidth: 170
+                                                }
                                             ]
                                         },
                                         {
-                                            id:"listDocuments",
+                                            id: "listDocuments",
                                             name: "listDocuments",
-                                            view:"list",
-                                            width:320,
-                                            height:200,
-                                            float:"left",
-                                            margin:"20px",
-                                            template:"#name# <div style='padding-left:18px'></div>",
-                                            type:{
-                                                height:32
+                                            view: "list",
+                                            width: 320,
+                                            height: 200,
+                                            margin: "20px",
+                                            template: "<div class='download'>#name#</div> ",
+                                            type: {
+                                                height: 32
                                             },
-                                            select: true,
-                                            /*onClick:{
-                                                "downloadDocumentFunction":function(id, e, node){
-                                                    console.log("Klik");
+                                            onClick: {
+                                                'download': function (e, id) {
+                                                    var item = $$("listDocuments").getItem(id);
+                                                    var blob = util.b64toBlob(item.content);
+                                                    saveFileAs(blob, item.name);
                                                     return false;
                                                 }
-                                            },*/
+                                            },
 
                                         }
                                     ]
-
 
 
                                 },
@@ -1037,10 +1046,10 @@ var meetingView = {
 
 
     },
-    
-     showMap: function () {
-         roomView.showMapDetailsDialog(meetingView.room.latitude,meetingView.room.longitude);
-     }   
+
+    showMap: function () {
+        roomView.showMapDetailsDialog(meetingView.room.latitude, meetingView.room.longitude);
+    }
 
 
     , updateMeeting: function () {
@@ -1060,7 +1069,8 @@ var meetingView = {
                         userId: obj.id,
                         deleted: 0,
                         companyId: companyData.id,
-                        meetingId: 1};
+                        meetingId: 1
+                    };
 
                     participants.push(participant);
                 }
@@ -1100,7 +1110,7 @@ var meetingView = {
 
         if (form.validate()) {
             var newMeeting = {
-                id:newEventId,
+                id: newEventId,
                 start_date: formatter(form.getValues().startTime),
                 end_date: formatter(form.getValues().endTime),
                 description: form.getValues().description,
@@ -1123,21 +1133,22 @@ var meetingView = {
                         meetingId: newEventId
                     };
                     documents.push(doc);
-                }}
+                }
+            }
             for (var i = 0; i < participants.length; i++) {
                 participants[i].meetingId = newEventId;
             }
             var pro = webix.ajax().headers({
                 "Content-type": "application/json"
-            }).put("meeting/"+newEventId, newMeeting).then(function (realData) {
+            }).put("meeting/" + newEventId, newMeeting).then(function (realData) {
                 return webix.ajax().headers({
                     "Content-type": "application/json"
-                }).post("participant/insertAll",JSON.stringify(participants));
-            }).then(function(realData){
+                }).post("participant/insertAll", JSON.stringify(participants));
+            }).then(function (realData) {
                 return webix.ajax().headers({
                     "Content-type": "application/json"
-                }).put("document/updateAll/"+newEventId,JSON.stringify(documents));
-            }).then(function(realData){
+                }).put("document/updateAll/" + newEventId, JSON.stringify(documents));
+            }).then(function (realData) {
                 util.messages.showMessage("Uspješna izmjena rezervacije.")
             });
             pro.fail(function (err) {
@@ -1147,7 +1158,7 @@ var meetingView = {
             util.dismissDialog('editMeetingDialog')
 
         }
-    },saveMeeting: function () {
+    }, saveMeeting: function () {
         var file = meetingView.files[0];
 
         var participants = [];
@@ -1224,16 +1235,16 @@ var meetingView = {
                     }
 
                 }
-                var meetingParticipantsDocuments={
-                    "meeting":newMeeting,
-                    "participants":participants,
-                    "documents":documents
+                var meetingParticipantsDocuments = {
+                    "meeting": newMeeting,
+                    "participants": participants,
+                    "documents": documents
                 };
                 connection.sendAjax("POST", "meeting/full",
                     function (text, data, xhr) {
                         if (text) {
                             util.messages.showMessage("Uspješno kreirana rezervacija.");
-                            newMeeting.id=data.json()['meeting'].id;
+                            newMeeting.id = data.json()['meeting'].id;
                             scheduler.addEvent(newMeeting);
                         } else
                             util.messages.showErrorMessage("Neuspješno kreiranje rezervacije.");
@@ -1245,7 +1256,8 @@ var meetingView = {
                 util.dismissDialog('addMeetingDialog');
                 //  }
             }
-        }}
+        }
+    }
     , hide: function () {
         $$("tmpFile").hide();
     },
@@ -1256,60 +1268,60 @@ var meetingView = {
 
     },
 
-    finishMeetingDialog:{
+    finishMeetingDialog: {
         title: "Zatvaranje sastanka",
         ok: "Da",
         cancel: "Ne",
         width: 500,
         text: "Da li ste sigurni da želite da zatvorite sastanak?"
     },
-    cancelMeetingDialog:{
+    cancelMeetingDialog: {
         title: "Otkazivanje sastanka",
         ok: "Da",
         cancel: "Ne",
         width: 500,
         text: "Da li ste sigurni da želite da otkažete sastanak?"
     },
-    addReportDialog:{
-        view:"popup",
+    addReportDialog: {
+        view: "popup",
         id: "addReportDialog",
         modal: true,
         position: "center",
-        meetingId:null,
-        body:{
-            rows:[
+        meetingId: null,
+        body: {
+            rows: [
                 {
-                    view:"toolbar",
-                    cols:[
+                    view: "toolbar",
+                    cols: [
                         {
-                            view:"label",
-                            width:200,
-                            label:"<span class='webix icon_delete fa fa-file'/> Dodavanje izvještaja"
+                            view: "label",
+                            width: 200,
+                            label: "<span class='webix icon_delete fa fa-file'/> Dodavanje izvještaja"
                         },
                         {},
                         {
-                            view:"icon",
-                            icon:"close",
-                            align:"right",
-                            click:"util.dismissDialog('addReportDialog');"
+                            view: "icon",
+                            icon: "close",
+                            align: "right",
+                            click: "util.dismissDialog('addReportDialog');"
                         }
                     ]
                 },
                 {
-                    cols:[
+                    cols: [
                         {
-                            view:"label",
-                            width:150,
-                            label:"Dodajte dokumente"
+                            view: "label",
+                            width: 150,
+                            label: "Dodajte dokumente"
                         },
                         {},
                         {
-                            view:"uploader",
-                            id:"reportUploader",
-                            width:32,
-                            height:32,
-                            css:"upload",
-                            template:"<span class='webix fa fa-upload' /></span>",
+                            view: "uploader",
+                            id: "reportUploader",
+                            width: 32,
+                            height: 32,
+                            css: "upload",
+                            template: "<span class='webix fa fa-upload' /></span>",
                             on: {
                                 onBeforeFileAdd: function (upload) {
                                     var file = upload.file;
@@ -1332,38 +1344,44 @@ var meetingView = {
                     ]
                 },
                 {
-                    view:"list",
-                    id:"reportList",
-                    autowidth:true,
-                    height:200,
-                    css:"relative",
-                    template:"<div class='list-name'>#name#</div> <span class='delete-file'><span class='webix fa fa-close'/></span>",
-                    onClick:{
-                        'delete-file':function (e,id) {
+                    view: "list",
+                    id: "reportList",
+                    autowidth: true,
+                    height: 200,
+                    css: "relative",
+                    template: "<div class='list-name'>#name#</div> <span class='delete-file'><span class='webix fa fa-close'/></span>",
+                    onClick: {
+                        'delete-file': function (e, id) {
                             this.remove(id);
+                            return false;
+                        },
+                        'list-name': function (e, id) {
+                            var item = $$("reportList").getItem(id);
+                            var blob = util.b64toBlob(item.content);
+                            saveFileAs(blob, item.name);
                             return false;
                         }
                     }
                 },
                 {
-                    view:"button",
-                    width:140,
-                    value:"Dodajte izvještaj",
-                    click:function () {
-                        var list=$$("reportList");
-                        if (list.count()===0){
+                    view: "button",
+                    width: 140,
+                    value: "Dodajte izvještaj",
+                    click: function () {
+                        var list = $$("reportList");
+                        if (list.count() === 0) {
                             util.messages.showErrorMessage("Nije odabran nijedan dokument!");
                             return;
                         }
-                        var reports=[];
+                        var reports = [];
                         list.data.each(function (report) {
-                            report.id=null;
+                            report.id = null;
                             reports.push(report);
                         });
 
                         webix.ajax().headers({
                             "Content-type": "application/json"
-                        }).post("document/list/",JSON.stringify(reports)).then(function (result) {
+                        }).post("document/list/", JSON.stringify(reports)).then(function (result) {
                             util.messages.showMessage("Izvještaj je uspješno dodat.");
                             util.dismissDialog("addReportDialog");
                         }).fail(function (err) {
@@ -1384,10 +1402,9 @@ var meetingView = {
     }
 
 
-
 };
 
-var checkIfNotHoliday=function(date){
+var checkIfNotHoliday = function (date) {
 
     var probe = {
         start_date: new Date(date),
