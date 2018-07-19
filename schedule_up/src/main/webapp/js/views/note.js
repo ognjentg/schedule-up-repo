@@ -336,7 +336,7 @@ var noteView = {
                     view: "textarea",
                     id: "description",
                     name: "description",
-                    label: "Opis",
+                    label: "Opis:",
                     height: 200,
                     invalidMessage: "Unesite tekst oglasa!",
                     required: true
@@ -345,7 +345,7 @@ var noteView = {
                     timepicker: true,
                     id: "expiredTime",
                     name: "expiredTime",
-                    label: "Datum isteka",
+                    label: "Datum isteka:",
                     invalidMessage: "Unesite validan datum isteka oglasa!",
                     required: true
                 }, {
@@ -394,18 +394,20 @@ var noteView = {
     },
 
     showChangeNoteDialog: function (note) {
-        webix.ui(webix.copy(noteView.changeNoteDialog));
-        var form = $$("changeNoteForm");
-        form.elements.id.setValue(note.id);
-        form.elements.name.setValue(note.name);
-        form.elements.description.setValue(note.description);
-        form.elements.expiredTime.setValue(new Date(note.expiredTime));
-        // form.elements.publishedTime.setValue(note.publishedTime);
-        //datum?!?
-        setTimeout(function () {
-            $$("changeNoteDialog").show();
-            webix.UIManager.setFocus("name");
-        }, 0);
+        if (util.popupIsntAlreadyOpened("changeNoteDialog")) {
+            webix.ui(webix.copy(noteView.changeNoteDialog));
+            var form = $$("changeNoteForm");
+            form.elements.id.setValue(note.id);
+            form.elements.name.setValue(note.name);
+            form.elements.description.setValue(note.description);
+            form.elements.expiredTime.setValue(new Date(note.expiredTime));
+            // form.elements.publishedTime.setValue(note.publishedTime);
+            //datum?!?
+            setTimeout(function () {
+                $$("changeNoteDialog").show();
+                webix.UIManager.setFocus("name");
+            }, 0);
+        }
     },
 
     saveChangedNote: function () {

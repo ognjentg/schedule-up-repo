@@ -125,14 +125,14 @@ userView = {
                         view: "text",
                         id: "email",
                         name: "email",
-                        label: "E-mail",
+                        label: "E-mail:",
                         required: true,
-                        invalidMessage: "Unesite odgovarajuću email adresu"
+                        invalidMessage: "Unesite odgovarajuću e-mail adresu"
                     },{
                         view: "richselect",
                         id: "role",
                         name: "role",
-                        label: "uloga",
+                        label: "Uloga:",
                         value: 4,
                         options: [
                             {id:4, "value":"korisnik"},
@@ -225,8 +225,10 @@ userView = {
     },
 
     showAddDialog: function () {
-        webix.ui(webix.copy(userView.addDialog)).show();
-        webix.UIManager.setFocus("name");
+        if (util.popupIsntAlreadyOpened("addUserDialog")) {
+            webix.ui(webix.copy(userView.addDialog)).show();
+            webix.UIManager.setFocus("name");
+        }
     },
 
     save: function () {

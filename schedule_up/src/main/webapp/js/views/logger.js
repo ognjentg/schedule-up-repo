@@ -9,7 +9,7 @@ var loggerView = {
             cols: [{
                 view: "label",
                 width: 400,
-                template: "<span class='fa fa-history'></span> Logovi "
+                template: "<span class='fa fa-history'></span> Logger korisničkih akcija"
             }]
         }, {
             view: "datatable",
@@ -52,8 +52,7 @@ var loggerView = {
                     fillspace: true,
                     editable: false,
                     editor: "text",
-                    header: ["Detaljnije",
-                        {
+                    header: ["Detaljnije", {
                             content: "textFilter"
                         }]
                 },
