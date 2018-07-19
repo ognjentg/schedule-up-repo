@@ -71,6 +71,7 @@ var noteView = {
                     fillspace: false, width: 400,
                     editor: "text",
                     tooltip: false,
+                    editable:true,
                     header: ["Naslov", {
                         content: "textFilter"
                     }],
@@ -79,6 +80,8 @@ var noteView = {
                 {
                     id: "description",
                     fillspace: true,
+                    editable: true,
+
                     editor: "text",
                     header: ["Opis", {
                         content: "textFilter"

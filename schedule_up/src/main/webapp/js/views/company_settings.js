@@ -47,19 +47,24 @@ var companySettingsView = {
                                         return;
                                     }
                                     var oldTimeFrom = companyData.timeFrom;
-                                    companyData.timeFrom = $$("customizeForm").getValues().timeFrom + ":00";
-                                    connection.sendAjax("PUT", "company/" + companyData.id,
-                                        function (text, data, xhr) {
-                                            if (text && text == "Success") {
-                                                util.messages.showMessage("Uspješno ste izmjenili radno vrijeme");
-                                            } else {
+                                    var endTime=companyData.timeTo;
+                                    if(endTime<$$("customizeForm").getValues().timeFrom ) {
+                                        companyData.timeFrom = $$("customizeForm").getValues().timeFrom + ":00";
+                                        connection.sendAjax("PUT", "company/" + companyData.id,
+                                            function (text, data, xhr) {
+                                                if (text && text == "Success") {
+                                                    util.messages.showMessage("Uspješno ste izmjenili radno vrijeme");
+                                                } else {
+                                                    util.messages.showErrorMessage("Greška pri izmjeni.");
+                                                    companyData.timeFrom = oldTimeFrom;
+                                                }
+                                            }, function (text, data, xhr) {
                                                 util.messages.showErrorMessage("Greška pri izmjeni.");
                                                 companyData.timeFrom = oldTimeFrom;
-                                            }
-                                        }, function (text,data,xhr) {
-                                            util.messages.showErrorMessage("Greška pri izmjeni.");
-                                            companyData.timeFrom = oldTimeFrom;
-                                        }, companyData)
+                                            }, companyData)
+                                    }else{
+                                        util.messages.showMessage("Vrijeme početka ne može biti poslije kraja radnog vremena.")
+                                    }
                                 }
                             }
                             ,
@@ -343,7 +348,8 @@ var companySettingsView = {
     },
     save:function(){
         var date=$$("customizeForm").getValues().holiday;
-        if(date==""){
+        var name=$$("customizeForm").getValues().naziv;
+        if(date==""||name==""){
             util.messages.showErrorMessage("Potrebno je unijeti datum.");
             return;
         }
