@@ -320,20 +320,22 @@ var gearView = {
                     view: "text",
                     id: "name",
                     name: "name",
-                    label: "Naziv opreme",
+                    label: "Naziv opreme:",
                     invalidMessage: "Unesite validan naziv opreme!",
                     required: true,
-                    suggest: {
-                        id: "gearSuggest",
-                        url: "gear/getAllNames"
-                    }
-
+                },{
+                    view: "text",
+                    id: " inventoryNumber",
+                    name: "inventoryNumber",
+                    label: "Inventarski broj:",
+                    invalidMessage: "Unesite validan inventarski broj!",
+                    required: true,
                 },
                     {
                         id: "description",
                         name: "description",
                         view: "text",
-                        label: "Opis",
+                        label: "Opis:",
                         required: false
                     }, {
                         margin: 5,
@@ -359,7 +361,16 @@ var gearView = {
                     },
                     "description": function (value) {
                         if (value.length > 500) {
-                            $$('addGearForm').elements.email.config.invalidMessage = 'Maksimalan broj karaktera je 500';
+                            $$('addGearForm').elements.description.config.invalidMessage = 'Maksimalan broj karaktera je 500';
+                            return false;
+                        }
+                        return true;
+                    },
+                    "inventoryNumber":function (value) {
+                        if (!value)
+                            return false;
+                        if (value.length > 100) {
+                            $$('addGearForm').elements.inventoryNumber.config.invalidMessage = 'Maksimalan broj karaktera je 100';
                             return false;
                         }
                         return true;
@@ -370,8 +381,10 @@ var gearView = {
     },
 
     showAddDialog: function () {
-        webix.ui(webix.copy(gearView.addDialog)).show();
-        webix.UIManager.setFocus("name");
+        if(util.popupIsntAlreadyOpened("addGearDialog")){
+            webix.ui(webix.copy(gearView.addDialog)).show();
+            webix.UIManager.setFocus("name");
+        }
     },
 
     save: function () {
@@ -380,6 +393,7 @@ var gearView = {
             var newItem = {
                 name: $$("addGearForm").getValues().name,
                 description: $$("addGearForm").getValues().description,
+                inventoryNumber: $$("addGearForm").getValues().inventoryNumber,
                 available: 1,
                 companyId: userData.companyId,
                 gearId: null

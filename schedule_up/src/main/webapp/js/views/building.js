@@ -237,7 +237,7 @@ var buildingView = {
         $$("main").addView(webix.copy(panelCopy));
         this.preloadDependencies();
         connection.attachAjaxEvents("buildingDT", "building");
-
+        $$("buildingDT").detachEvent("onBeforeDelete");
         webix.ui({
             view: "contextmenu",
             id: "buildingContextMenu",
