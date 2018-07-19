@@ -755,47 +755,49 @@ var meetingView = {
     },
 
     showEventPopup: function (event) {
-        webix.ui(webix.copy(meetingView.eventDialog));
+        if(util.popupIsntAlreadyOpened("eventDialog")) {
+            webix.ui(webix.copy(meetingView.eventDialog));
 
-        var formRight = $$("rightForm");
-        var format = webix.Date.dateToStr("%d.%m.%Y. %H:%i");
+            var formRight = $$("rightForm");
+            var format = webix.Date.dateToStr("%d.%m.%Y. %H:%i");
 
-        formRight.elements.text.setValue(event.text);
-        formRight.elements.start_date.setValue(format(event.start_date));
-        formRight.elements.end_date.setValue(format(event.end_date));
-        formRight.elements.participantsNumber.setValue(event.participantsNumber);
-        formRight.elements.description.setValue(event.description);
-        formRight.elements.roomName.setValue(event.roomName);
-        formRight.elements.creatorNameLbl.setValue(event.creatorUsername);
+            formRight.elements.text.setValue(event.text);
+            formRight.elements.start_date.setValue(format(event.start_date));
+            formRight.elements.end_date.setValue(format(event.end_date));
+            formRight.elements.participantsNumber.setValue(event.participantsNumber);
+            formRight.elements.description.setValue(event.description);
+            formRight.elements.roomName.setValue(event.roomName);
+            formRight.elements.creatorNameLbl.setValue(event.creatorUsername);
 
-        var formLeft = $$("leftForm");
+            var formLeft = $$("leftForm");
 
-        $$("list").clearAll();
-        //alert("duzina liste ucesnika:"+event.meetingParticipants.length);
-        $$("list").parse(event.meetingParticipants);
-        $$("listDocuments").clearAll();
-        $$("listDocuments").parse(event.meetingDocuments);
-        $$("listDocuments").attachEvent("onItemClick", function(id, e, node) {
-            //meetingView.showDocumentDetailsDialog(id);
-            return false;
+            $$("list").clearAll();
+            //alert("duzina liste ucesnika:"+event.meetingParticipants.length);
+            $$("list").parse(event.meetingParticipants);
+            $$("listDocuments").clearAll();
+            $$("listDocuments").parse(event.meetingDocuments);
+            $$("listDocuments").attachEvent("onItemClick", function(id, e, node) {
+                //meetingView.showDocumentDetailsDialog(id);
+                return false;
             });
 
-        $$("listParticipants_input").attachEvent("onTimedKeyPress",function(){
-            var value = this.getValue().toLowerCase();
-            $$("list").filter(function(obj){
-                var firstLastName=obj.firstName+" "+obj.lastName;
-                return firstLastName.toLowerCase().indexOf(value)>-1;
-            })
-        });
+            $$("listParticipants_input").attachEvent("onTimedKeyPress",function(){
+                var value = this.getValue().toLowerCase();
+                $$("list").filter(function(obj){
+                    var firstLastName=obj.firstName+" "+obj.lastName;
+                    return firstLastName.toLowerCase().indexOf(value)>-1;
+                })
+            });
 
-        $$("listDocuments_input").attachEvent("onTimedKeyPress",function(){
-            var value = this.getValue().toLowerCase();
-            $$("listDocuments").filter(function(obj){
-                return obj.name.toLowerCase().indexOf(value)>-1;
-            })
-        });
+            $$("listDocuments_input").attachEvent("onTimedKeyPress",function(){
+                var value = this.getValue().toLowerCase();
+                $$("listDocuments").filter(function(obj){
+                    return obj.name.toLowerCase().indexOf(value)>-1;
+                })
+            });
 
-        $$("eventDialog").show();
+            $$("eventDialog").show();
+        }
     },
 
     showDocumentDetailsDialog: function(id){
@@ -888,49 +890,49 @@ var meetingView = {
                                 view: "text",
                                 id: "text",
                                 name: "text",
-                                label: "Naziv",
+                                label: "Naziv:",
                                 readonly: true
                             },
                                 {
                                     view: "text",
                                     id: "creatorNameLbl",
                                     name: "creatorNameLbl",
-                                    label: "Autor",
+                                    label: "Autor:",
                                     readonly: true
                                 },
                                 {
                                     view: "text",
                                     id: "start_date",
                                     name: "start_date",
-                                    label: "Početak",
+                                    label: "Početak:",
                                     readonly: true
                                 },
                                 {
                                     view: "text",
                                     id: "end_date",
                                     name: "end_date",
-                                    label: "Kraj",
+                                    label: "Kraj:",
                                     readonly: true
                                 },
                                 {
                                     view: "text",
                                     id: "roomName",
                                     name: "roomName",
-                                    label: "Sala",
+                                    label: "Sala:",
                                     readonly: true
                                 },
                                 {
                                     view: "text",
                                     id: "participantsNumber",
                                     name: "participantsNumber",
-                                    label: "Broj učesnika",
+                                    label: "Broj učesnika:",
                                     readonly: true
                                 },
                                 {
                                     view: "textarea",
                                     id: "description",
                                     name: "description",
-                                    label: "Opis",
+                                    label: "Opis:",
                                     readonly: true,
                                     height: 100
                                 },
@@ -942,9 +944,6 @@ var meetingView = {
                                     id: "location",
                                     name: "location",
                                     click: "meetingView.showMap",
-                                    //click: "roomView.showMapDetailsDialog("+meetingView.room.latitude+","+meetingView.room.longitude+")",
-                                    //template: "<span class='fa fa-map-marker info'></span>",
-
                                 },
 
                             ]
@@ -967,7 +966,7 @@ var meetingView = {
                                             height: 35,
                                             view:"toolbar",
                                             elements:[
-                                                {view:"text", id:"listParticipants_input",label:"Učesnici", labelWidth:170}
+                                                {view:"text", id:"listParticipants_input",label:"Učesnici:", labelWidth:170}
                                             ]
                                         },
                                         {
@@ -996,7 +995,7 @@ var meetingView = {
                                             height: 35,
                                             view:"toolbar",
                                             elements:[
-                                                {view:"text", id:"listDocuments_input",label:"Dokumenti", labelWidth:170}
+                                                {view:"text", id:"listDocuments_input",label:"Dokumenti:", labelWidth:170}
                                             ]
                                         },
                                         {

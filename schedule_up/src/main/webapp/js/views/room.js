@@ -27,6 +27,7 @@ var roomView = {
             view: "datatable",
             //css: "webixDatatable",
             adjust:true,
+            tooltip:true,
             multiselect: false,
             id: "roomDT",
             resizeColumn: true,
@@ -40,6 +41,7 @@ var roomView = {
             }, {
                 id: "name",
                 fillspace: true,
+                tooltip:false,
                 editor: "text",
                 sort: "string",
                 header: [
@@ -50,6 +52,7 @@ var roomView = {
             }, {
                 id: "floor",
                 fillspace: true,
+                tooltip:false,
                 editor: "text",
                 sort: "int",
                 header: ["Sprat",
@@ -60,6 +63,7 @@ var roomView = {
                 {
                     id: "capacity",
                     fillspace: true,
+                    tooltip:false,
                     editor: "text",
                     sort: "int",
                     header: ["Kapacitet", {
@@ -69,6 +73,7 @@ var roomView = {
                 {
                     id: "buildingName",
                     fillspace: true,
+                    tooltip:false,
                     sort: "string",
                     header: [
                         "Naziv zgrade", {
@@ -92,6 +97,7 @@ var roomView = {
                 {
                     id: "location",
                     editable: false,
+                    tooltip:false,
                     header: {
                         text: "Lokacija",
                         css: {"text-align": "justify"},
@@ -288,7 +294,7 @@ var roomView = {
                             roomView.showChangeRoomDialog($$("roomDT").getItem(context.id.row));
                             break;
                         case "2":
-                            var delBox = (webix.copy(commonViews.brisanjePotvrda("sale", "salu")));
+                            var delBox = (webix.copy(commonViews.brisanjePotvrda("sale"," salu "+$$("roomDT").getItem(context.id.row).name)));
                             var newItem = $$("roomDT").getItem(context.id.row);
                             delBox.callback = function (result) {
                                 if (result == 1) {
@@ -733,38 +739,39 @@ var roomView = {
     },
 
     showAddGearDialog: function () {
-        webix.ui(webix.copy(roomView.addGearDialog));
-        connection.sendAjax("GET", "/gear-unit" ,
-            function (text, data, xhr) {
-                if (text ) {
-                    $$("addGearList").clearAll();
-                    var listAll=data.json();
-                    var listAvailable=[];
-                    for(var i=0;i<listAll.length;i++){
-                        if(listAll[i].available===1){
-                            listAvailable.push(listAll[i]);
+        if(util.popupIsntAlreadyOpened("addGearDialog")){
+            webix.ui(webix.copy(roomView.addGearDialog));
+            connection.sendAjax("GET", "/gear-unit" ,
+                function (text, data, xhr) {
+                    if (text ) {
+                        $$("addGearList").clearAll();
+                        var listAll=data.json();
+                        var listAvailable=[];
+                        for(var i=0;i<listAll.length;i++){
+                            if(listAll[i].available===1){
+                                listAvailable.push(listAll[i]);
+                            }
                         }
+                        $$("addGearList").parse(listAvailable);
+
+                        $$("listNewGear_input").attachEvent("onTimedKeyPress",function(){
+                            var value = this.getValue().toLowerCase();
+                            $$("addGearList").filter(function(obj){
+                                var text=obj.name+" "+obj.description;
+                                return text.toLowerCase().indexOf(value)>-1;
+                            })
+                        });
+                        $$("addGearDialog").show();
+                    } else {
+                        util.messages.showErrorMessage("Greška pri učitavanju opreme.");
                     }
-                    $$("addGearList").parse(listAvailable);
-
-                    $$("listNewGear_input").attachEvent("onTimedKeyPress",function(){
-                        var value = this.getValue().toLowerCase();
-                        $$("addGearList").filter(function(obj){
-                            var text=obj.name+" "+obj.description;
-                            return text.toLowerCase().indexOf(value)>-1;
-                        })
-                    });
-                    $$("addGearDialog").show();
-                } else {
+                }, function (text, data, xhr) {
                     util.messages.showErrorMessage("Greška pri učitavanju opreme.");
+
                 }
-            }, function (text, data, xhr) {
-                util.messages.showErrorMessage("Greška pri učitavanju opreme.");
-
-            }
-            , null);
-        webix.UIManager.setFocus("name");
-
+                , null);
+            webix.UIManager.setFocus("name");
+        }
     },
 
     addGearDialog: {
@@ -823,8 +830,7 @@ var roomView = {
                                         this.updateItem(id, item);
                                     }
                                 },
-                                template: "#name# #description#  {common.markCheckbox()}",
-
+                                template: "{common.markCheckbox()} #name# #description# ",
                             }]
                     },
                     {

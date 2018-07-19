@@ -214,52 +214,53 @@ var dashboardView = {
     },
 
     showMeetingDialog: function(){
-        webix.ui(webix.copy(dashboardView.meetingDialog));
-        var formRight = $$("rightForm");
-        var formBasic = $$("eventDialogForm");
-        var format = webix.Date.dateToStr("%d.%m.%Y. %H:%i");
+        if(util.popupIsntAlreadyOpened("meetingDialog")){
+            webix.ui(webix.copy(dashboardView.meetingDialog));
+            var formRight = $$("rightForm");
+            var formBasic = $$("eventDialogForm");
+            var format = webix.Date.dateToStr("%d.%m.%Y. %H:%i");
 
-        formRight.elements.text.setValue(formBasic.elements.text.getValue());
-        formRight.elements.start_date.setValue(format(formBasic.elements.start_date.getValue()));
-        formRight.elements.end_date.setValue(format(formBasic.elements.end_date.getValue()));
-        formRight.elements.participantsNumber.setValue(formBasic.elements.participantNumber.getValue().toString());
-        formRight.elements.description.setValue(formBasic.elements.description.getValue());
-        formRight.elements.roomName.setValue(formBasic.elements.roomName.getValue());
-        var autor=$$("creatorNameLbl").data.label.substring("Autor: ".length);
-        formRight.elements.creatorName.setValue(autor);
+            formRight.elements.text.setValue(formBasic.elements.text.getValue());
+            formRight.elements.start_date.setValue(format(formBasic.elements.start_date.getValue()));
+            formRight.elements.end_date.setValue(format(formBasic.elements.end_date.getValue()));
+            formRight.elements.participantsNumber.setValue(formBasic.elements.participantNumber.getValue().toString());
+            formRight.elements.description.setValue(formBasic.elements.description.getValue());
+            formRight.elements.roomName.setValue(formBasic.elements.roomName.getValue());
+            var autor=$$("creatorNameLbl").data.label.substring("Autor: ".length);
+            formRight.elements.creatorName.setValue(autor);
 
-        $$("list").clearAll();
-        $$("listDocuments").clearAll();
-        var id=formBasic.elements.id.getValue();
-        webix.promise.all([webix.ajax("/user/participantsFor/" + id), webix.ajax("document/getAllByMeetingId/" + id)]).then(
-            function (results) {
-                $$("list").parse(JSON.parse(results[0].text()));
-                $$("listDocuments").parse(JSON.parse(results[1].text()));
+            $$("list").clearAll();
+            $$("listDocuments").clearAll();
+            var id=formBasic.elements.id.getValue();
+            webix.promise.all([webix.ajax("/user/participantsFor/" + id), webix.ajax("document/getAllByMeetingId/" + id)]).then(
+                function (results) {
+                    $$("list").parse(JSON.parse(results[0].text()));
+                    $$("listDocuments").parse(JSON.parse(results[1].text()));
+                });
+
+            $$("listParticipants_input").attachEvent("onTimedKeyPress",function(){
+                var value = this.getValue().toLowerCase();
+                $$("list").filter(function(obj){
+                    var firstLastName=obj.firstName+" "+obj.lastName;
+                    return firstLastName.toLowerCase().indexOf(value)>-1;
+                })
             });
 
-        $$("listParticipants_input").attachEvent("onTimedKeyPress",function(){
-            var value = this.getValue().toLowerCase();
-            $$("list").filter(function(obj){
-                var firstLastName=obj.firstName+" "+obj.lastName;
-                return firstLastName.toLowerCase().indexOf(value)>-1;
-            })
-        });
+            $$("listDocuments_input").attachEvent("onTimedKeyPress",function(){
+                var value = this.getValue().toLowerCase();
+                $$("listDocuments").filter(function(obj){
+                    return obj.name.toLowerCase().indexOf(value)>-1;
+                })
+            });
 
-        $$("listDocuments_input").attachEvent("onTimedKeyPress",function(){
-            var value = this.getValue().toLowerCase();
-            $$("listDocuments").filter(function(obj){
-                return obj.name.toLowerCase().indexOf(value)>-1;
-            })
-        });
-
-        var formLeft = $$("leftForm");
-        /*
-        $$("listDocuments").attachEvent("onItemClick", function(id, e, node) {
-            //meetingView.showDocumentDetailsDialog(id);
-            return false;
-        });*/
-        $$("meetingDialog").show();
-
+            var formLeft = $$("leftForm");
+            /*
+            $$("listDocuments").attachEvent("onItemClick", function(id, e, node) {
+                //meetingView.showDocumentDetailsDialog(id);
+                return false;
+            });*/
+            $$("meetingDialog").show();
+        }
     },
 
     meetingDialog: {
@@ -297,49 +298,49 @@ var dashboardView = {
                                 view: "text",
                                 id: "text",
                                 name: "text",
-                                label: "Naziv",
+                                label: "Naziv:",
                                 readonly: true
                             },
                                 {
                                     view: "text",
                                     id: "creatorName",
                                     name: "creatorName",
-                                    label: "Autor",
+                                    label: "Autor:",
                                     readonly: true
                                 },
                                 {
                                     view: "text",
                                     id: "start_date",
                                     name: "start_date",
-                                    label: "Početak",
+                                    label: "Početak:",
                                     readonly: true
                                 },
                                 {
                                     view: "text",
                                     id: "end_date",
                                     name: "end_date",
-                                    label: "Kraj",
+                                    label: "Kraj:",
                                     readonly: true
                                 },
                                 {
                                     view: "text",
                                     id: "roomName",
                                     name: "roomName",
-                                    label: "Sala",
+                                    label: "Sala:",
                                     readonly: true
                                 },
                                 {
                                     view: "text",
                                     id: "participantsNumber",
                                     name: "participantsNumber",
-                                    label: "Broj učesnika",
+                                    label: "Broj učesnika:",
                                     readonly: true
                                 },
                                 {
                                     view: "textarea",
                                     id: "description",
                                     name: "description",
-                                    label: "Opis",
+                                    label: "Opis:",
                                     readonly: true,
                                     height: 100
                                 },
@@ -373,7 +374,7 @@ var dashboardView = {
                                             height: 35,
                                             view:"toolbar",
                                             elements:[
-                                                {view:"text", id:"listParticipants_input",label:"Učesnici", labelWidth:170}
+                                                {view:"text", id:"listParticipants_input",label:"Učesnici:", labelWidth:170}
                                             ]
                                         },
                                         {
@@ -402,7 +403,7 @@ var dashboardView = {
                                             height: 35,
                                             view:"toolbar",
                                             elements:[
-                                                {view:"text", id:"listDocuments_input",label:"Dokumenti", labelWidth:170}
+                                                {view:"text", id:"listDocuments_input",label:"Dokumenti:", labelWidth:170}
                                             ]
                                         },
                                         {
