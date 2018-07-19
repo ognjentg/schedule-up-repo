@@ -98,8 +98,11 @@ public class MeetingController extends GenericController<Meeting, Integer> {
     @Override
     public @ResponseBody
     List<Meeting> getAll() throws ForbiddenException {
-        if (!userBean.getUser().getRoleId().equals(superAdmin)) {
+        if (userBean.getUser().getRoleId().equals(admin)) {
             return meetingRepository.getAllByStatusInAndCompanyId(new Byte[]{scheduled, finished}, userBean.getUser().getCompanyId());
+        }
+        else if(userBean.getUser().getRoleId().equals(advancedUser) || userBean.getUser().getRoleId().equals(user)){
+            return meetingRepository.getAllByUserId(userBean.getUser().getId());
         }
         throw new ForbiddenException(forbiddenNotAuthorized);
     }
