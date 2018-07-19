@@ -16,7 +16,7 @@ var companySettingsView = {
             css: "panelToolbar",
             cols: [{
                 view: "label",
-                template: "<span class='fa fa-cog'></span> Podešavanja"
+                template: "<span class='fa fa-cog'></span> Opšta podešavanja"
             }]
         }, {
             view: "form",
@@ -302,7 +302,9 @@ var companySettingsView = {
                         resizeRow: true,
                         onContext: {},
                         columns: [{
+
                             id: "name",
+
                             editable: false,
                             fillspace: true,
                             editor: "text",

@@ -1,6 +1,7 @@
 var countries = [];
 var tabledata = [];
 var tablecentar = [];
+var state;
 var lat;
 var lng;
 var buildingView = {
@@ -161,14 +162,14 @@ var buildingView = {
                     name: "description",
                     label: "Opis:",
                     required: false
-                },
+                },   { view:"fieldset", label:"Izmijenite lokaciju", body:{rows:[
                     {
                         view: "label",
                         label: "Unesite lokaciju zgrade: ",
                         inputWidth: 100,
                     },
                     {
-                        view: "select", options: countries, label: "Država:", value: countries[0], id: "combo"
+                        view: "select", options: countries, label: "Država:",  id: "combo"
 
                     },
                     {
@@ -186,7 +187,7 @@ var buildingView = {
                         label: "Adresa:",
                         invalidMessage: "Unesite adresu zgrade!",
                         required: true
-                    },
+                    }]}},
                     {
                         margin: 5,
                         cols: [{
@@ -318,14 +319,24 @@ var buildingView = {
             throw new Error('Neuspješno dobavljanje tačne lokacije.');
         }).then(function(json) {
             var place=json['results'][0];
-            if(place!=null) {
+
+                var filtered_array = place.address_components.filter(function(address_component){
+                    return address_component.types.includes("country");
+                });
+                var country_long = filtered_array.length ? filtered_array[0].long_name: "";
+                var country_short = filtered_array.length ? filtered_array[0].short_name: "";
                 var filtered_array2 = place.address_components.filter(function (address_component) {
                     return address_component.types.includes("locality");
                 });
 
+
                 var city = filtered_array2.length ? filtered_array2[0].long_name : "";
-            }else city="";
+            if(city==null){city="" ,console.log("grad prazan")}
             form.elements.grad.setValue(city);
+            if(country_short==""){country_short="",console.log("grad prazan2")};
+            if(country_long==""){country_long="",console.log("grad prazan3")};
+            console.log(country_long+" : "+country_short);
+             state=country_long+" : "+country_short;
 
         }).catch(function(error) {
             util.messages.showErrorMessage("Neuspješno dobavljanje grada.")
@@ -335,11 +346,13 @@ var buildingView = {
         var form = $$("changeBuildingForm");
         console.log("Buidling id:" + building.id);
         console.log(form.elements.id);
+        console.log(countries[23]);
+        //
         form.elements.id.setValue(building.id);
         form.elements.name.setValue(building.name);
         form.elements.description.setValue(building.description);
-
         form.elements.adresa.setValue(building.address);
+
         var url = "https://restcountries.eu/rest/v2/all";
         fetch(url).then(function (result) {
             return result.json();

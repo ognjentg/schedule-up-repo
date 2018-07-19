@@ -39,7 +39,6 @@ var noteView = {
                     editable: false,
                     fillspace: false,
                     width: 150,
-                    editor: "date",
                     sort: "string",
                     tooltip: false,
                     header: ["Datum objave", {
@@ -58,7 +57,6 @@ var noteView = {
                 }, {
                     id: "username",
                     fillspace: false,
-                    editor: "text",
                     width: 200,
                     tooltip: false,
                     editable: false,
@@ -93,7 +91,7 @@ var noteView = {
                     fillspace: false,
                     width: 150,
                     tooltip: false,
-                    editor: "date",
+
                     header: ["Datum isteka", {
                         content: "dateFilter"
                     }],
