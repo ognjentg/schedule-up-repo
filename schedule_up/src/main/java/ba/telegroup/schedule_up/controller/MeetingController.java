@@ -3,6 +3,7 @@ package ba.telegroup.schedule_up.controller;
 import ba.telegroup.schedule_up.common.exceptions.BadRequestException;
 import ba.telegroup.schedule_up.common.exceptions.ForbiddenException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
+import ba.telegroup.schedule_up.interaction.Notification;
 import ba.telegroup.schedule_up.model.Document;
 import ba.telegroup.schedule_up.model.Meeting;
 import ba.telegroup.schedule_up.model.Participant;
@@ -150,7 +151,13 @@ public class MeetingController extends GenericController<Meeting, Integer> {
                     && Validator.timestampCompare(currentTime,minimalCancelTime)==-1) {
                 //if(meeting.getCancelationReason() != null && Validator.stringMaxLength(meeting.getCancelationReason(),500)
                 //        && Validator.stringMaxLength(meeting.getTopic(),500)) {
-                    return updateStatus(meeting, canceled);
+
+                // notify participants
+                List<Participant> participants = participantRepository.getAllByMeetingIdAndDeletedIs(id, (byte)0);
+                for(Participant p : participants)
+                    Notification.notify(p.getEmail().trim(),"Meeting canceled");
+
+                return updateStatus(meeting, canceled);
                 //}
                 //throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}","topic-a").replace("{broj}",String.valueOf(500)));
             }
@@ -322,6 +329,12 @@ public class MeetingController extends GenericController<Meeting, Integer> {
         meeting.setParticipants(participantRepository.saveAll(meeting.getParticipants()));
         meeting.getMeeting().setParticipantsNumber(meetingRepository.getParticipantsNumberByMeetingId(meeting.getMeeting().getId()));
         meeting.setDocuments(documentRepository.saveAll(meeting.getDocuments()));
+
+        // notify participants
+        List<Participant> participants = participantRepository.getAllByMeetingIdAndDeletedIs(meeting.getMeeting().getId(), (byte)0);
+        for(Participant p : participants)
+            Notification.notify(p.getEmail().trim(),"New meeting");
+
         return meeting;
 
     }
