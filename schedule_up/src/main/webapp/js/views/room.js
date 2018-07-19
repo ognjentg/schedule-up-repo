@@ -25,7 +25,8 @@ var roomView = {
             }]
         }, {
             view: "datatable",
-            css: "webixDatatable",
+            //css: "webixDatatable",
+            adjust:true,
             multiselect: false,
             id: "roomDT",
             resizeColumn: true,
@@ -91,11 +92,12 @@ var roomView = {
                 {
                     id: "location",
                     editable: false,
-                    fillspace: true,
                     header: {
                         text: "Lokacija",
                         css: {"text-align": "justify"},
                     },
+                    css: {"text-align":"center"},
+                    adjust:true,
                     template: "<span class='fa fa-map-marker info'></span>",
 
                 }
@@ -219,6 +221,8 @@ var roomView = {
         var panelCopy = webix.copy(this.panel);
 
         $$("main").addView(webix.copy(panelCopy));
+        $$("roomDT").adjustColumn("location", "header");
+        $$("roomDT").refresh();
         connection.attachAjaxEvents("roomDT", "room", false, false, editValidationRules);
         $$("roomDT").detachEvent("onBeforeDelete");
 
