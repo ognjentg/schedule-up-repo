@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
 public class MeetingController extends GenericController<Meeting, Integer> {
     private final MeetingRepository meetingRepository;
     private final SettingsRepository settingsRepository;
-    private final UserGroupHasUserRepository userGroupHasUserRepository;
     private final ParticipantRepository participantRepository;
     private final DocumentRepository documentRepository;
     @Value("${admin.id}")
@@ -85,13 +84,13 @@ public class MeetingController extends GenericController<Meeting, Integer> {
     private String badRequestMeetingCompanyMismatch;
 
     @Autowired
-    public MeetingController(MeetingRepository meetingRepository, SettingsRepository settingsRepository, ParticipantRepository participantRepository, DocumentRepository documentRepository,UserGroupHasUserRepository userGroupHasUserRepository) {
+    public MeetingController(MeetingRepository meetingRepository, SettingsRepository settingsRepository, ParticipantRepository participantRepository, DocumentRepository documentRepository) {
         super(meetingRepository);
         this.meetingRepository = meetingRepository;
         this.settingsRepository = settingsRepository;
         this.participantRepository = participantRepository;
         this.documentRepository = documentRepository;
-        this.userGroupHasUserRepository=userGroupHasUserRepository;
+
     }
 
 
@@ -321,30 +320,10 @@ public class MeetingController extends GenericController<Meeting, Integer> {
         meeting.getParticipants().forEach(participant -> participant.setMeetingId(meeting.getMeeting().getId()));
         meeting.getDocuments().forEach(document -> document.setMeetingId(meeting.getMeeting().getId()));
         meeting.setParticipants(participantRepository.saveAll(meeting.getParticipants()));
+        meeting.getMeeting().setParticipantsNumber(meetingRepository.getParticipantsNumberByMeetingId(meeting.getMeeting().getId()));
         meeting.setDocuments(documentRepository.saveAll(meeting.getDocuments()));
-        int participantsNumber=countParticipants(participantRepository.getAllByMeetingIdAndDeletedIs(meeting.getMeeting().getId(),(byte)0));
-        meeting.getMeeting().setParticipantsNumber(participantsNumber);
-        update(meeting.getMeeting().getId(),meeting.getMeeting());
         return meeting;
 
-    }
-    private Integer countParticipants(List<Participant> participants){
-        List<Integer> userIds=new ArrayList<>();
-        Integer participantsNumber=0;
-        for(Participant p:participants){
-            if(p.getUserGroupId()!=null){
-                userIds.addAll(userGroupHasUserRepository.getUserIdsByGroupId(p.getUserGroupId()));
-            }
-            else if(p.getUserId()!=null){
-                userIds.add(p.getUserId());
-            }
-            else{
-                participantsNumber++;
-            }
-        }
-        List<Integer> distinctIds=userIds.stream().distinct().collect(Collectors.toList());
-        participantsNumber+=distinctIds.size();
-        return participantsNumber;
     }
     @Transactional
     @RequestMapping(value = "/full/{id}", method = RequestMethod.PUT)
@@ -366,7 +345,7 @@ public class MeetingController extends GenericController<Meeting, Integer> {
         documents = documentRepository.saveAll(documents);
         documents.addAll(currentDocuments);
         meeting.setDocuments(documents);
-        meeting.getMeeting().setParticipantsNumber(countParticipants(participantRepository.getAllByMeetingIdAndDeletedIs(meeting.getMeeting().getId(),(byte)0)));
+        meeting.getMeeting().setParticipantsNumber(meetingRepository.getParticipantsNumberByMeetingId(meeting.getMeeting().getId()));
         update(id,meeting.getMeeting());
         return meeting;
     }

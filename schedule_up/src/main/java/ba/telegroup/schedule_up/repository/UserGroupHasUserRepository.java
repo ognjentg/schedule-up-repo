@@ -12,6 +12,4 @@ import java.util.List;
 public interface UserGroupHasUserRepository extends JpaRepository<UserGroupHasUser, UserGroupHasUserPK>, UserGroupHasUserRepositoryCustom {
 
     List<UserGroupHasUser> getDistinctBy();
-    @Query(value ="SELECT user_id from user_group_has_user  where user_group_id=?1",nativeQuery = true)
-    List<Integer> getUserIdsByGroupId(Integer groupId);
 }
