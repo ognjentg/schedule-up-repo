@@ -33,14 +33,14 @@ var noteView = {
                 {
                     id: "id",
                     hidden: true,
-                    fillspace: true,
-
+                    fillspace: true
                 }, {
                     id: "publishTime",
                     editable: false,
                     fillspace: false,
                     width: 150,
                     editor: "date",
+                    tooltip: false,
                     header: ["Datum objave", {
                         content: "textFilter"
                     }],
@@ -59,6 +59,7 @@ var noteView = {
                     fillspace: false,
                     editor: "text",
                     width: 200,
+                    tooltip: false,
                     editable: false,
                     header: ["Korisnik", {
                         content: "textFilter"
@@ -69,6 +70,7 @@ var noteView = {
                     editable: true,
                     fillspace: false, width: 400,
                     editor: "text",
+                    tooltip: false,
                     header: ["Naziv", {
                         content: "textFilter"
                     }],
@@ -88,6 +90,7 @@ var noteView = {
                     editable: false,
                     fillspace: false,
                     width: 150,
+                    tooltip: false,
                     editor: "date",
                     header: ["Datum isteka", {
                         content: "textFilter"
@@ -107,6 +110,7 @@ var noteView = {
             select: "row",
             navigation: true,
             editable: true,
+            tooltip: true,
             editaction: "dblclick",
             url: "note/",
             on: {
@@ -160,9 +164,9 @@ var noteView = {
                                                 util.messages.showMessage("Oglas uspješno uklonjen.");
                                                 $$("noteDT").remove(context.id.row);
                                             } else
-                                                util.messages.showErrorMessage("Neuspješno uklanjanje.");
+                                                util.messages.showErrorMessage("Neuspješno uklanjanje oglasa.");
                                         }, function () {
-                                            util.messages.showErrorMessage("Neuspješno uklanjanje.");
+                                            util.messages.showErrorMessage("Neuspješno uklanjanje oglasa.");
                                         }, null);
 
                                 }
@@ -329,8 +333,8 @@ var noteView = {
                     view: "text",
                     id: "name",
                     name: "name",
-                    label: "Naslov: ",
-                    invalidMessage: "Unesite naslov oglasa !",
+                    label: "Naslov:",
+                    invalidMessage: "Unesite naslov oglasa!",
                     required: true
                 }, {
                     view: "textarea",
@@ -432,13 +436,12 @@ var noteView = {
                         util.messages.showMessage("Oglas uspješno izmjenjen.");
                         $$("noteDT").updateItem(newItem.id, newItem);
                     } else
-                        util.messages.showErrorMessage("Neuspješna izmjena.");
+                        util.messages.showErrorMessage("Neuspješna izmjena oglasa.");
                 }, function () {
-                    util.messages.showErrorMessage("Neuspješna izmjena.");
+                    util.messages.showErrorMessage("Neuspješna izmjena oglasa.");
                 }, newItem);
 
             util.dismissDialog('changeNoteDialog');
         }
     }
-
 };

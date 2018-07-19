@@ -39,6 +39,18 @@ var commonViews = {
         };
     },
 
+    izbacivanjePotvrda: function (titleEntity, textEntity) {
+        var text = titleEntity;
+        if (textEntity) text = textEntity;
+        return {
+            title: "Izbacivanje " + titleEntity,
+            ok: "Da",
+            cancel: "Ne",
+            width: 500,
+            text: "Jeste li sigurni da želite da izbacite " + text + "?"
+        };
+    },
+
 
     confirm: function (titleEntity, textEntity) {
         var text = titleEntity;

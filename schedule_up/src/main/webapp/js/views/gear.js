@@ -31,11 +31,12 @@ var gearView = {
             columns: [{
                 id: "id",
                 hidden: true,
-                fillspace: true,
+                fillspace: true
             }, {
                 id: "name",
                 editable: false,
                 fillspace: true,
+                tooltip: false,
                 editor: "text",
                 sort: "string",
                 header: [
@@ -60,6 +61,7 @@ var gearView = {
                 fillspace: true,
                 editor: "text",
                 sort: "text",
+                tooltip: false,
                 editable: false,
                 adjust: "data",
                 header: [
@@ -71,6 +73,7 @@ var gearView = {
                 id: "available",
                 fillspace: true,
                 editor: "text",
+                tooltip: false,
                 sort: "text",
                 editable: false,
                 format: function (value) {
@@ -85,6 +88,7 @@ var gearView = {
             }
             ],
             select: "row",
+            tooltip: true,
             navigation: true,
             editable: false,
             url: "gear-unit/",
@@ -141,9 +145,9 @@ var gearView = {
                                                 util.messages.showMessage("Oprema uspješno uklonjena.");
                                                 $$("gearDT").remove(context.id.row);
                                             } else
-                                                util.messages.showErrorMessage("Neuspješno uklanjanje.");
+                                                util.messages.showErrorMessage("Neuspješno uklanjanje opreme.");
                                         }, function () {
-                                            util.messages.showErrorMessage("Neuspješno uklanjanje.");
+                                            util.messages.showErrorMessage("Neuspješno uklanjanje opreme.");
                                         }, null);
                                 }
                             };
@@ -243,17 +247,20 @@ var gearView = {
     },
 
     showChangeGearDialog: function (gear) {
-        webix.ui(webix.copy(gearView.changeGearDialog));
-        var form = $$("changeGearForm");
-        form.elements.id.setValue(gear.id);
-        form.elements.name.setValue(gear.name);
-        form.elements.description.setValue(gear.description);
-        form.elements.inventoryNumber.setValue(gear.inventoryNumber);
+        if(util.popupIsntAlreadyOpened("changeGearDialog")){
+            webix.ui(webix.copy(gearView.changeGearDialog));
+            var form = $$("changeGearForm");
+            form.elements.id.setValue(gear.id);
+            form.elements.name.setValue(gear.name);
+            form.elements.description.setValue(gear.description);
+            form.elements.inventoryNumber.setValue(gear.inventoryNumber);
 
-        setTimeout(function () {
-            $$("changeGearDialog").show();
-            webix.UIManager.setFocus("name");
-        }, 0);
+            setTimeout(function () {
+                $$("changeGearDialog").show();
+                webix.UIManager.setFocus("name");
+            }, 0);
+        }
+
     },
 
     saveChangedGear: function () {
@@ -285,8 +292,6 @@ var gearView = {
             util.dismissDialog('changeGearDialog');
         }
     },
-
-    /////////////////
 
     addDialog: {
         view: "popup",
@@ -361,7 +366,7 @@ var gearView = {
                     },
                     "description": function (value) {
                         if (value.length > 500) {
-                            $$('addGearForm').elements.description.config.invalidMessage = 'Maksimalan broj karaktera je 500';
+                            $$('addGearForm').elements.description.config.invalidMessage = 'Maksimalan broj karaktera je 500!';
                             return false;
                         }
                         return true;
@@ -370,7 +375,7 @@ var gearView = {
                         if (!value)
                             return false;
                         if (value.length > 100) {
-                            $$('addGearForm').elements.inventoryNumber.config.invalidMessage = 'Maksimalan broj karaktera je 100';
+                            $$('addGearForm').elements.inventoryNumber.config.invalidMessage = 'Maksimalan broj karaktera je 100!';
                             return false;
                         }
                         return true;

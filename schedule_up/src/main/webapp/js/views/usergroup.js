@@ -172,10 +172,10 @@ var usergroupView = {
                                         if (text) {
                                             $$("usergroupDT").remove(context.id.row);
                                             $$("usersFromUserGroupDT").clearAll();
-                                            util.messages.showMessage("Uspjesno uklanjanje");
+                                            util.messages.showMessage("Uspjesno uklanjanje korisničke grupe");
                                         }
                                     }, function (text, data, xhr) {
-                                        util.messages.showErrorMessage("Neuspjesno uklanjanje");
+                                        util.messages.showErrorMessage("Neuspjesno uklanjanje korisničke grupe");
                                     }, item);
                                 }
                             };
@@ -201,31 +201,31 @@ var usergroupView = {
                     var context = this.getContext();
                     switch (id) {
                         case "1":
-                            var delBox = (webix.copy(commonViews.deaktivacijaPotvrda("korisnik", "korisnika")));
+                            var delBox = (webix.copy(commonViews.izbacivanjePotvrda("korisnika", "korisnika")));
                             delBox.callback = function (result) {
-                                if (result == 1) {
+                                if (result) {
                                     var selectedUser = $$("usersFromUserGroupDT").getItem(context.id.row);
                                     console.log(context.id);
                                     var temp = $$("usergroupDT").getSelectedItem();
                                     var item = {
                                         userGroupId: temp.id,
                                         userId: selectedUser.id
-                                    }
+                                    };
                                     $$("usersFromUserGroupDT").detachEvent("onBeforeDelete");
                                     connection.sendAjax("DELETE", "/user-group-has-user/" + item.userGroupId+ "/"+item.userId, function (text, data, xhr) {
                                         if (text) {
                                             $$("usersFromUserGroupDT").remove(context.id.row);
-                                            util.messages.showMessage("Uspjesno uklanjanje");
+                                            util.messages.showMessage("Uspjesno uklanjanje korisnika");
                                         }
                                     }, function (text, data, xhr) {
-                                        util.messages.showErrorMessage("Neuspjesno uklanjanje");
+                                        util.messages.showErrorMessage("Neuspjesno uklanjanje korisnika");
                                     }, item);
                                 }
                             };
                             webix.confirm(delBox);
 
                             break;
-                        case "1":
+                        case "2":
                             util.messages.showMessage("to be implemented");
                             break;
                     }
@@ -267,14 +267,14 @@ var usergroupView = {
                     view: "text",
                     id: "name",
                     name: "name",
-                    label: "Naziv korisničke grupe",
+                    label: "Naziv korisničke grupe:",
                     invalidMessage: "Unesite naziv korisničke grupe!",
                     required: true
                 }, {
                     view: "multicombo",
                     id: "users",
                     name: "users",
-                    label: "Korisnici",
+                    label: "Korisnici:",
                     suggest: {
                         body: {
                             template: "#firstName# #lastName#",
@@ -292,16 +292,16 @@ var usergroupView = {
                         hotkey: "enter",
                         width: 150
                     }]
-                }],
-
-
+                }]
             }]
         }
     },
 
     showAddDialog: function () {
-        webix.ui(webix.copy(usergroupView.addDialog)).show();
-        webix.UIManager.setFocus("name");
+        if(util.popupIsntAlreadyOpened("addUsergroupDialog")){
+            webix.ui(webix.copy(usergroupView.addDialog)).show();
+            webix.UIManager.setFocus("name");
+        }
     },
 
     addUsersDialog: {
@@ -337,7 +337,7 @@ var usergroupView = {
                         view: "multicombo",
                         id: "users",
                         name: "users",
-                        label: "Korisnici",
+                        label: "Korisnici:",
                         master: $$("addUsersToGroupDialog"),
                         suggest:{
                             body: {
@@ -355,7 +355,7 @@ var usergroupView = {
                         hotkey: "enter",
                         width: 150
                     }]
-                }],
+                }]
             }]
         }
 
@@ -409,7 +409,7 @@ var usergroupView = {
                             var newUserGroupHasUser = {
                                 userGroupId: usergroupId,
                                 userId: Number(userIds[i])
-                            }
+                            };
                             connection.sendAjax("POST", "user-group-has-user",
                                 function (text, data, xhr) {}, function () {
                                     util.messages.showErrorMessage("Podaci nisu dodati.");
@@ -422,4 +422,4 @@ var usergroupView = {
         }
         util.dismissDialog('addUsergroupDialog');
     }
-}
+};
