@@ -363,4 +363,11 @@ public class MeetingController extends GenericController<Meeting, Integer> {
         return meeting;
     }
 
+    @RequestMapping(value = "/getEmailsByMeetingId/{id}", method = RequestMethod.GET)
+    public @ResponseBody
+    List<String> getAllByNameContains(@PathVariable Integer id) {
+        return meetingRepository.getEmailsForMeeting(id);
+
+    }
+
 }

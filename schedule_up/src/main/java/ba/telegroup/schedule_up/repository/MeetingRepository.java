@@ -20,4 +20,7 @@ public interface MeetingRepository extends JpaRepository<Meeting,Integer>{
     List<Meeting> getAllByStatusInAndRoomIdAndCompanyId(Byte[] status,Integer roomId,Integer companyId);
     @Query(value ="SELECT meeting.participants_number from meeting  where meeting.id=?1",nativeQuery = true)
     Integer getParticipantsNumberByMeetingId(Integer meetingId);
+    @Query(value ="(SELECT distinct t.email as type FROM  participant p  left join user_group_has_user u on p.user_group_id=u.user_group_id left join user t on t.id=u.user_id or p.user_id=t.id " +
+            "where p.deleted=0 and p.meeting_id=?1 and  t.id is not null) union (select distinct email from participant where email is not null and meeting_id=?1 and deleted=0);",nativeQuery = true)
+    List<String> getEmailsForMeeting(Integer meetingId);
 }
