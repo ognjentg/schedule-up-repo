@@ -260,7 +260,6 @@ var companySettingsView = {
                             label: "Naziv:",
                             id:"naziv",
                             name:"naziv",
-                            value:"proba",
                             inputWidth:400,
                             align:"left"
                         },
@@ -279,7 +278,9 @@ var companySettingsView = {
                                 type: "calendar",
                                 body: {
                                     type: "date",
-                                    calendarDate: "%d/%m/%y"
+                                    calendarDate: "%d/%m/%y",
+                                    minDate:new Date(),
+                                    maxDate:new Date().getFullYear()+"-12-31",
                                 }
                             }},{
                                 id: "addHolidayBtn",
@@ -351,12 +352,12 @@ var companySettingsView = {
     save:function(){
         var date=$$("customizeForm").getValues().holiday;
         var name=$$("customizeForm").getValues().naziv;
-        if(date==""||name==""){
-            util.messages.showErrorMessage("Potrebno je unijeti datum.");
+        if(name==""||date==""){
+            util.messages.showErrorMessage("Potrebno je unijeti datum i naziv.");
             return;
         }
         var naziv=$$("customizeForm").getValues().naziv;
-        console.log(naziv);
+
         var formatDate=date.split(" ")[0];
         var newHoliday={
             date: formatDate,
