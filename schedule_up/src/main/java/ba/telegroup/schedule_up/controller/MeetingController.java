@@ -130,7 +130,7 @@ public class MeetingController extends GenericController<Meeting, Integer> {
     List<Meeting> getByRoom(@PathVariable Integer id) throws BadRequestException, ForbiddenException {
         if (id != null) {
             if (!userBean.getUser().getRoleId().equals(superAdmin)) {
-                return meetingRepository.getAllByStatusInAndRoomIdAndCompanyId(new Byte[]{scheduled, finished}, id, userBean.getUser().getCompanyId());
+                return meetingRepository.getAllByRoomIdAndCompanyId(id, userBean.getUser().getCompanyId());
             }
             throw new ForbiddenException(forbiddenNotAuthorized);
         }
