@@ -153,9 +153,9 @@ public class MeetingController extends GenericController<Meeting, Integer> {
                 //        && Validator.stringMaxLength(meeting.getTopic(),500)) {
 
                 // notify participants
-                List<Participant> participants = participantRepository.getAllByMeetingIdAndDeletedIs(id, (byte)0);
-                for(Participant p : participants)
-                    Notification.notify(p.getEmail().trim(),"Meeting canceled");
+                List<String> emails = meetingRepository.getEmailsForMeeting(id);
+                for(String s : emails)
+                    Notification.notify(s.trim(), "Meeting canceled");
 
                 return updateStatus(meeting, canceled);
                 //}
@@ -331,9 +331,9 @@ public class MeetingController extends GenericController<Meeting, Integer> {
         meeting.setDocuments(documentRepository.saveAll(meeting.getDocuments()));
 
         // notify participants
-        List<Participant> participants = participantRepository.getAllByMeetingIdAndDeletedIs(meeting.getMeeting().getId(), (byte)0);
-        for(Participant p : participants)
-            Notification.notify(p.getEmail().trim(),"New meeting");
+        List<String> emails = meetingRepository.getEmailsForMeeting(meeting.getMeeting().getId());
+        for(String s : emails)
+            Notification.notify(s.trim(), "New meeting");
 
         return meeting;
 
