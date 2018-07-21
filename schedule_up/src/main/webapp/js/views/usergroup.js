@@ -1,6 +1,6 @@
-var usergroupView = {
+var userGroupView = {
     panel: {
-        id: "usergroupPanel",
+        id: "userGroupPanel",
         adjust: true,
         rows: [{
             view: "toolbar",
@@ -10,143 +10,161 @@ var usergroupView = {
                 view: "label",
                 width: 400,
                 template: "<span class='fa fa-users'></span> Korisničke grupe"
-            }, {}, {
-                id: "addUsergroupBtn",
-                view: "button",
-                type: "iconButton",
-                label: "Dodajte korisničku grupu",
-                icon: "plus-circle",
-                click: 'usergroupView.showAddDialog',
-                autowidth: true
             }]
         }, {
-            cols: [
-                {
-                    //jedna tabela
-                    view: "datatable",
-                    css: "webixDatatable",
+            height: 40
+        }, {
+            cols: [{
+                cols: [{
+                }, {
+                    id: "addUserGroupBtn",
+                    view: "button",
+                    type: "iconButton",
+                    label: "Dodajte korisničku grupu",
+                    icon: "plus-circle",
+                    click: 'userGroupView.showAddDialog',
+                    autowidth: true
+                }
+                ]
+            }, {gravity: 0.1}, {}, {gravity: 0.1}, {}
+            ]
+        }, {
+            cols: [{
+                rows: [{
+                    view: "template",
+                    template: "Korisničke grupe",
+                    type: "header"
+                }, {
+                    view: "list",
                     multiselect: false,
-                    gravity: 0.7,
-                    id: "usergroupDT",
-                    resizeColumn: true,
-                    resizeRow: true,
+                    id: "userGroupList",
                     onContext: {},
-                    columns: [{
-                        id: "id",
-                        hidden: true,
-                        fillspace: true,
-
-                    },{
-                        id: "name",
-                        editable: false,
-                        fillspace: true,
-                        editor: "text",
-                        sort: "string",
-                        header: [
-                            "Naziv", {
-                                content: "textFilter"
-                            }
-                        ]
-                    }
-                    ],
                     select: "row",
                     navigation: true,
                     editable: false,
-                    url: "user-group",
+                    type: {
+                        height: "auto",
+                        template: function (value) {
+                            var name = value.name;
+                            return "<div class='noteName'>" + name + "</div>";
+                        }
+                    },
+                    url: "user-group/",
                     on: {
-
-                        onAfterContextMenu: function (item) {
-                            this.select(item.row);
+                        onAfterContextMenu: function (id) {
+                           this.select(id);
                         },
 
-                        onAfterSelect: function (item) {
-                            $$("addUsersBtn").show();
-                            var groupId = item.id;
-                            $$("usersFromUserGroupDT").clearAll();
-                            $$("usersFromUserGroupDT").load("user-group-has-user/custom/" + groupId);
+                        onAfterSelect: function (id) {
+                            $$("inUsersList").clearAll();
+                            $$("inUsersList").load("user-group-has-user/custom/" + id);
+                            $$("outUsersList").clearAll();
+                            $$("outUsersList").load("user/nonInGroup/" + id);
                         }
                     }
-                },
-                {
-                    rows:[{
-                        view: "toolbar",
-                        id: "usersToolbar",
-                        padding: 8,
-                        css: "panelToolbar",
-                        cols: [{
-                            view: "label",
-                            width: 400,
-                            template: "<span class='fa fa-users'></span> Korisnici"
-                        }, {}, {
-                            id: "addUsersBtn",
-                            view: "button",
-                            hidden: true,
-                            type: "iconButton",
-                            label: "Dodajte korisnike",
-                            icon: "plus-circle",
-                            click: 'usergroupView.addUsersToGroup',
-                            autowidth: true
-                        }]
-                    },{//druga tabela
-                        view: "datatable",
-                        css: "webixDatatable",
-                        multiselect: false,
-                        id: "usersFromUserGroupDT",
-                        resizeColumn: true,
-                        resizeRow: true,
-                        onContext: {},
-                        columns: [{
-                            id: "id",
-                            hidden: true,
-                            fillspace: true,
-
-                        },{
-                            id: "firstName",
-                            editable: false,
-                            fillspace: true,
-                            editor: "text",
-                            sort: "string",
-                            header: [
-                                "Ime", {
-                                    content: "textFilter"
-                                }
-                            ]
-                        },{
-                            id: "lastName",
-                            editable: false,
-                            fillspace: true,
-                            editor: "text",
-                            sort: "string",
-                            header: [
-                                "Prezime", {
-                                    content: "textFilter"
-                                }
-                            ]
-                        }
-                        ],
-                        select: "row",
-                        navigation: true,
-                        editable: false,
-                        on: {
-
-                            onAfterContextMenu: function (item) {
-                                this.select(item.row);
-                            }
-                        }}],
-
                 }
-            ]
+
+                ]
+            }, {gravity: 0.1}, {
+                rows: [{
+                    view: "template",
+                    template: "Članovi korisničke grupe",
+                    type: "header"
+                }, {
+                    view: "list",
+                    multiselect: true,
+                    id: "inUsersList",
+                    onContext: {},
+                    select: "row",
+                    navigation: true,
+                    editable: false,
+                    drag: true,
+                    type: {
+                        height: "auto",
+                        template: function (value) {
+                            var firstName = value.firstName;
+                            var lastName = value.lastName;
+                            var email = value.email;
+                            return "<div>" + firstName + " " + lastName + "</div>" +
+                                   "<div>" + email + "</div>";
+                        }
+                    },
+                    on: {
+                        onAfterDrop: function (context, event) {
+                            if (context.from != context.to) {
+                                var userIds = context.source;
+                                for (var i = 0; i < userIds.length; i++) {
+                                    var newUserGroupHasUser = {
+                                        userGroupId: $$("userGroupList").getSelectedId(),
+                                        userId: userIds[i]
+                                    }
+                                    connection.sendAjax("POST", "user-group-has-user",
+                                        function (text, data, xhr) {
+                                        }, function () {
+                                            util.messages.showErrorMessage("Podaci nisu dodati.");
+                                        }, newUserGroupHasUser);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                ]
+            }, {gravity: 0.1}, {
+                rows: [{
+                    view: "template",
+                    template: "Ostali korisnici",
+                    type: "header"
+                }, {
+                    view: "list",
+                    multiselect: true,
+                    id: "outUsersList",
+                    onContext: {},
+                    select: "row",
+                    navigation: true,
+                    editable: false,
+                    drag: true,
+                    type: {
+                        height: "auto",
+                        template: function (value) {
+                            var firstName = value.firstName;
+                            var lastName = value.lastName;
+                            var email = value.email;
+                            return "<div>" + firstName + " " + lastName + "</div>" +
+                                "<div>" + email + "</div>";
+                        }
+                    },
+                    on: {
+                        onAfterDrop: function (context, event) {
+                            if (context.from != context.to) {
+                                var userIds = context.source;
+                                for (var i = 0; i < userIds.length; i++) {
+                                    connection.sendAjax("DELETE", "user-group-has-user/" +
+                                        $$("userGroupList").getSelectedId() + "/" + userIds[i],
+                                        function (text, data, xhr) {
+                                            if (!text)
+                                                util.messages.showErrorMessage("Neuspješno brisanje.");
+                                        }, function () {
+                                            util.messages.showErrorMessage("Neuspješno brisanje.");
+                                        }, null);
+                                }
+                            }
+                        }
+                    }
+                }]
+            }]
         }]
     },
 
     selectPanel: function () {
         $$("main").removeView(rightPanel);
-        rightPanel = "usergroupPanel";
+        rightPanel = "userGroupPanel";
 
         var panelCopy = webix.copy(this.panel);
 
         $$("main").addView(webix.copy(panelCopy));
-        connection.attachAjaxEvents("usergroupDT", "user-group");
+        connection.attachAjaxEvents("userGroupList", "user-group");
+        $$("userGroupList").detachEvent("onBeforeDelete");
 
         webix.ui({
             view: "contextmenu",
@@ -157,7 +175,7 @@ var usergroupView = {
                 value: "Obrišite",
                 icon: "trash"
             }],
-            master: $$("usergroupDT"),
+            master: $$("userGroupList"),
             on: {
                 onItemClick: function (id) {
                     var context = this.getContext();
@@ -165,83 +183,38 @@ var usergroupView = {
                         case "1":
                             var delBox = (webix.copy(commonViews.brisanjePotvrda("korisničke grupe", "korisničku grupu")));
                             delBox.callback = function (result) {
-                                if (result == 1) {
-                                    var item = $$("usergroupDT").getItem(context.id.row);
-                                    $$("usergroupDT").detachEvent("onBeforeDelete");
-                                    connection.sendAjax("DELETE", "/user-group/" + item.id, function (text, data, xhr) {
-                                        if (text) {
-                                            $$("usergroupDT").remove(context.id.row);
-                                            $$("usersFromUserGroupDT").clearAll();
-                                            util.messages.showMessage("Uspjesno uklanjanje korisničke grupe");
-                                        }
-                                    }, function (text, data, xhr) {
-                                        util.messages.showErrorMessage("Neuspjesno uklanjanje korisničke grupe");
-                                    }, item);
-                                }
-                            };
-                            webix.confirm(delBox);
-                            break;
-                    }
-                }
-            }
-        });
-
-        webix.ui({
-            view: "contextmenu",
-            id: "removeUserContextMenu",
-            width: 200,
-            data: [{
-                id: "1",
-                value: "Izbaci",
-                icon: "user-times"
-            }],
-            master: $$("usersFromUserGroupDT"),
-            on: {
-                onItemClick: function (id) {
-                    var context = this.getContext();
-                    switch (id) {
-                        case "1":
-                            var delBox = (webix.copy(commonViews.izbacivanjePotvrda("korisnika", "korisnika")));
-                            delBox.callback = function (result) {
                                 if (result) {
-                                    var selectedUser = $$("usersFromUserGroupDT").getItem(context.id.row);
-                                    console.log(context.id);
-                                    var temp = $$("usergroupDT").getSelectedItem();
-                                    var item = {
-                                        userGroupId: temp.id,
-                                        userId: selectedUser.id
-                                    };
-                                    $$("usersFromUserGroupDT").detachEvent("onBeforeDelete");
-                                    connection.sendAjax("DELETE", "/user-group-has-user/" + item.userGroupId+ "/"+item.userId, function (text, data, xhr) {
+                                    var itemId = $$("userGroupList").getSelectedId();
+                                    connection.sendAjax("DELETE", "/user-group/" + itemId, function (text, data, xhr) {
                                         if (text) {
-                                            $$("usersFromUserGroupDT").remove(context.id.row);
-                                            util.messages.showMessage("Uspjesno uklanjanje korisnika");
+                                            $$("userGroupList").remove(itemId);
+                                            $$("inUsersList").clearAll();
+                                            $$("outUsersList").load("user/nonInGroup/" + itemId);
+                                            util.messages.showMessage("Uspješno uklanjanje korisničke grupe");
                                         }
                                     }, function (text, data, xhr) {
-                                        util.messages.showErrorMessage("Neuspjesno uklanjanje korisnika");
-                                    }, item);
+                                        util.messages.showErrorMessage("Neuspješno uklanjanje korisničke grupe");
+                                    }, null);
                                 }
                             };
                             webix.confirm(delBox);
-
-                            break;
-                        case "2":
-                            util.messages.showMessage("to be implemented");
                             break;
                     }
                 }
             }
         });
+
+
     },
 
 
     addDialog: {
         view: "popup",
-        id: "addUsergroupDialog",
+        id: "addUserGroupDialog",
         modal: true,
         position: "center",
         body: {
-            id: "addUsergroupInside",
+            id: "addUserGroupInside",
             rows: [{
                 view: "toolbar",
                 cols: [{
@@ -253,11 +226,11 @@ var usergroupView = {
                     view: "icon",
                     icon: "close",
                     align: "right",
-                    click: "util.dismissDialog('addUsergroupDialog');"
+                    click: "util.dismissDialog('addUserGroupDialog');"
                 }]
             }, {
                 view: "form",
-                id: "addUsergroupForm",
+                id: "addUserGroupForm",
                 width: 600,
                 elementsConfig: {
                     labelWidth: 200,
@@ -271,24 +244,13 @@ var usergroupView = {
                     invalidMessage: "Unesite naziv korisničke grupe!",
                     required: true
                 }, {
-                    view: "multicombo",
-                    id: "users",
-                    name: "users",
-                    label: "Korisnici:",
-                    suggest: {
-                        body: {
-                            template: "#firstName# #lastName#",
-                            url: "user"
-                        }
-                    }
-                }, {
                     margin: 5,
                     cols: [{}, {
-                        id: "saveUsergroup",
+                        id: "saveUserGroup",
                         view: "button",
                         value: "Sačuvajte",
                         type: "form",
-                        click: "usergroupView.save",
+                        click: "userGroupView.save",
                         hotkey: "enter",
                         width: 150
                     }]
@@ -298,128 +260,21 @@ var usergroupView = {
     },
 
     showAddDialog: function () {
-        if(util.popupIsntAlreadyOpened("addUsergroupDialog")){
-            webix.ui(webix.copy(usergroupView.addDialog)).show();
+        if(util.popupIsntAlreadyOpened("addUserGroupDialog")){
+            webix.ui(webix.copy(userGroupView.addDialog)).show();
             webix.UIManager.setFocus("name");
         }
     },
 
-    addUsersDialog: {
-        view: "popup",
-        id: "addUsersToGroupDialog",
-        modal: true,
-        position: "center",
-        body: {
-            id: "addUsersInside",
-            rows: [{
-                view: "toolbar",
-                cols: [{
-                    view: "label",
-                    label: "<span class='webix_icon fa-users'></span> Dodavanje korisnika u grupu",
-                    width: 400
-                }, {}, {
-                    hotkey: 'esc',
-                    view: "icon",
-                    icon: "close",
-                    align: "right",
-                    click: "util.dismissDialog('addUsersToGroupDialog');"
-                }]
-            }, {
-                view: "form",
-                id: "addUsersToGroupForm",
-                width: 600,
-                elementsConfig: {
-                    labelWidth: 200,
-                    bottomPadding: 18
-                },
-                elements: [
-                    {
-                        view: "multicombo",
-                        id: "users",
-                        name: "users",
-                        label: "Korisnici:",
-                        master: $$("addUsersToGroupDialog"),
-                        suggest:{
-                            body: {
-                                template: "#firstName# #lastName#"
-                            }
-                        }
-                    }, {
-                    margin: 5,
-                    cols: [{}, {
-                        id: "saveUsers",
-                        view: "button",
-                        value: "Sačuvajte",
-                        type: "form",
-                        click: "usergroupView.finishAddUsersToGroup",
-                        hotkey: "enter",
-                        width: 150
-                    }]
-                }]
-            }]
-        }
-
-    },
-    finishAddUsersToGroup: function(context){
-        var temp = $$("usergroupDT").getSelectedItem();
-        var selected = $$("addUsersToGroupForm").getValues().users;
-        var selectedIds=selected.split(",");
-        for (var i = 0; i < selectedIds.length; i++) {
-            var newUser = {
-                userGroupId: temp.id,
-                userId: Number(selectedIds[i])
-            }
-            connection.sendAjax("POST", "user-group-has-user",
-                function (text, data, xhr) {
-                }, function () {
-                    util.messages.showErrorMessage("Podaci nisu dodati.");
-                }, newUser);
-            connection.sendAjax("GET","user/"+Number(selectedIds[i]),function (text,data,xhr) {
-                var user= JSON.parse(text);
-                $$("usersFromUserGroupDT").add(user);
-            },function () {});
-        }
-        util.dismissDialog("addUsersToGroupDialog");
-    },
-
-    addUsersToGroup: function(){
-        webix.ui(webix.copy(usergroupView.addUsersDialog)).show();
-        var temp=$$("users").getPopup().getList();
-        temp.load("user/nonInGroup/"+$$("usergroupDT").getSelectedItem().id);
-        webix.UIManager.setFocus("users");
-    },
-
     save: function () {
-        var form = $$("addUsergroupForm");
+        var form = $$("addUserGroupForm");
         if (form.validate()) {
-            var newUsergroup = {
+            var newUserGroup = {
                 name: form.getValues().name,
                 companyId: companyData.id
             };
-            var userIdsStr = form.getValues().users;//format: v1,v2,...,v3
-            if(userIdsStr != "")
-                var userIds = userIdsStr.split(",");
-            connection.sendAjax("POST", "user-group",
-                function (text, data, xhr) {
-                    if (text) {
-                        $$("usergroupDT").load("user-group");
-                        var usergroupId = Number(JSON.parse(text).id);
-                        var i;
-                        for (i = 0; i < userIds.length; i++) {
-                            var newUserGroupHasUser = {
-                                userGroupId: usergroupId,
-                                userId: Number(userIds[i])
-                            };
-                            connection.sendAjax("POST", "user-group-has-user",
-                                function (text, data, xhr) {}, function () {
-                                    util.messages.showErrorMessage("Podaci nisu dodati.");
-                                }, newUserGroupHasUser);
-                        }
-                    }
-                }, function () {
-                    util.messages.showErrorMessage("Podaci nisu dodati.");
-                }, newUsergroup);
+            $$("userGroupList").add(newUserGroup);
         }
-        util.dismissDialog('addUsergroupDialog');
+        util.dismissDialog('addUserGroupDialog');
     }
 };

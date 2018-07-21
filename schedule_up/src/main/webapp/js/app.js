@@ -41,8 +41,8 @@ var menuActions = function (id) {
         case "user":
             userView.selectPanel();
             break;
-        case "usergroup":
-            usergroupView.selectPanel();
+        case "userGroup":
+            userGroupView.selectPanel();
             break;
     }
 };
@@ -95,7 +95,7 @@ var menuAdmin = [
         value: "Korisnici",
         icon: "user"
     },{
-        id: "usergroup",
+        id: "userGroup",
         value: "Korisničke grupe",
         icon: "users"
     }
