@@ -6,4 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface GearUnitRepository extends JpaRepository<GearUnit, Integer>, GearUnitRepositoryCustom {
      GearUnit getGearUnitById(Integer id);
+     Integer countAllByCompanyIdAndInventoryNumber(Integer companyId, String inventoryNumber);
 }

@@ -38,6 +38,9 @@ public class GearUnitController extends GenericController<GearUnit, Integer> {
     @Value("${badRequest.stringMaxLength}")
     private String badRequestStringMaxLength;
 
+    @Value("${badRequest.inventoryNumberExists}")
+    private String badRequestInventoryNumberExists;
+
     @Autowired
     public GearUnitController(GearUnitRepository repo, GearRepository gearRepository) {
         super(repo);
@@ -72,7 +75,10 @@ public class GearUnitController extends GenericController<GearUnit, Integer> {
         if(Validator.stringMaxLength(gearUnitGear.getName(),100)) {
             if(Validator.stringMaxLength(gearUnitGear.getDescription(), 500)) {
                 if(Validator.stringMaxLength(gearUnitGear.getInventoryNumber(), 100)) {
-                    return gearUnitRepository.insertExtended(gearUnitGear);
+                    if(gearUnitRepository.countAllByCompanyIdAndInventoryNumber(userBean.getUser().getCompanyId(),gearUnitGear.getInventoryNumber()).compareTo(Integer.valueOf(0))==0){
+                        return gearUnitRepository.insertExtended(gearUnitGear);
+                    }
+                    throw new BadRequestException(badRequestInventoryNumberExists);
                 }
                 throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "inventarnog broja").replace("{broj}", String.valueOf(100)));
             }
@@ -89,7 +95,10 @@ public class GearUnitController extends GenericController<GearUnit, Integer> {
         if(Validator.stringMaxLength(gearUnitGear.getName(),100)) {
             if(Validator.stringMaxLength(gearUnitGear.getDescription(), 500)) {
                 if(Validator.stringMaxLength(gearUnitGear.getInventoryNumber(), 100)) {
-                    return gearUnitRepository.updateExtended(gearUnitGear);
+                    if(gearUnitRepository.countAllByCompanyIdAndInventoryNumber(userBean.getUser().getCompanyId(),gearUnitGear.getInventoryNumber()).compareTo(Integer.valueOf(0))==0){
+                        return gearUnitRepository.updateExtended(gearUnitGear);
+                    }
+                    throw new BadRequestException(badRequestInventoryNumberExists);
                 }
                 throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "inventarnog broja").replace("{broj}", String.valueOf(100)));
             }
