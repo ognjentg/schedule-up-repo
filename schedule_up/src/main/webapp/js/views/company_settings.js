@@ -8,8 +8,8 @@ var companySettingsView = {
     panel: {
         id: "settingsPanel",
         adjust: true,
-        width: 1500,
-        height: 1500,
+
+
         rows: [{
             view: "toolbar",
             padding: 8,
@@ -24,7 +24,7 @@ var companySettingsView = {
             adjust: true,
             elementsConfig: {
                 bottomPadding: 18,
-                width: 430
+                width: 650
             },
             elements: [{
                 margin: 5, cols: [
@@ -36,7 +36,7 @@ var companySettingsView = {
                             view: "datepicker",
                             labelWidth:290,
                             stringResult: true,
-                            width: 400,
+                            width: 600,
                             label: "Početak radnog vremena:",
                             timepicker: true,
                             type: "time",
@@ -77,7 +77,7 @@ var companySettingsView = {
                             }
                         }, {
                             id: "timeTo",
-                            width: 400,
+                            width: 600,
                             labelWidth:290,
                             name: "timeTo",
                             view: "datepicker",
@@ -116,11 +116,14 @@ var companySettingsView = {
                                     calendarTime: "%H:%i"
                                 }
                             }
-                        }, {
+                        }
+                        ]
+                    },{
+                        rows: [ {
                             id: "reminderTime",
                             view: "combo",
                             labelWidth:290,
-                            width: 400,
+                            width: 600,
                             value: "One",
                             options: ["0 minuta", "5 minuta", "15 minuta", "30 minuta", "1 sat", "12 sati", "1 dan"],
                             label: "Podsjetnik:",
@@ -188,7 +191,7 @@ var companySettingsView = {
                                 id: "cancelTime",
                                 labelWidth:290,
                                 label: "Minimalno vrijeme za otkazivanje sastanka:",
-                                width: 400,
+                                width: 600,
                                 options: ["15 minuta", "30 minuta", "1 sat", "12 sati", "1 dan"],
                                 on: {
                                     onChange: function (item, oldv) {
@@ -247,106 +250,78 @@ var companySettingsView = {
                                 }
 
                             }
-                        ]
-                    },{
-                        rows: [{
-                            view:"label",
-                            label: "Unesite neradni dan",
-                            inputWidth:100,
-                            align:"left"
-
-                        },{
-                            view:"text",
-                            label: "Naziv:",
-                            id:"naziv",
-                            name:"naziv",
-                            inputWidth:400,
-                            align:"left"
-                        },
-
-                            {
-                            id: "holiday",
-                            width: 400,
-                            name: "holiday",
-                            view: "datepicker",
-                            stringResult: true,
-                            label: "Datum:",
-                            timepicker: false,
-                            type: "date",
-                            format: "%d/%m/%y",
-                            suggest: {
-                                type: "calendar",
-                                body: {
-                                    type: "date",
-                                    calendarDate: "%d/%m/%y",
-                                    minDate:new Date(),
-                                    maxDate:new Date().getFullYear()+"-12-31",
-                                }
-                            }},{
-                                id: "addHolidayBtn",
-                                view: "button",
-                                type: "iconButton",
-                                label: "Dodajte",
-                                icon: "plus-circle",
-                                click: 'companySettingsView.save',
-                                autowidth: true
-                            }
 
                         ]
-                    },{
-                        view: "datatable",
-                        css: "webixDatatable",
-                        width:400,
-                        multiselect: false,
-                        id: "holidayDT",
-                        resizeColumn: true,
-                        resizeRow: true,
-                        onContext: {},
-                        columns: [{
-
-                            id: "name",
-
-                            editable: false,
-                            fillspace: true,
-                            editor: "text",
-                            sort: "string",
-                            header: [
-                                "Naziv", {
-                                    content: "textFilter"
-                                }
-                            ]
-                        },{id:"companyId",
-                        hidden:true
-                        },{id:"company_id",
-                            hidden:true
-                        },
-                           {
-                                id: "date",
-                                fillspace: true,
-                                editable: false,
-                                editor: "text",
-                                sort: "text",
-                                header: [
-                                    "Datum", {
-                                        content: "textFilter"
-                                    }
-                                ]
-                            }
-                        ],
-                        select: "row",
-                        navigation: true,
-                        editable: false,
-                        url: "holiday",
-                        on: {
-
-                            onAfterContextMenu: function (item) {
-                                this.select(item.row);
-                            }
-                        }
                     }
                 ]
             }
             ]
+        },{
+            view: "toolbar",
+            padding: 8,
+            css: "panelToolbar",
+            cols: [{
+                view: "label",
+                template: "<span class='fa fa-cog'></span> Neradni dani"
+            }, {}, {
+                id: "addDayBtn",
+                view: "button",
+                type: "iconButton",
+                label: "Dodajte neradni dan",
+                click: "companySettingsView.showAddDialog",
+                icon: "plus-circle",
+                autowidth: true
+            }]
+        },{
+            view: "datatable",
+            css: "webixDatatable",
+            width:400,
+            multiselect: false,
+            id: "holidayDT",
+            resizeColumn: true,
+            resizeRow: true,
+            onContext: {},
+            columns: [{
+
+                id: "name",
+
+                editable: false,
+                fillspace: true,
+                editor: "text",
+                sort: "string",
+                header: [
+                    "Naziv", {
+                        content: "textFilter"
+                    }
+                ]
+            },{id:"companyId",
+                hidden:true
+            },{id:"company_id",
+                hidden:true
+            },
+                {
+                    id: "date",
+                    fillspace: true,
+                    editable: false,
+                    editor: "text",
+                    sort: "text",
+                    header: [
+                        "Datum", {
+                            content: "textFilter"
+                        }
+                    ]
+                }
+            ],
+            select: "row",
+            navigation: true,
+            editable: false,
+            url: "holiday",
+            on: {
+
+                onAfterContextMenu: function (item) {
+                    this.select(item.row);
+                }
+            }
         }]
     },
     save:function(){
@@ -498,6 +473,12 @@ var companySettingsView = {
 
         $$("timeTo").setValue(companyData.timeTo);
         $$("timeFrom").setValue(companyData.timeFrom);
+
+    }, showAddDialog: function () {
+
+
+        webix.ui(webix.copy(companySettingsView.addDialog)).show();
+        webix.UIManager.setFocus("name");
 
     }
 };

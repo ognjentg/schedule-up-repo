@@ -337,6 +337,7 @@ var buildingView = {
             if(country_long==""){country_long="",console.log("grad prazan3")};
             console.log(country_long+" : "+country_short);
              state=country_long+" : "+country_short;
+             $$("combo").setValue(state);
 
         }).catch(function(error) {
             util.messages.showErrorMessage("Neuspješno dobavljanje grada.")
@@ -382,7 +383,7 @@ var buildingView = {
                     var grad = $$("grad").getValue();
                     grad = grad.replace(/ /g, "+");
                     var query = res + "+" + grad + "+" + drzava;
-                    var url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + query + "&key=AIzaSyBExEHqJmRKJoRhWOT6Ok3fLR5QMGIZ_eg";
+                    var url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + query + "&key=AIzaSyBExEHqJmRKJoRhWOT6Ok3fLR5QMGIZ_eg&language=hr";
                     fetch(url).then(function (result) {
                         return result.json();
                     }).then(function (json) {
@@ -726,7 +727,7 @@ var buildingView = {
                     var grad = $$("grad").getValue();
                     grad = grad.replace(/ /g, "+");
                     var query = res + "+" + grad + "+" + drzava;
-                    var url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + query + "&key=AIzaSyBExEHqJmRKJoRhWOT6Ok3fLR5QMGIZ_eg";
+                    var url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + query + "&key=AIzaSyBExEHqJmRKJoRhWOT6Ok3fLR5QMGIZ_eg&language=hr";
                     fetch(url).then(function (result) {
                         return result.json();
                     }).then(function (json) {
