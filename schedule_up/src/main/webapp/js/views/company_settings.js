@@ -323,27 +323,117 @@ var companySettingsView = {
                 }
             }
         }]
+    }, addDialog: {
+        view: "popup",
+        id: "addDialog",
+        modal: true,
+        position: "center",
+        body: {
+            id: "addDayInside",
+            rows: [{
+                view: "toolbar",
+                cols: [{
+                    view: "label",
+                    label: "<span class='webix_icon fa fa-calendar'></span> Dodavanje neradnog dana",
+                    width: 400
+                }, {}, {
+                    hotkey: 'esc',
+                    view: "icon",
+                    icon: "close",
+                    align: "right",
+                    click: "util.dismissDialog('addDialog');"
+                }]
+            }, {
+                view: "form",
+                id: "addDayForm",
+                width: 600,
+                elementsConfig: {
+                    labelWidth: 200,
+                    bottomPadding: 18
+                },
+                elements: [{
+                    view: "text",
+                    id: "name",
+                    name: "name",
+                    label: "Naziv:",
+                    invalidMessage: "Unesite naziv neradnog dana!",
+                    required: true
+                },{
+                    id: "holiday",
+                    width: 600,
+                    name: "holiday",
+                    view: "datepicker",
+                    stringResult: true,
+                    label: "Datum:",
+                    timepicker: false,
+                    type: "date",
+                    format: "%d/%m/%y",
+                    suggest: {
+                        type: "calendar",
+                        body: {
+                            type: "date",
+                            calendarDate: "%d/%m/%y",
+                            minDate:new Date(),
+                            maxDate:new Date().getFullYear()+"-12-31",
+                        }
+                    }},
+                    {
+                        margin: 5,
+                        cols: [{
+                            id: "saveDay",
+                            view: "button",
+                            value: "Sačuvajete",
+                            type: "form",
+                            click: "companySettingsView.save",
+                            hotkey: "enter",
+                            width: 150
+                        }]
+                    }],
+                rules: {
+                    "name": function (value) {
+                        if (!value)
+                            return false;
+                        if (value.length > 100) {
+                            $$('addBuildingForm').elements.name.config.invalidMessage = 'Maksimalan broj karaktera je 100!';
+                            return false;
+                        }
+                        return true;
+                    },
+                    "description": function (value) {
+                        if (value.length > 500) {
+                            $$('addBuildingForm').elements.description.config.invalidMessage = 'Maksimalan broj karaktera je 500!';
+                            return false;
+                        }
+
+                        return true;
+                    }
+
+                }
+            }]
+        }
     },
     save:function(){
-        var date=$$("customizeForm").getValues().holiday;
-        var name=$$("customizeForm").getValues().naziv;
+        console.log("hoho");
+        var date=$$("addDayForm").getValues().holiday;
+        var name=$$("addDayForm").getValues().name;
         if(name==""||date==""){
             util.messages.showErrorMessage("Potrebno je unijeti datum i naziv.");
             return;
         }
-        var naziv=$$("customizeForm").getValues().naziv;
+
 
         var formatDate=date.split(" ")[0];
         var newHoliday={
             date: formatDate,
-            name:naziv,
+            name:name,
             companyId: companyData.id};
-        $$("naziv").setValue("");
+        $$("name").setValue("");
         $$("holiday").setValue("");
        $$("holidayDT").add(newHoliday);
         webix.dp( $$("holidayDT") ).attachEvent("onAfterUpdate", function(id, response){
             if (response.error) console.log(response.error);
-        })
+        });
+        util.dismissDialog('addDialog');
     },
     selectPanel: function () {
         $$("main").removeView(rightPanel);
