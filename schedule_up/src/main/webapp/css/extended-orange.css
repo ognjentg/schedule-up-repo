@@ -128,3 +128,8 @@
     margin-top: 5px !important;
 }
 .webix_cal_icon_clear { display:none }
+
+.rounded-top{
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
