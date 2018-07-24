@@ -8,8 +8,9 @@ var companySettingsView = {
     panel: {
         id: "settingsPanel",
         adjust: true,
+
         cols: [
-            {},
+
             {
                 rows: [
                     {
@@ -50,12 +51,13 @@ var companySettingsView = {
                                         }
                                         var oldTimeFrom = companyData.timeFrom;
                                         var endTime = companyData.timeTo;
-                                        if (endTime < $$("customizeForm").getValues().timeFrom) {
+                                        console.log(item);
+                                        if (endTime > $$("customizeForm").getValues().timeFrom) {
                                             companyData.timeFrom = $$("customizeForm").getValues().timeFrom + ":00";
                                             connection.sendAjax("PUT", "company/" + companyData.id,
                                                 function (text, data, xhr) {
                                                     if (text && text == "Success") {
-                                                        util.messages.showMessage("Uspješno ste izmjenili radno vrijeme");
+                                                        util.messages.showMessage("Uspješno ste izmjenili radno vrijeme.");
                                                     } else {
                                                         util.messages.showErrorMessage("Greška pri izmjeni.");
                                                         companyData.timeFrom = oldTimeFrom;
@@ -65,7 +67,8 @@ var companySettingsView = {
                                                     companyData.timeFrom = oldTimeFrom;
                                                 }, companyData)
                                         } else {
-                                            util.messages.showMessage("Vrijeme početka ne može biti poslije kraja radnog vremena.")
+                                            util.messages.showErrorMessage("Vrijeme početka ne može biti poslije kraja radnog vremena.");
+                                            companyData.timeFrom = oldTimeFrom;
                                         }
                                     }
                                 },
@@ -96,10 +99,12 @@ var companySettingsView = {
                                         }
                                         var oldTimeTo = companyData.timeTo;
                                         companyData.timeTo = $$("customizeForm").getValues().timeTo + ":00";
+                                        var startTime = companyData.timeFrom;
+                                        if (startTime < $$("customizeForm").getValues().timeTo) {
                                         connection.sendAjax("PUT", "company/" + companyData.id,
                                             function (text, data, xhr) {
                                                 if (text && text == "Success") {
-                                                    util.messages.showMessage("Uspješno ste izmjenili radno vrijeme");
+                                                    util.messages.showMessage("Uspješno ste izmjenili radno vrijeme.");
                                                 } else {
                                                     util.messages.showErrorMessage("Greška pri izmjeni.");
                                                     companyData.timeTo = oldTimeTo;
@@ -109,7 +114,10 @@ var companySettingsView = {
                                                 util.messages.showErrorMessage("Greška pri izmjeni.");
                                                 companyData.timeTo = oldTimeTo;
                                             }, companyData)
-                                    }
+                                    }else{
+                                            util.messages.showErrorMessage("Vrijeme početka ne može biti poslije kraja radnog vremena.");
+                                            companyData.timeTo = oldTimeTo;;
+                                    }}
                                 },
                                 suggest: {
                                     type: "calendar",
@@ -320,8 +328,6 @@ var companySettingsView = {
                         }
                     }]
             }
-            ,
-            {}
         ]
     },
     addDialog: {
