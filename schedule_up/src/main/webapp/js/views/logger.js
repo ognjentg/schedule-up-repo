@@ -15,10 +15,20 @@ var loggerView = {
                 view:"daterangepicker",
                 name:"dateRangePicker",
                 label:"Od-Do:",
-                value:{start: new Date(2018,1,1), end: new Date()},
                 on:{
-                    onChange: function (id) {
-                        util.messages.showMessage("to be implemented  "+id);
+                    onChange: function (dates) {
+                        if (dates.start != null && dates.end != null){
+                            $$("loggerDT").filterByAll();
+                            var startingDate = new Date(dates.start);
+                            var endingDate = new Date(dates.end.getFullYear(),dates.end.getMonth(),dates.end.getDate()+1);
+                            $$("loggerDT").filter(function (obj) {
+                                var dateOfObj= new Date(obj.created);
+                                if (dateOfObj >= startingDate && dateOfObj <= endingDate)
+                                    return true;
+                                return false;
+                            });
+                            $$("datePickerFilter").getPopup().hide();
+                        }
                     }
                 }
             },{
