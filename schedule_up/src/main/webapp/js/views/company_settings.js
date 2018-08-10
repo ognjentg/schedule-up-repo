@@ -51,8 +51,6 @@ var companySettingsView = {
                                         }
                                         var oldTimeFrom = companyData.timeFrom;
                                         var endTime = companyData.timeTo;
-
-                                        console.log("old"+item);
                                         if (endTime > $$("customizeForm").getValues().timeFrom) {
                                             companyData.timeFrom = $$("customizeForm").getValues().timeFrom + ":00";
                                             connection.sendAjax("PUT", "company/" + companyData.id,
@@ -101,8 +99,6 @@ var companySettingsView = {
                                             return;
                                         }
                                         var oldTimeTo = companyData.timeTo;
-                                        console.log("item:"+item);
-                                        cosole.log("novi:"+novi);
                                         companyData.timeTo = $$("customizeForm").getValues().timeTo + ":00";
                                         var startTime = companyData.timeFrom;
                                         if (startTime < $$("customizeForm").getValues().timeTo) {
@@ -471,7 +467,6 @@ var companySettingsView = {
                                     $$("holidayDT").detachEvent("onBeforeDelete");
                                     connection.sendAjax("DELETE", "/holiday/" + item.id, function (text, data, xhr) {
                                         if (text) {
-                                            console.log(item);
                                             $$("holidayDT").remove(context.id.row);
                                             util.messages.showMessage("Uspjesno uklanjanje");
                                         }
