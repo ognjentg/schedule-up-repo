@@ -51,13 +51,13 @@ var companySettingsView = {
                                         }
                                         var oldTimeFrom = companyData.timeFrom;
                                         var endTime = companyData.timeTo;
-                                        console.log(item);
+
+                                        console.log("old"+item);
                                         if (endTime > $$("customizeForm").getValues().timeFrom) {
                                             companyData.timeFrom = $$("customizeForm").getValues().timeFrom + ":00";
                                             connection.sendAjax("PUT", "company/" + companyData.id,
                                                 function (text, data, xhr) {
                                                     if (text && text == "Success") {
-                                                        util.messages.showMessage("Uspješno ste izmjenili radno vrijeme.");
                                                     } else {
                                                         util.messages.showErrorMessage("Greška pri izmjeni.");
                                                         companyData.timeFrom = oldTimeFrom;
@@ -69,6 +69,9 @@ var companySettingsView = {
                                         } else {
                                             util.messages.showErrorMessage("Vrijeme početka ne može biti poslije kraja radnog vremena.");
                                             companyData.timeFrom = oldTimeFrom;
+                                            $$("timeFrom").setValue(oldTimeFrom);
+                                             $$("customizeForm").refresh();
+                                            return false;
                                         }
                                     }
                                 },
@@ -92,22 +95,24 @@ var companySettingsView = {
                                 type: "time",
                                 format: "%H:%i",
                                 on: {
-                                    onChange: function (item) {
+                                    onChange: function (item,novi) {
 
                                         if (companySettingsView.firstLoadEnd++ == 0) {
                                             return;
                                         }
                                         var oldTimeTo = companyData.timeTo;
+                                        console.log("item:"+item);
+                                        cosole.log("novi:"+novi);
                                         companyData.timeTo = $$("customizeForm").getValues().timeTo + ":00";
                                         var startTime = companyData.timeFrom;
                                         if (startTime < $$("customizeForm").getValues().timeTo) {
                                         connection.sendAjax("PUT", "company/" + companyData.id,
                                             function (text, data, xhr) {
                                                 if (text && text == "Success") {
-                                                    util.messages.showMessage("Uspješno ste izmjenili radno vrijeme.");
                                                 } else {
                                                     util.messages.showErrorMessage("Greška pri izmjeni.");
                                                     companyData.timeTo = oldTimeTo;
+
                                                 }
                                             }, function (text, data, xhr) {
 
@@ -117,6 +122,8 @@ var companySettingsView = {
                                     }else{
                                             util.messages.showErrorMessage("Vrijeme početka ne može biti poslije kraja radnog vremena.");
                                             companyData.timeTo = oldTimeTo;;
+                                            $$("timeTo").setValue( oldTimeTo);
+                                            $$("customizeForm").refresh();
                                     }}
                                 },
                                 suggest: {
@@ -342,7 +349,7 @@ var companySettingsView = {
                 cols: [{
                     view: "label",
                     label: "<span class='webix_icon fa fa-calendar'></span> Dodavanje neradnog dana",
-                    width: 400
+                    width: 300
                 }, {}, {
                     hotkey: 'esc',
                     view: "icon",
@@ -353,7 +360,7 @@ var companySettingsView = {
             }, {
                 view: "form",
                 id: "addDayForm",
-                width: 600,
+                width: 400,
                 elementsConfig: {
                     labelWidth: 200,
                     bottomPadding: 18
@@ -363,13 +370,15 @@ var companySettingsView = {
                     id: "name",
                     name: "name",
                     label: "Naziv:",
-                    invalidMessage: "Unesite naziv neradnog dana!",
+                    invalidMessage: "Unesite naziv!",
                     required: true
                 }, {
                     id: "holiday",
                     width: 600,
                     name: "holiday",
                     view: "datepicker",
+                    invalidMessage: "Unesite datum!",
+                    required: true,
                     stringResult: true,
                     label: "Datum:",
                     timepicker: false,
@@ -387,10 +396,10 @@ var companySettingsView = {
                 },
                     {
                         margin: 5,
-                        cols: [{
+                        cols: [{},{
                             id: "saveDay",
                             view: "button",
-                            value: "Sačuvajete",
+                            value: "Sačuvajte",
                             type: "form",
                             click: "companySettingsView.save",
                             hotkey: "enter",
@@ -406,14 +415,6 @@ var companySettingsView = {
                             return false;
                         }
                         return true;
-                    },
-                    "description": function (value) {
-                        if (value.length > 500) {
-                            $$('addBuildingForm').elements.description.config.invalidMessage = 'Maksimalan broj karaktera je 500!';
-                            return false;
-                        }
-
-                        return true;
                     }
 
                 }
@@ -421,15 +422,10 @@ var companySettingsView = {
         }
     },
     save: function () {
-        console.log("hoho");
         var date = $$("addDayForm").getValues().holiday;
         var name = $$("addDayForm").getValues().name;
-        if (name == "" || date == "") {
-            util.messages.showErrorMessage("Potrebno je unijeti datum i naziv.");
-            return;
-        }
-
-
+        var form = $$("addDayForm");
+        if (form.validate()) {
         var formatDate = date.split(" ")[0];
         var newHoliday = {
             date: formatDate,
@@ -443,7 +439,7 @@ var companySettingsView = {
             if (response.error) console.log(response.error);
         });
         util.dismissDialog('addDialog');
-    },
+    }},
     selectPanel: function () {
         $$("main").removeView(rightPanel);
         rightPanel = "settingsPanel";
@@ -574,10 +570,9 @@ var companySettingsView = {
         $$("timeFrom").setValue(companyData.timeFrom);
 
     }, showAddDialog: function () {
-
-
+            if (util.popupIsntAlreadyOpened("addDialog")) {
         webix.ui(webix.copy(companySettingsView.addDialog)).show();
-        webix.UIManager.setFocus("name");
+        webix.UIManager.setFocus("name");}
 
     }
 };
