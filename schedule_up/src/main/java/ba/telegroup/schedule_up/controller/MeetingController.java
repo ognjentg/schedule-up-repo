@@ -4,9 +4,7 @@ import ba.telegroup.schedule_up.common.exceptions.BadRequestException;
 import ba.telegroup.schedule_up.common.exceptions.ForbiddenException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.interaction.Notification;
-import ba.telegroup.schedule_up.model.Document;
-import ba.telegroup.schedule_up.model.Meeting;
-import ba.telegroup.schedule_up.model.Participant;
+import ba.telegroup.schedule_up.model.*;
 import ba.telegroup.schedule_up.model.modelCustom.MeetingDocumentParticipant;
 import ba.telegroup.schedule_up.repository.*;
 import ba.telegroup.schedule_up.util.Validator;
@@ -33,6 +31,8 @@ public class MeetingController extends GenericController<Meeting, Integer> {
     private final SettingsRepository settingsRepository;
     private final ParticipantRepository participantRepository;
     private final DocumentRepository documentRepository;
+    private final UserRepository userRepository;
+    private final UserGroupRepository userGroupRepository;
     @Value("${admin.id}")
     private Integer admin;
     @Value("${superAdmin.id}")
@@ -85,13 +85,14 @@ public class MeetingController extends GenericController<Meeting, Integer> {
     private String badRequestMeetingCompanyMismatch;
 
     @Autowired
-    public MeetingController(MeetingRepository meetingRepository, SettingsRepository settingsRepository, ParticipantRepository participantRepository, DocumentRepository documentRepository) {
+    public MeetingController(MeetingRepository meetingRepository, SettingsRepository settingsRepository, ParticipantRepository participantRepository, DocumentRepository documentRepository, UserRepository userRepository, UserGroupRepository userGroupRepository) {
         super(meetingRepository);
         this.meetingRepository = meetingRepository;
         this.settingsRepository = settingsRepository;
         this.participantRepository = participantRepository;
         this.documentRepository = documentRepository;
-
+        this.userRepository = userRepository;
+        this.userGroupRepository = userGroupRepository;
     }
 
 
@@ -307,17 +308,27 @@ public class MeetingController extends GenericController<Meeting, Integer> {
         MeetingDocumentParticipant meetingDocumentParticipant = new MeetingDocumentParticipant();
         Meeting meeting = meetingRepository.getOne(id);
         if(meeting != null && meeting.getCompanyId().equals(userBean.getUser().getCompanyId())){
+            User author = userRepository.getById(meeting.getUserId());
             List<Document> documents = documentRepository.getAllByMeetingId(id);
             List<Participant> participants = participantRepository.getAllByMeetingIdAndDeletedIs(id, (byte)0);
+            List<String> participantsOther = participantRepository.getParticipantOther(id);
+            List<User> participantsUser = userRepository.getByMeetingId(id);
+            List<UserGroup> participantsGroup = userGroupRepository.getParticipantsGroup(id);
 
             meetingDocumentParticipant.setMeeting(meeting);
+            meetingDocumentParticipant.setAuthor(author);
             meetingDocumentParticipant.setDocuments(documents);
             meetingDocumentParticipant.setParticipants(participants);
+            meetingDocumentParticipant.setParticipantsOther(participantsOther);
+            meetingDocumentParticipant.setParticipantsUser(participantsUser);
+            meetingDocumentParticipant.setParticipantsGroup(participantsGroup);
 
             return meetingDocumentParticipant;
         }
         throw new BadRequestException(badRequestMeetingNotExist);
     }
+
+
 
     @Transactional
     @RequestMapping(value = "/full", method = RequestMethod.POST)
