@@ -542,42 +542,10 @@ var meetingView = {
         document.getElementById("scheduler_room_name").innerHTML = roomName;
         var event = scheduler.attachEvent("onEmptyClick", function (date, e) {
             if (date > new Date() && checkIfNotHoliday(date)) {
-                webix.ui(webix.copy(meetingView.addMeetingDialog)).show();
-                $$("startTime").setValue(date);
-                $$("endTime").setValue(date);
-                $$("userList").load("user");
-                $$("userGroupList").load("user-group");
-                $$("userList").attachEvent("onAfterLoad", function () {
-                    $$("userList").filter(function (obj) {
-                        return (obj.firstName != null && obj.id != userData.id);
-                    });
-                });
-                $$("userGroupList").attachEvent("onAfterLoad", function () {
-                    $$("userGroupList").filter(function (obj) {
-                        return obj.name != null;
-                    });
-                });
-                $$("userList_input").attachEvent("onTimedKeyPress", function () {
-                    //get user input value
-                    var value = this.getValue().toLowerCase();
-                    $$("userList").filter(function (obj) {
-                        var firstLastName2 = obj.firstName + " " + obj.lastName;
-                        return firstLastName2.toLowerCase().indexOf(value) > -1 && obj.firstName != null && obj.id != userData.id;
-                    })
-                });
-
-                $$("userGroupList_input").attachEvent("onTimedKeyPress", function () {
-                    var value = this.getValue().toLowerCase();
-                    $$("userGroupList").filter(function (obj) {
-
-                        return obj.name.toLowerCase().indexOf(value) > -1 && obj.name != null;
-                    });
-                });
-
+              meetingDetailsView.showAddDialog(date);
             }
         });
         schedulerEvents.push(event);
-
         var onClick = scheduler.attachEvent("onClick", function (id, e) {
             var event1 = scheduler.getEvent(id);
             event1.roomName = room.name;
