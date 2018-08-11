@@ -23,6 +23,7 @@ import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -362,18 +363,23 @@ public class UserController extends GenericController<User, Integer> {
     }
 
     @Transactional
-    @RequestMapping(value = {"/nonParticipantsFor/{meetingId}"}, method = RequestMethod.GET)
+        @RequestMapping(value = {"/nonParticipantsFor/{meetingId}"}, method = RequestMethod.GET)
     public @ResponseBody
     List<User> getNonParticipants(@PathVariable Integer meetingId) {
-        List<User> retValue = getAll();
-        retValue.removeAll(userRepository.findAllById(participantRepository.getAllByMeetingIdAndDeletedIs(meetingId, (byte) 0).stream().map(Participant::getUserId).collect(Collectors.toList())));
-        return retValue.stream().map(user -> {
-            User newUser=new User();
-            newUser.setId(user.getId());
-            newUser.setFirstName(user.getFirstName());
-            newUser.setLastName(user.getLastName());
-            return newUser;
-        }).collect(Collectors.toList());
+        List<User> allUsers = getAll();
+        List<User> retValue=new ArrayList<>();
+        List<Integer> list=participantRepository.getAllByMeetingIdAndDeletedIs(meetingId, (byte) 0).stream().map(Participant::getUserId).collect(Collectors.toList());
+        allUsers.forEach(user -> {
+            if (!list.contains(user.getId())) {
+                User newUser = new User();
+                newUser.setId(user.getId());
+                newUser.setFirstName(user.getFirstName());
+                newUser.setLastName(user.getLastName());
+                retValue.add(newUser);
+            }
+        });
+
+        return retValue;
     }
 
     @Transactional

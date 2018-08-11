@@ -353,6 +353,7 @@ public class MeetingController extends GenericController<Meeting, Integer> {
     @RequestMapping(value = "/full/{id}", method = RequestMethod.PUT)
     public @ResponseBody
     MeetingDocumentParticipant updateFullMeeting(@PathVariable Integer id,@RequestBody MeetingDocumentParticipant meeting) throws BadRequestException, ForbiddenException {
+        update(id,meeting.getMeeting());
         meeting.getParticipants().forEach(participant -> participant.setMeetingId(id));
         meeting.setParticipants(participantRepository.saveAll(meeting.getParticipants()));
         List<Document> documents = meeting.getDocuments();
@@ -370,7 +371,6 @@ public class MeetingController extends GenericController<Meeting, Integer> {
         documents.addAll(currentDocuments);
         meeting.setDocuments(documents);
         meeting.getMeeting().setParticipantsNumber(meetingRepository.getParticipantsNumberByMeetingId(meeting.getMeeting().getId()));
-        update(id,meeting.getMeeting());
         return meeting;
     }
 

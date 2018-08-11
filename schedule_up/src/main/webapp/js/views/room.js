@@ -1,8 +1,8 @@
-var tableData=[];
-var tableCentar=[];
+var tableData = [];
+var tableCentar = [];
 
 var roomView = {
-    roomId:null,
+    roomId: null,
     panel: {
         id: "roomPanel",
         adjust: true,
@@ -26,8 +26,8 @@ var roomView = {
         }, {
             view: "datatable",
             //css: "webixDatatable",
-            adjust:true,
-            tooltip:true,
+            adjust: true,
+            tooltip: true,
             multiselect: false,
             id: "roomDT",
             resizeColumn: true,
@@ -41,7 +41,7 @@ var roomView = {
             }, {
                 id: "name",
                 fillspace: true,
-                tooltip:false,
+                tooltip: false,
                 editor: "text",
                 sort: "string",
                 header: [
@@ -52,7 +52,7 @@ var roomView = {
             }, {
                 id: "floor",
                 fillspace: true,
-                tooltip:false,
+                tooltip: false,
                 editor: "text",
                 sort: "int",
                 header: ["Sprat",
@@ -63,7 +63,7 @@ var roomView = {
                 {
                     id: "capacity",
                     fillspace: true,
-                    tooltip:false,
+                    tooltip: false,
                     editor: "text",
                     sort: "int",
                     header: ["Kapacitet", {
@@ -73,7 +73,7 @@ var roomView = {
                 {
                     id: "buildingName",
                     fillspace: true,
-                    tooltip:false,
+                    tooltip: false,
                     sort: "string",
                     header: [
                         "Naziv zgrade", {
@@ -97,13 +97,13 @@ var roomView = {
                 {
                     id: "location",
                     editable: false,
-                    tooltip:false,
+                    tooltip: false,
                     header: {
                         text: "Lokacija",
                         css: {"text-align": "justify"},
                     },
-                    css: {"text-align":"center"},
-                    adjust:true,
+                    css: {"text-align": "center"},
+                    adjust: true,
                     template: "<span class='fa fa-map-marker info'></span>",
 
                 }
@@ -120,60 +120,60 @@ var roomView = {
                 }
             },
 
-            onMouseMove:{
-                info:function(e, id){
-                    roomView.showMapDetailsDialog(this.getItem(id).latitude,this.getItem(id).longitude);
+            onMouseMove: {
+                info: function (e, id) {
+                    roomView.showMapDetailsDialog(this.getItem(id).latitude, this.getItem(id).longitude);
                     return false;
                 }
             }
         }]
     },
 
-    showMapDetailsDialog: function(latitude,longitude){
-        var url="https://maps.googleapis.com/maps/api/geocode/json?latlng="+latitude+","+longitude+"+&key=AIzaSyBExEHqJmRKJoRhWOT6Ok3fLR5QMGIZ_eg&language=hr";
-        fetch(url).then(function(result) {
-            if(result.ok) {
+    showMapDetailsDialog: function (latitude, longitude) {
+        var url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latitude + "," + longitude + "+&key=AIzaSyBExEHqJmRKJoRhWOT6Ok3fLR5QMGIZ_eg&language=hr";
+        fetch(url).then(function (result) {
+            if (result.ok) {
                 return result.json();
             }
             throw new Error('Neuspješno dobavljanje tačne lokacije.');
-        }).then(function(json) {
-            tableCentar[0]=latitude;
-            tableCentar[1]=longitude;
-            var mapaObjekat={
-                id:1,lat:tableCentar[0],  lng:tableCentar[1]
+        }).then(function (json) {
+            tableCentar[0] = latitude;
+            tableCentar[1] = longitude;
+            var mapaObjekat = {
+                id: 1, lat: tableCentar[0], lng: tableCentar[1]
             };
-            tableData[0]=mapaObjekat;
+            tableData[0] = mapaObjekat;
             webix.ui(webix.copy(roomView.showMapDialog));
-            $$("mapLabel").data.label="<span class='webix_icon fa fa-map-marker '></span> Lokacija sale";
-            $$("map").add({ id:2, lat: latitude, lng: longitude})
+            $$("mapLabel").data.label = "<span class='webix_icon fa fa-map-marker '></span> Lokacija sale";
+            $$("map").add({id: 2, lat: latitude, lng: longitude})
 
             $$("showMapDialog").show();
 
-            var place=json['results'][0];
+            var place = json['results'][0];
 
-            var filtered_array3 = place.address_components.filter(function(address_component){
+            var filtered_array3 = place.address_components.filter(function (address_component) {
                 return address_component.types.includes("route");
             });
-            var adresa = filtered_array3.length ? filtered_array3[0].long_name: "";
-            var filtered_array4 = place.address_components.filter(function(address_component){
+            var adresa = filtered_array3.length ? filtered_array3[0].long_name : "";
+            var filtered_array4 = place.address_components.filter(function (address_component) {
                 return address_component.types.includes("street_number");
             });
 
-            var broj = filtered_array4.length ? filtered_array4[0].long_name: "";
-            var broj2 = filtered_array4.length ? filtered_array4[0].short_name: "";
+            var broj = filtered_array4.length ? filtered_array4[0].long_name : "";
+            var broj2 = filtered_array4.length ? filtered_array4[0].short_name : "";
 
             var infowindow;
             var item = $$("map").getItem(2);
             var marker = item.$marker;
-            if(broj!=null){
+            if (broj != null) {
                 marker.infowindow = new google.maps.InfoWindow({
-                    content: adresa+" "+broj
+                    content: adresa + " " + broj
                 });
-            }else if(broj2!=null){
+            } else if (broj2 != null) {
                 marker.infowindow = new google.maps.InfoWindow({
-                    content: adresa+" "+broj2
+                    content: adresa + " " + broj2
                 });
-            }else{
+            } else {
                 marker.infowindow = new google.maps.InfoWindow({
                     content: adresa
                 });
@@ -185,7 +185,7 @@ var roomView = {
     },
 
 
-    showMapDialog:{
+    showMapDialog: {
         view: "popup",
         id: "showMapDialog",
         modal: true,
@@ -195,7 +195,7 @@ var roomView = {
             rows: [{
                 view: "toolbar",
                 cols: [{
-                    id:"mapLabel",
+                    id: "mapLabel",
                     view: "label",
                     label: "<span class='webix_icon fa fa-map-marker '></span> Lokacija sale",
                     width: 600,
@@ -207,14 +207,14 @@ var roomView = {
                     click: "util.dismissDialog('showMapDialog');"
                 }]
             }, {
-                key:"AIzaSyBExEHqJmRKJoRhWOT6Ok3fLR5QMGIZ_eg",
-                view:"google-map",
-                id:"map",
-                zoom:15,
+                key: "AIzaSyBExEHqJmRKJoRhWOT6Ok3fLR5QMGIZ_eg",
+                view: "google-map",
+                id: "map",
+                zoom: 15,
                 width: 600,
-                height:500,
-                center:tableCentar,
-                data:tableData
+                height: 500,
+                center: tableCentar,
+                data: tableData
 
             }]
         }
@@ -233,8 +233,8 @@ var roomView = {
         $$("roomDT").detachEvent("onBeforeDelete");
 
         var roomContextMenu;
-        if (userData.roleId==2){
-            roomContextMenu=[{
+        if (userData.roleId == 2) {
+            roomContextMenu = [{
                 id: "1",
                 value: "Izmjenite",
                 icon: "pencil-square-o"
@@ -253,7 +253,7 @@ var roomView = {
                     icon: "calendar"
                 },
                 {
-                    $template:"Separator"
+                    $template: "Separator"
                 },
                 {
                     id: "4",
@@ -261,14 +261,14 @@ var roomView = {
                     icon: "hdd-o"
                 }
             ];
-        }else{
-            roomContextMenu=[{
+        } else {
+            roomContextMenu = [{
                 id: "3",
                 value: "Prikaz rezervacija",
                 icon: "calendar"
             },
                 {
-                    $template:"Separator"
+                    $template: "Separator"
                 },
                 {
                     id: "4",
@@ -276,7 +276,7 @@ var roomView = {
                     icon: "hdd-o"
                 }];
             $$("addRoomBtn").hide();
-            $$("roomDT").define("editaction","none");
+            $$("roomDT").define("editaction", "none");
             $$("roomDT").refresh();
         }
 
@@ -294,7 +294,7 @@ var roomView = {
                             roomView.showChangeRoomDialog($$("roomDT").getItem(context.id.row));
                             break;
                         case "2":
-                            var delBox = (webix.copy(commonViews.brisanjePotvrda("sale"," salu "+$$("roomDT").getItem(context.id.row).name)));
+                            var delBox = (webix.copy(commonViews.brisanjePotvrda("sale", " salu " + $$("roomDT").getItem(context.id.row).name)));
                             var newItem = $$("roomDT").getItem(context.id.row);
                             delBox.callback = function (result) {
                                 if (result == 1) {
@@ -315,7 +315,7 @@ var roomView = {
                             webix.confirm(delBox);
                             break;
                         case "3":
-                            meetingView.selectPanel($$("roomDT").getItem(context.id.row),$$("roomDT").getItem(context.id.row).name);
+                            meetingView.selectPanel($$("roomDT").getItem(context.id.row));
                             break;
                         case "4":
                             roomView.showGearDialog($$("roomDT").getItem(context.id.row).id);
@@ -679,7 +679,7 @@ var roomView = {
         id: "gearDialog",
         modal: true,
         position: "center",
-        roomId:null,
+        roomId: null,
         body: {
             rows: [
                 {
@@ -696,40 +696,38 @@ var roomView = {
                     }]
                 },
                 {
-                    paddingY:10,
-                    cols:[
+                    paddingY: 10,
+                    cols: [
                         {},
                         {
-                            id:"addGearBtn",
-                            view:"button",
-                            icon:"plus-circle",
-                            type:"iconButton",
-                            label:"Dodajte opremu",
+                            id: "addGearBtn",
+                            view: "button",
+                            icon: "plus-circle",
+                            type: "iconButton",
+                            label: "Dodajte opremu",
                             click: "roomView.showAddGearDialog",
-                            autowidth:true
+                            autowidth: true
                         }
                     ]
                 },
                 {
-                    id:"gearList",
-                    view:"list",
+                    id: "gearList",
+                    view: "list",
                     onContext: {},
-                    width:300,
-                    height:300,
+                    width: 300,
+                    height: 300,
                     select: "row",
-                    type:{
-                        height:"auto",
-                        template:"<div class='gear-name'>#name#</div><div class='gear-description'>#description#</div>"
+                    type: {
+                        height: "auto",
+                        template: "<div class='gear-name'>#name#</div><div class='gear-description'>#description#</div>"
                     },
 
-                    on:{
-                        onAfterContextMenu: function(id, e, node){
+                    on: {
+                        onAfterContextMenu: function (id, e, node) {
 
                             $$("gearList").select(id);
                         }
                     }
-
-
 
 
                 }
@@ -739,26 +737,26 @@ var roomView = {
     },
 
     showAddGearDialog: function () {
-        if(util.popupIsntAlreadyOpened("addGearDialog")){
+        if (util.popupIsntAlreadyOpened("addGearDialog")) {
             webix.ui(webix.copy(roomView.addGearDialog));
-            connection.sendAjax("GET", "/gear-unit" ,
+            connection.sendAjax("GET", "/gear-unit",
                 function (text, data, xhr) {
-                    if (text ) {
+                    if (text) {
                         $$("addGearList").clearAll();
-                        var listAll=data.json();
-                        var listAvailable=[];
-                        for(var i=0;i<listAll.length;i++){
-                            if(listAll[i].available===1){
+                        var listAll = data.json();
+                        var listAvailable = [];
+                        for (var i = 0; i < listAll.length; i++) {
+                            if (listAll[i].available === 1) {
                                 listAvailable.push(listAll[i]);
                             }
                         }
                         $$("addGearList").parse(listAvailable);
 
-                        $$("listNewGear_input").attachEvent("onTimedKeyPress",function(){
+                        $$("listNewGear_input").attachEvent("onTimedKeyPress", function () {
                             var value = this.getValue().toLowerCase();
-                            $$("addGearList").filter(function(obj){
-                                var text=obj.name+" "+obj.description;
-                                return text.toLowerCase().indexOf(value)>-1;
+                            $$("addGearList").filter(function (obj) {
+                                var text = obj.name + " " + obj.description;
+                                return text.toLowerCase().indexOf(value) > -1;
                             })
                         });
                         $$("addGearDialog").show();
@@ -798,7 +796,7 @@ var roomView = {
                 view: "form",
                 id: "addGearDialog",
                 width: 600,
-                height:500,
+                height: 500,
                 elementsConfig: {
                     labelWidth: 200,
                     bottomPadding: 5
@@ -809,10 +807,10 @@ var roomView = {
                             {
                                 height: 38,
                                 cols: [{
-                                    view:"search",
-                                    id:"listNewGear_input",
+                                    view: "search",
+                                    id: "listNewGear_input",
                                     name: "listNewGear_input",
-                                }, ]
+                                },]
                             },
                             {
                                 view: "list",
@@ -852,8 +850,8 @@ var roomView = {
     saveGear: function () {
         //var form = $$("addGearForm");
         var gearIds = [];
-        var names=[];
-        var descriptions=[];
+        var names = [];
+        var descriptions = [];
 
         $$("addGearList").data.each(function (obj) {
                 if (obj.markCheckbox == 1) {
@@ -864,15 +862,14 @@ var roomView = {
             }
         );
 
-        if(gearIds.length===0){
+        if (gearIds.length === 0) {
             util.messages.showErrorMessage("Niste označili opremu koju želite da dodate!");
-        }else{
+        } else {
 
-            connection.sendAjax("POST", "/room/addGearUnits/"+roomView.roomId,
+            connection.sendAjax("POST", "/room/addGearUnits/" + roomView.roomId,
                 function (text, data, xhr) {
-                    if (text==="Success" ) {
-                        for(var i=0;i<gearIds.length;i++)
-                        {
+                    if (text === "Success") {
+                        for (var i = 0; i < gearIds.length; i++) {
                             $$("gearList").add({
                                 name: names[i],
                                 description: descriptions[i]
@@ -891,7 +888,7 @@ var roomView = {
         }
     },
 
-    showGearDialog:function (roomId) {
+    showGearDialog: function (roomId) {
         if (util.popupIsntAlreadyOpened("gearDialog")) {
             var dialog = webix.ui(webix.copy(this.gearDialog));
             roomView.roomId = roomId;

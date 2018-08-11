@@ -223,7 +223,7 @@ var loginLayout = {
                             id: "username",
                             name: "username",
                             view: "text",
-                            label: "Korisničko ime",
+                            label: "Korisničko ime:",
                             invalidMessage: "Korisničke ime je obavezno!",
                             required: true
                         },
@@ -232,7 +232,7 @@ var loginLayout = {
                             name: "password",
                             view: "text",
                             type: "password",
-                            label: "Lozinka",
+                            label: "Lozinka:",
                             invalidMessage: "Lozinka je obavezna!",
                             required: true
                         },
@@ -240,7 +240,7 @@ var loginLayout = {
                             id: "companyName",
                             name: "companyName",
                             view: "text",
-                            label: "Kompanija"
+                            label: "Kompanija:"
                         }, {
                             margin: 5,
                             cols: [

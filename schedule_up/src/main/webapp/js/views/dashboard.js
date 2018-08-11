@@ -15,12 +15,12 @@ var dashboardView = {
         cols: [{
             view: "template",
             template: "<div id='scheduler_here' class='dhx_cal_container' " +
-            "style='width:100%; height:100%;'><div class='dhx_cal_navline'>" +
-            "<div class='dhx_cal_prev_button'>&nbsp;</div><div class='dhx_cal_next_button'>" +
-            "&nbsp;</div><div class='dhx_cal_today_button'></div><div class='dhx_cal_date'></div><div class=\"dhx_cal_tab\" name=\"day_tab\" style=\"right:204px;\"></div>\n" +
-            "        <div class=\"dhx_cal_tab\" name=\"week_tab\" style=\"right:140px;\"></div>\n" +
-            "        <div class=\"dhx_cal_tab\" name=\"month_tab\" style=\"right:76px;\"></div></div><div" +
-            " class='dhx_cal_header'></div><div class='dhx_cal_data'></div></div>",
+                "style='width:100%; height:100%;'><div class='dhx_cal_navline'>" +
+                "<div class='dhx_cal_prev_button'>&nbsp;</div><div class='dhx_cal_next_button'>" +
+                "&nbsp;</div><div class='dhx_cal_today_button'></div><div class='dhx_cal_date'></div><div class=\"dhx_cal_tab\" name=\"day_tab\" style=\"right:204px;\"></div>\n" +
+                "        <div class=\"dhx_cal_tab\" name=\"week_tab\" style=\"right:140px;\"></div>\n" +
+                "        <div class=\"dhx_cal_tab\" name=\"month_tab\" style=\"right:76px;\"></div></div><div" +
+                " class='dhx_cal_header'></div><div class='dhx_cal_data'></div></div>",
         },
             {
                 view: "accordion",
@@ -79,20 +79,18 @@ var dashboardView = {
         scheduler.init("scheduler_here", new Date(), "week");
         scheduler.clearAll();
 
-        var onClick = scheduler.attachEvent("onClick", function (id, e) {
-            var event = scheduler.getEvent(id);
-            webix.promise.all([webix.ajax("user/" + event.userId), webix.ajax("room/" + event.roomId)]).then(
-                function (results) {
-                    event.creatorUsername = JSON.parse(results[0].text()).username;
-                    event.roomName = JSON.parse(results[1].text()).name;
-                    dashboardView.showEventPopup(event);
-                }
-            );
-        });
-        schedulerEvents.push(onClick);
+        schedulerEvents.push(scheduler.attachEvent("onClick", function (id, e) {
+            meetingDetailsView.showEventInfo(id);
+        }));
+
         schedulerEvents.push(scheduler.attachEvent("onEventLoading", function (ev) {
-            if (ev.status !== 0)
+            if (ev.status !== 0 && ev.userId === userData.id)
                 ev.color = "#bdd5ff";
+            else if (ev.status === 0 && ev.userId !== userData.id)
+                ev.color = "#3d454c";
+            else if (ev.status !== 0 && ev.userId !== userData.id)
+                ev.color = "#8798a8";
+
             return true;
         }));
         scheduler.load("meeting/", "json");

@@ -1,15 +1,15 @@
-var meetingDetailsView={
+var meetingDetailsView = {
 
-    addEditMeetingDialog:{
+    addEditMeetingDialog: {
         view: "popup",
         id: "addEditMeetingDialog",
         modal: true,
         position: "center",
-        body:{
-            rows:[
+        body: {
+            rows: [
                 {
-                    view:"toolbar",
-                    cols:[
+                    view: "toolbar",
+                    cols: [
                         {
                             view: "label",
                             label: "<span class='webix_icon fa fa-calendar'></span> Rezervacija sale",
@@ -26,24 +26,40 @@ var meetingDetailsView={
                     ]
                 },
                 {
-                    cols:[
+                    cols: [
                         {
                             //basic info
-                            rows:[
+                            rows: [
                                 {
-                                    view:"form",
-                                    id:"addEditMeetingForm",
-                                    width:500,
+                                    view: "form",
+                                    id: "addEditMeetingForm",
+                                    width: 500,
                                     elementsConfig: {
                                         labelWidth: 150,
                                         bottomPadding: 18
                                     },
-                                    elements:[
+                                    elements: [
+                                        {
+                                            view: "text",
+                                            id: "id",
+                                            name: "id",
+                                            hidden: true,
+
+                                        },
+                                        {
+                                            view: "text",
+                                            id: "userId",
+                                            name: "userId",
+                                            hidden: true,
+
+                                        },
                                         {
                                             view: "text",
                                             id: "topic",
                                             name: "topic",
                                             label: "Tema:",
+
+
                                             invalidMessage: "Unesite temu!",
                                             required: true
                                         },
@@ -76,24 +92,24 @@ var meetingDetailsView={
                                             required: true
                                         }
                                     ],
-                                    rules:{
-                                        "startTime":function (value) {
+                                    rules: {
+                                        "startTime": function (value) {
                                             if (!value) {
                                                 $$('addEditMeetingForm').elements.startTime.config.invalidMessage = 'Unesite vrijeme početka!';
                                                 return false;
                                             }
-                                            if (value<new Date()){
+                                            if (value < new Date()) {
                                                 $$('addEditMeetingForm').elements.startTime.config.invalidMessage = 'Vrijeme početka ne smije biti u prošlosti!';
                                                 return false;
                                             }
-                                                return true;
+                                            return true;
                                         },
-                                        "endTime":function (value) {
+                                        "endTime": function (value) {
                                             if (!value) {
                                                 $$('addEditMeetingForm').elements.endTime.config.invalidMessage = 'Unesite vrijeme završetka!';
                                                 return false;
                                             }
-                                            if (value<$$("startTime").getValue()){
+                                            if (value < $$("startTime").getValue()) {
                                                 $$('addEditMeetingForm').elements.endTime.config.invalidMessage = 'Vrijeme završetka ne smije biti prije vremena početka!';
                                                 return false;
                                             }
@@ -102,8 +118,8 @@ var meetingDetailsView={
                                     }
                                 },
                                 {
-                                    view:"toolbar",
-                                    cols:[
+                                    view: "toolbar",
+                                    cols: [
                                         {
                                             view: "label",
                                             label: "<span class='webix_icon fa fa-file'></span> Dokumenti",
@@ -113,7 +129,7 @@ var meetingDetailsView={
                                         {
                                             view: "uploader",
                                             id: "documentUploader",
-                                            label:"Dodajte",
+                                            label: "Dodajte",
                                             on: {
                                                 onBeforeFileAdd: function (upload) {
                                                     var file = upload.file;
@@ -124,6 +140,7 @@ var meetingDetailsView={
                                                             name: file['name'],
                                                             content: event.target.result.split("base64,")[1],
                                                             report: 0,
+                                                            newEntry: true
                                                         };
                                                         $$("documentList").add(newDocument);
                                                     };
@@ -159,37 +176,38 @@ var meetingDetailsView={
                         {
                             //participants
                             view: "tabview",
-                            width:350,
-                            cells:[
+                            width: 350,
+                            cells: [
                                 {
-                                    header:"<span class='webix_icon fa fa-user'/> Učesnici",
-                                    rows:[
+                                    header: "<span class='webix_icon fa fa-user'/> Učesnici",
+                                    rows: [
                                         {
-                                            view:"toolbar",
-                                            cols:[
+                                            view: "toolbar",
+                                            id: "participantToolbar",
+                                            cols: [
                                                 {
-                                                    view:"combo",
-                                                    id:"participantSearchInput"
+                                                    view: "combo",
+                                                    id: "participantSearchInput"
                                                 },
                                                 {
                                                     id: "addParticipantBtn",
                                                     view: "button",
                                                     type: "iconButton",
-                                                    hotkey:"enter",
+                                                    hotkey: "enter",
                                                     icon: "plus-circle",
-                                                    click:"meetingDetailsView.addParticipant();",
+                                                    click: "meetingDetailsView.addParticipant();",
 
                                                     width: 36
                                                 }
                                             ]
                                         },
                                         {
-                                            id:"participantList",
-                                            view:"list",
+                                            id: "participantList",
+                                            view: "list",
                                             css: "relative",
                                             template: function (obj) {
                                                 if (obj.newEntry)
-                                                    return obj.value+"<span class='delete-file'><span class='webix fa fa-close'/></span>";
+                                                    return obj.value + "<span class='delete-file'><span class='webix fa fa-close'/></span>";
                                                 else return obj.value;
                                             },
                                             onClick: {
@@ -205,33 +223,34 @@ var meetingDetailsView={
                                     ]
                                 },
                                 {
-                                    header:"<span class='webix_icon fa fa-users'/> Grupe",
-                                    rows:[
+                                    header: "<span class='webix_icon fa fa-users'/> Grupe",
+                                    rows: [
                                         {
-                                            view:"toolbar",
-                                            cols:[
+                                            view: "toolbar",
+                                            id: "groupToolbar",
+                                            cols: [
                                                 {
-                                                    view:"combo",
-                                                    id:"groupSearchInput"
+                                                    view: "combo",
+                                                    id: "groupSearchInput"
                                                 },
                                                 {
                                                     id: "addGroupBtn",
                                                     view: "button",
-                                                    hotkey:"enter",
+                                                    hotkey: "enter",
                                                     type: "iconButton",
-                                                    click:"meetingDetailsView.addGroup();",
+                                                    click: "meetingDetailsView.addGroup();",
                                                     icon: "plus-circle",
                                                     width: 36
                                                 }
                                             ]
                                         },
                                         {
-                                            id:"groupList",
-                                            view:"list",
-                                            css:"relative",
+                                            id: "groupList",
+                                            view: "list",
+                                            css: "relative",
                                             template: function (obj) {
                                                 if (obj.newEntry)
-                                                    return obj.value+"<span class='delete-file'><span class='webix fa fa-close'/></span>";
+                                                    return obj.value + "<span class='delete-file'><span class='webix fa fa-close'/></span>";
                                                 else return obj.value;
                                             },
                                             onClick: {
@@ -246,33 +265,34 @@ var meetingDetailsView={
                                     ]
                                 },
                                 {
-                                    header:"<span class='webix_icon fa fa-envelope'/> Ostali",
-                                    rows:[
+                                    header: "<span class='webix_icon fa fa-envelope'/> Ostali",
+                                    rows: [
                                         {
-                                            view:"toolbar",
-                                            cols:[
+                                            view: "toolbar",
+                                            id: "otherToolbar",
+                                            cols: [
                                                 {
-                                                    view:"text",
-                                                    id:"otherSearchInput"
+                                                    view: "text",
+                                                    id: "otherSearchInput"
                                                 },
                                                 {
                                                     id: "addOtherBtn",
                                                     view: "button",
-                                                    hotkey:"enter",
+                                                    hotkey: "enter",
                                                     type: "iconButton",
                                                     icon: "plus-circle",
                                                     width: 36,
-                                                    click:"meetingDetailsView.addOther();"
+                                                    click: "meetingDetailsView.addOther();"
                                                 }
                                             ]
                                         },
                                         {
-                                            id:"otherList",
-                                            view:"list",
-                                            css:"relative",
+                                            id: "otherList",
+                                            view: "list",
+                                            css: "relative",
                                             template: function (obj) {
                                                 if (obj.newEntry)
-                                                    return obj.value+"<span class='delete-file'><span class='webix fa fa-close'/></span>";
+                                                    return obj.value + "<span class='delete-file'><span class='webix fa fa-close'/></span>";
                                                 else return obj.value;
                                             },
                                             onClick: {
@@ -289,11 +309,11 @@ var meetingDetailsView={
                     ]
                 },
                 {
-                    view:"toolbar",
-                    cols:[
+
+                    cols: [
                         {
                             view: "label",
-                            id:"authorNameLbl",
+                            id: "authorNameLbl",
                             label: "Autor:",
                             width: 400
                         },
@@ -305,7 +325,15 @@ var meetingDetailsView={
                             type: "iconButton",
                             label: "Dodajte sastanak",
                             icon: "plus-circle",
-                            click:"meetingDetailsView.addMeeting();",
+                            click: "meetingDetailsView.addMeeting();",
+                            autowidth: true
+                        },
+                        {
+                            hotkey: 'enter',
+                            id: "editMeetingBtn",
+                            view: "button",
+                            label: "Sačuvajte",
+                            click: "meetingDetailsView.saveEditedMeeting();",
                             autowidth: true
                         }
                     ]
@@ -315,27 +343,30 @@ var meetingDetailsView={
     },
 
 
-    showAddDialog:function(date) {
+    showAddDialog: function (date) {
         var dialog = webix.copy(meetingDetailsView.addEditMeetingDialog);
 
         webix.ui(dialog).show();
+        meetingDetailsView.nonParticipantsUser = [];
+        meetingDetailsView.nonParticipantsGroup = [];
+        $$("editMeetingBtn").hide();
         $$("authorNameLbl").setValue("Autor: " + userData.firstName + " " + userData.lastName);
         $$("startTime").setValue(date);
         $$("endTime").setValue(new Date(date.getTime() + 60000));
-        webix.ajax().get("user").then(function(result){
-            var userArray=JSON.parse(result.text());
-            for (var i=0;i<userArray.length;i++){
-                var user=userArray[i];
-                if (user.id!=userData.id)
-                meetingDetailsView.nonParticipantsUser.push({
-                    id:user.id,
-                    value:user.firstName+' '+user.lastName
-                });
+        webix.ajax().get("user").then(function (result) {
+            var userArray = JSON.parse(result.text());
+            for (var i = 0; i < userArray.length; i++) {
+                var user = userArray[i];
+                if (user.id != userData.id)
+                    meetingDetailsView.nonParticipantsUser.push({
+                        id: user.id,
+                        value: user.firstName + ' ' + user.lastName
+                    });
             }
             $$("participantSearchInput").define("options", meetingDetailsView.nonParticipantsUser);
             $$("participantSearchInput").refresh();
         });
-        webix.ajax().get("user-group").then(function(result) {
+        webix.ajax().get("user-group").then(function (result) {
             var groupArray = JSON.parse(result.text());
             for (var i = 0; i < groupArray.length; i++) {
                 var group = groupArray[i];
@@ -344,27 +375,144 @@ var meetingDetailsView={
                     value: group.name
                 });
             }
-            $$("groupSearchInput").define("options",meetingDetailsView.nonParticipantsGroup);
+            $$("groupSearchInput").define("options", meetingDetailsView.nonParticipantsGroup);
             $$("groupSearchInput").refresh();
         });
+
     },
 
+    showEditDialog: function (eventId) {
+        if (Date.parse(scheduler.getEvent(eventId).start_date) < Date.now()) {
+            util.messages.showErrorMessage("Nije moguće izmijeniti događaj koji je prošao.");
+            return;
+        }
+        meetingDetailsView.nonParticipantsUser = [];
+        meetingDetailsView.nonParticipantsGroup = [];
+        webix.ui(webix.copy(meetingDetailsView.addEditMeetingDialog)).show();
+        $$("addMeetingBtn").hide();
+        var meeting = scheduler.getEvent(eventId);
+        var form = $$("addEditMeetingForm");
+        form.elements.id.setValue(meeting.id);
+        form.elements.userId.setValue(meeting.userId);
+        form.elements.topic.setValue(meeting.text);
+        form.elements.startTime.setValue(meeting.start_date);
+        form.elements.endTime.setValue(meeting.end_date);
+        form.elements.description.setValue(meeting.description);
+        webix.ajax().get("meeting/full/" + eventId).then(function (result) {
+            var text = result.text();
+            if (text) {
+                var meetingObject = JSON.parse(text);
+                $$("authorNameLbl").setValue("Autor: " + meetingObject['author'].firstName + " " + meetingObject['author'].lastName);
+                meetingObject['documents'].forEach(function (obj) {
+                    $$("documentList").add(obj);
+                });
+                meetingObject['participantsUser'].forEach(function (obj) {
+                    $$("participantList").add({value: obj.firstName + " " + obj.lastName});
+                });
+                meetingObject['participantsGroup'].forEach(function (obj) {
+                    $$("groupList").add({value: obj.name});
+                });
+                meetingObject['participantsOther'].forEach(function (obj) {
+                    $$("otherList").add({value: obj});
+                });
 
+            }
+        }).fail(function (err) {
+            util.messages.showErrorMessage(err.responseText);
+        });
+        webix.ajax().get("user/nonParticipantsFor/" + eventId).then(function (result) {
+            if (result.text()) {
+                var nonParticipants = JSON.parse(result.text());
+                nonParticipants.forEach(function (user) {
+                    meetingDetailsView.nonParticipantsUser.push({
+                        id: user.id,
+                        value: user.firstName + ' ' + user.lastName
+                    });
+                });
+                $$("participantSearchInput").define("options", meetingDetailsView.nonParticipantsUser);
+                $$("participantSearchInput").refresh();
+            }
+        });
+        webix.ajax().get("user-group/nonParticipantsFor/" + eventId).then(function (result) {
+            var groupArray = JSON.parse(result.text());
+            for (var i = 0; i < groupArray.length; i++) {
+                var group = groupArray[i];
+                meetingDetailsView.nonParticipantsGroup.push({
+                    id: group.id,
+                    value: group.name
+                });
+            }
+            $$("groupSearchInput").define("options", meetingDetailsView.nonParticipantsGroup);
+            $$("groupSearchInput").refresh();
+        });
 
+    },
 
-    addOther:function(){
-        var newEmail=$$("otherSearchInput").getValue();
-        if (newEmail){
-            if (webix.rules.isEmail(newEmail)){
-                var newObject={
-                    value:newEmail,
-                    newEntry:true
+    showEventInfo: function (eventId) {
+        webix.ui(webix.copy(meetingDetailsView.addEditMeetingDialog)).show();
+        $$("addMeetingBtn").hide();
+        $$("editMeetingBtn").hide();
+        $$("documentUploader").hide();
+        $$("participantToolbar").hide();
+        $$("groupToolbar").hide();
+        $$("otherToolbar").hide();
+        $$("documentList").define("template", "<div class='list-name'>#name#</div>");
+        $$("documentList").refresh();
+
+        var meeting = scheduler.getEvent(eventId);
+        var form = $$("addEditMeetingForm");
+        var $object = form.elements;
+        for (var key in $object) {
+            var $el = $object[key];
+            $el.define("readonly", "true")
+            $el.define("required", false);
+            $el.refresh()
+            //el  - webix view
+        }
+
+        form.elements.id.setValue(meeting.id);
+        form.elements.userId.setValue(meeting.userId);
+        form.elements.topic.setValue(meeting.text);
+        form.elements.startTime.setValue(meeting.start_date);
+        form.elements.endTime.setValue(meeting.end_date);
+        form.elements.description.setValue(meeting.description);
+        webix.ajax().get("meeting/full/" + eventId).then(function (result) {
+            var text = result.text();
+            if (text) {
+                var meetingObject = JSON.parse(text);
+                $$("authorNameLbl").setValue("Autor: " + meetingObject['author'].firstName + " " + meetingObject['author'].lastName);
+                meetingObject['documents'].forEach(function (obj) {
+                    $$("documentList").add(obj);
+                });
+                meetingObject['participantsUser'].forEach(function (obj) {
+                    $$("participantList").add({value: obj.firstName + " " + obj.lastName});
+                });
+                meetingObject['participantsGroup'].forEach(function (obj) {
+                    $$("groupList").add({value: obj.name});
+                });
+                meetingObject['participantsOther'].forEach(function (obj) {
+                    $$("otherList").add({value: obj});
+                });
+
+            }
+        }).fail(function (err) {
+            util.messages.showErrorMessage(err.responseText);
+        });
+
+    },
+    addOther: function () {
+        var newEmail = $$("otherSearchInput").getValue();
+        if (newEmail) {
+            if (webix.rules.isEmail(newEmail)) {
+                var newObject = {
+                    value: newEmail,
+                    newEntry: true
                 };
-                var uniqueEmail=true;
+                var uniqueEmail = true;
                 $$("otherList").data.each(function (obj) {
-                    if (obj.value==newEmail){
+                    if (obj.value == newEmail) {
                         util.messages.showErrorMessage("E-mail već postoji!");
-                        uniqueEmail=false;
+                        uniqueEmail = false;
                         return;
                     }
                 });
@@ -373,65 +521,65 @@ var meetingDetailsView={
                     $$("otherSearchInput").setValue("");
                 }
                 return;
-            }else{
+            } else {
                 util.messages.showErrorMessage("E-mail nije validan!");
                 return;
             }
         }
     },
 
-    addParticipant:function(){
-        var input=$$("participantSearchInput").getInputNode().value;
-        if (input && checkIfValueIsInArray(meetingDetailsView.nonParticipantsUser,input)){
-            var index=getIndexByValue(meetingDetailsView.nonParticipantsUser,input);
-            var objectToAdd=meetingDetailsView.nonParticipantsUser.splice(index,1)[0];
+    addParticipant: function () {
+        var input = $$("participantSearchInput").getInputNode().value;
+        if (input && checkIfValueIsInArray(meetingDetailsView.nonParticipantsUser, input)) {
+            var index = getIndexByValue(meetingDetailsView.nonParticipantsUser, input);
+            var objectToAdd = meetingDetailsView.nonParticipantsUser.splice(index, 1)[0];
             $$("participantSearchInput").define("options", meetingDetailsView.nonParticipantsUser);
             $$("participantSearchInput").refresh();
-            objectToAdd.newEntry=true;
+            objectToAdd.newEntry = true;
             $$("participantList").add(objectToAdd);
 
         }
 
     },
-    addGroup:function(){
-        var input=$$("groupSearchInput").getInputNode().value;
-        if (input && checkIfValueIsInArray(meetingDetailsView.nonParticipantsGroup,input)){
-            var index=getIndexByValue(meetingDetailsView.nonParticipantsGroup,input);
-            var objectToAdd=meetingDetailsView.nonParticipantsGroup.splice(index,1)[0];
+    addGroup: function () {
+        var input = $$("groupSearchInput").getInputNode().value;
+        if (input && checkIfValueIsInArray(meetingDetailsView.nonParticipantsGroup, input)) {
+            var index = getIndexByValue(meetingDetailsView.nonParticipantsGroup, input);
+            var objectToAdd = meetingDetailsView.nonParticipantsGroup.splice(index, 1)[0];
             $$("groupSearchInput").define("options", meetingDetailsView.nonParticipantsGroup);
             $$("groupSearchInput").refresh();
-            objectToAdd.newEntry=true;
+            objectToAdd.newEntry = true;
             $$("groupList").add(objectToAdd);
         }
 
     },
 
-    addMeeting:function(){
-        var form=$$("addEditMeetingForm");
-        if (form.validate()){
+    addMeeting: function () {
+        var form = $$("addEditMeetingForm");
+        if (form.validate()) {
 
-            var participants=[];
-            $$("participantList").data.each(function(obj){
+            var participants = [];
+            $$("participantList").data.each(function (obj) {
                 participants.push({
-                    userId:obj.id,
-                    companyId:companyData.id
+                    userId: obj.id,
+                    companyId: companyData.id
                 });
             });
             $$("groupList").data.each(function (obj) {
                 participants.push({
-                    userGroupId:obj.id,
-                    companyId:companyData.id
+                    userGroupId: obj.id,
+                    companyId: companyData.id
                 });
             });
             $$("otherList").data.each(function (obj) {
                 participants.push({
-                    email:obj.value,
-                    companyId:companyData.id
+                    email: obj.value,
+                    companyId: companyData.id
                 });
             });
-            var documents=[];
+            var documents = [];
             $$("documentList").data.each(function (obj) {
-                obj.id=null;
+                obj.id = null;
                 documents.push(obj);
             });
             var newMeeting = {
@@ -442,7 +590,7 @@ var meetingDetailsView={
                 status: 0,
                 companyId: companyData.id,
                 userId: userData.id,
-                roomId: meetingView.roomId.id
+                roomId: meetingView.room.id
             };
 
             var meetingParticipantsDocuments = {
@@ -453,13 +601,13 @@ var meetingDetailsView={
 
             webix.ajax().headers({
                 "Content-type": "application/json"
-            }).post("meeting/full",JSON.stringify(meetingParticipantsDocuments)).then(function(result){
-                var resultText=result.text();
-                if (resultText){
+            }).post("meeting/full", JSON.stringify(meetingParticipantsDocuments)).then(function (result) {
+                var resultText = result.text();
+                if (resultText) {
                     newMeeting.id = result.json()['meeting'].id;
                     scheduler.addEvent(newMeeting);
                     util.messages.showMessage("Uspješno kreirana rezervacija.");
-                }else{
+                } else {
                     util.messages.showErrorMessage("Neuspješno kreiranje rezervacije.");
                 }
 
@@ -469,22 +617,98 @@ var meetingDetailsView={
             util.dismissDialog('addEditMeetingDialog');
         }
     },
-    nonParticipantsUser:[],
-    nonParticipantsGroup:[]
+
+    saveEditedMeeting: function () {
+        var form = $$("addEditMeetingForm");
+        var id = form.elements.id.getValue();
+        if (form.validate()) {
+
+            var participants = [];
+            $$("participantList").data.each(function (obj) {
+                if (obj.newEntry) {
+                    participants.push({
+                        userId: obj.id,
+                        companyId: companyData.id
+                    });
+                }
+            });
+            $$("groupList").data.each(function (obj) {
+                if (obj.newEntry) {
+                    participants.push({
+                        userGroupId: obj.id,
+                        companyId: companyData.id
+                    });
+                }
+            });
+            $$("otherList").data.each(function (obj) {
+                if (obj.newEntry) {
+                    participants.push({
+                        email: obj.value,
+                        companyId: companyData.id
+                    });
+                }
+            });
+            var documents = [];
+            $$("documentList").data.each(function (obj) {
+                if (obj.newEntry) {
+                    obj.id = null;
+                }
+                documents.push(obj);
+            });
+
+            var editedMeeting = {
+                id: id,
+                start_date: formatter(form.getValues().startTime),
+                end_date: formatter(form.getValues().endTime),
+                description: form.getValues().description,
+                text: form.getValues().topic,
+                status: 0,
+                companyId: companyData.id,
+                userId: form.getValues().userId,
+                roomId: meetingView.room.id
+            };
+
+            var meetingParticipantsDocuments = {
+                "meeting": editedMeeting,
+                "participants": participants,
+                "documents": documents
+            };
+
+            webix.ajax().headers({
+                "Content-type": "application/json"
+            }).put("meeting/full/" + id, JSON.stringify(meetingParticipantsDocuments)).then(function (result) {
+                var resultText = result.text();
+                if (resultText) {
+                    scheduler.deleteEvent(id);
+                    scheduler.addEvent(editedMeeting);
+                    util.messages.showMessage("Uspješna izmjena rezervacija.");
+
+                } else {
+                    util.messages.showErrorMessage("Neuspješa izmjena rezervacije!");
+                }
+
+            }).fail(function (err) {
+                util.messages.showErrorMessage(err.responseText);
+            });
+            util.dismissDialog('addEditMeetingDialog');
+        }
+    },
+    nonParticipantsUser: [],
+    nonParticipantsGroup: []
 
 
 };
 
-function checkIfValueIsInArray(array,value){
-    for(var i=0;i<array.length;i++)
-        if (array[i].value===value)
+function checkIfValueIsInArray(array, value) {
+    for (var i = 0; i < array.length; i++)
+        if (array[i].value === value)
             return true;
-        return false;
+    return false;
 }
 
-function getIndexByValue(array,value){
-    for(var i=0;i<array.length;i++)
-        if (array[i].value===value)
+function getIndexByValue(array, value) {
+    for (var i = 0; i < array.length; i++)
+        if (array[i].value === value)
             return i;
     return -1;
 }
