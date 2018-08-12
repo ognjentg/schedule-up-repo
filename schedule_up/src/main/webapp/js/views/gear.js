@@ -109,7 +109,7 @@ var gearView = {
         var panelCopy = webix.copy(this.panel);
 
         $$("main").addView(webix.copy(panelCopy));
-        connection.attachAjaxEvents("gearDT", "gear-unit", true);
+        connection.attachAjaxEvents("gearDT", "gear-unit", true, true, editValidationRules);
         $$("gearDT").detachEvent("onBeforeDelete");
 
         webix.ui({
@@ -412,3 +412,8 @@ var gearView = {
         }
     }
 };
+var editValidationRules = [
+    {column: "name", rule: "isEmpty"},
+    {column: "name", rule: "checkLength"},
+    {column: "inventoryNumber", rule: "isEmpty"}
+];
