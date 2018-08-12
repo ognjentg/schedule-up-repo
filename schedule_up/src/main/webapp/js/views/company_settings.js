@@ -170,7 +170,7 @@ var companySettingsView = {
                                                 break;
                                             }
                                             case "1 dan": {
-                                                newReminderTime = "24:00:00";
+                                                newReminderTime = "23:59:59";
                                                 break;
                                             }
                                         }
@@ -233,7 +233,7 @@ var companySettingsView = {
                                                 break;
                                             }
                                             case "1 dan": {
-                                                newCancelTime = "24:00:00";
+                                                newCancelTime = "23:59:59";
                                                 break;
                                             }
                                         }
@@ -509,8 +509,8 @@ var companySettingsView = {
                             time = "12 sati";
                             break;
                         }
-                        case "24:00:00": {
-                            time = "1 dan ";
+                        case "23:59:59": {
+                            time = "1 dan";
                             break;
                         }
 
@@ -541,7 +541,7 @@ var companySettingsView = {
                             cancelTime = "12 sati";
                             break;
                         }
-                        case "24:00:00": {
+                        case "23:59:59": {
                             cancelTime = "1 dan";
                             break;
                         }

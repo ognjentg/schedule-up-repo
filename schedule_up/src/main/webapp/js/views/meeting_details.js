@@ -382,7 +382,7 @@ var meetingDetailsView = {
     },
 
     showEditDialog: function (eventId) {
-        if (Date.parse(scheduler.getEvent(eventId).start_date) < Date.now()) {
+        if (Date.parse(scheduler.getEvent(eventId).end_date) < Date.now()) {
             util.messages.showErrorMessage("Nije moguće izmijeniti događaj koji je prošao.");
             return;
         }
