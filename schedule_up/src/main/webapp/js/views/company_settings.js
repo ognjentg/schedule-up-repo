@@ -8,9 +8,7 @@ var companySettingsView = {
     panel: {
         id: "settingsPanel",
         adjust: true,
-
         cols: [
-
             {
                 rows: [
                     {
@@ -182,8 +180,6 @@ var companySettingsView = {
                                         connection.sendAjax("PUT", "settings/" + companySettingsView.settings.id,
                                             function (text, data, xhr) {
                                                 if (text && text == "Success") {
-                                                    util.messages.showMessage("Uspješno ste izmjenili podsjetnik");
-
                                                 } else {
                                                     companySettingsView.settings.reminderTime = oldValue;
                                                     util.messages.showErrorMessage("Greška pri izmjeni.");
@@ -246,8 +242,6 @@ var companySettingsView = {
                                         connection.sendAjax("PUT", "settings/" + companySettingsView.settings.id,
                                             function (text, data, xhr) {
                                                 if (text && text == "Success") {
-                                                    util.messages.showMessage("Uspješno ste izmjenili minimalno vrijeme otkazivanja.");
-
                                                 } else {
                                                     companySettingsView.settings.cancelTime = oldValue;
                                                     util.messages.showErrorMessage("Greška pri izmjeni.");
@@ -551,7 +545,6 @@ var companySettingsView = {
                             cancelTime = "1 dan";
                             break;
                         }
-
                     }
                     $$("reminderTime").setValue(time);
                     $$("cancelTime").setValue(cancelTime);
