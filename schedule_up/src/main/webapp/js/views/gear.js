@@ -34,7 +34,7 @@ var gearView = {
                 fillspace: true
             }, {
                 id: "name",
-                editable: false,
+                editable: true,
                 fillspace: true,
                 tooltip: false,
                 editor: "text",
@@ -49,7 +49,7 @@ var gearView = {
                 fillspace: true,
                 editor: "text",
                 sort: "text",
-                editable: false,
+                editable: true,
                 adjust: "data",
                 header: [
                     "Opis", {
@@ -62,7 +62,7 @@ var gearView = {
                 editor: "text",
                 sort: "text",
                 tooltip: false,
-                editable: false,
+                editable: true,
                 adjust: "data",
                 header: [
                     "Inventarski broj", {
@@ -90,7 +90,8 @@ var gearView = {
             select: "row",
             tooltip: true,
             navigation: true,
-            editable: false,
+            editable: true,
+            editaction: "dblclick",
             url: "gear-unit/",
             on: {
 

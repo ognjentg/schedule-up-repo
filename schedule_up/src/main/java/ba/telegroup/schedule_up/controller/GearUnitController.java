@@ -89,13 +89,13 @@ public class GearUnitController extends GenericController<GearUnit, Integer> {
     }
 
     @Transactional
-    @RequestMapping(value = "/custom/", method = RequestMethod.PUT)
+    @RequestMapping(value = "/custom/{id}", method = RequestMethod.PUT)
     public @ResponseBody
     GearUnitGear updateExtended(@RequestBody GearUnitGear gearUnitGear) throws BadRequestException {
         if(Validator.stringMaxLength(gearUnitGear.getName(),100)) {
             if(Validator.stringMaxLength(gearUnitGear.getDescription(), 500)) {
                 if(Validator.stringMaxLength(gearUnitGear.getInventoryNumber(), 100)) {
-                    if(gearUnitRepository.countAllByCompanyIdAndInventoryNumber(userBean.getUser().getCompanyId(),gearUnitGear.getInventoryNumber()).compareTo(Integer.valueOf(0))==0){
+                    if(gearUnitRepository.getGearUnitById(gearUnitGear.getId()).getInventoryNumber().equals(gearUnitGear.getInventoryNumber()) || gearUnitRepository.countAllByCompanyIdAndInventoryNumber(userBean.getUser().getCompanyId(),gearUnitGear.getInventoryNumber()).compareTo(Integer.valueOf(0))==0){
                         return gearUnitRepository.updateExtended(gearUnitGear);
                     }
                     throw new BadRequestException(badRequestInventoryNumberExists);
