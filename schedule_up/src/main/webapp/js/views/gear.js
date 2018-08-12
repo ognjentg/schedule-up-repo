@@ -72,7 +72,6 @@ var gearView = {
             }, {
                 id: "available",
                 fillspace: true,
-                editor: "text",
                 tooltip: false,
                 sort: "text",
                 editable: false,
