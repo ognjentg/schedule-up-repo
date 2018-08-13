@@ -277,7 +277,7 @@ var gearView = {
                 inventoryNumber: $$("changeGearForm").getValues().inventoryNumber
             };
 
-            connection.sendAjax("PUT", "gear-unit/custom/",
+            connection.sendAjax("PUT", "gear-unit/custom/"+oldItem.id,
                 function (text, data, xhr) {
                     if (text) {
                         util.messages.showMessage("Podaci su uspješno izmijenjeni.");
@@ -285,8 +285,8 @@ var gearView = {
                         $$("gearDT").updateItem(newItem.id, newItem);
                     } else
                         util.messages.showErrorMessage("Podaci nisu izmijenjeni.");
-                }, function () {
-                    util.messages.showErrorMessage("Podaci nisu izmijenjeni.");
+                }, function (text, data, xhr) {
+                    util.messages.showErrorMessage(text);
                 }, newItem);
 
             util.dismissDialog('changeGearDialog');
