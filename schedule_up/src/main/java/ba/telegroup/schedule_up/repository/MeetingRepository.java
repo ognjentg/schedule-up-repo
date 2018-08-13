@@ -3,6 +3,9 @@ package ba.telegroup.schedule_up.repository;
 import ba.telegroup.schedule_up.model.Meeting;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+
+import java.sql.Date;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -23,4 +26,6 @@ public interface MeetingRepository extends JpaRepository<Meeting,Integer>{
     @Query(value ="(SELECT distinct t.email as type FROM  participant p  left join user_group_has_user u on p.user_group_id=u.user_group_id left join user t on t.id=u.user_id or p.user_id=t.id " +
             "where p.deleted=0 and p.meeting_id=?1 and  t.id is not null) union (select distinct email from participant where email is not null and meeting_id=?1 and deleted=0);",nativeQuery = true)
     List<String> getEmailsForMeeting(Integer meetingId);
+
+
 }

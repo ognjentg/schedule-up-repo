@@ -243,4 +243,5 @@ public class CompanyController extends GenericController<Company, Integer> {
         }
         throw new BadRequestException(badRequestDelete);
     }
+
 }

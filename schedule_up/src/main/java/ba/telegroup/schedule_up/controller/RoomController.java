@@ -1,13 +1,11 @@
 package ba.telegroup.schedule_up.controller;
 
 import ba.telegroup.schedule_up.common.exceptions.BadRequestException;
+import ba.telegroup.schedule_up.common.exceptions.ForbiddenException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.model.*;
 import ba.telegroup.schedule_up.model.modelCustom.RoomBuilding;
-import ba.telegroup.schedule_up.repository.BuildingRepository;
-import ba.telegroup.schedule_up.repository.GearUnitRepository;
-import ba.telegroup.schedule_up.repository.RoomHasGearUnitRepository;
-import ba.telegroup.schedule_up.repository.RoomRepository;
+import ba.telegroup.schedule_up.repository.*;
 import ba.telegroup.schedule_up.repository.repositoryCustom.GearUnitRepositoryCustom;
 import ba.telegroup.schedule_up.util.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +18,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.sql.Timestamp;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @RequestMapping(value = "/room")
@@ -31,6 +33,8 @@ public class RoomController extends GenericController<Room, Integer> {
     private final RoomHasGearUnitRepository roomHasGearUnitRepository;
     private final GearUnitRepository gearUnitRepository;
     private final BuildingRepository buildingRepository;
+    private final MeetingRepository meetingRepository;
+    private final CompanyRepository companyRepository;
 
     @Value("${badRequest.alreadyTaken}")
     private String badRequestAlreadyTaken;
@@ -56,18 +60,23 @@ public class RoomController extends GenericController<Room, Integer> {
     @Value("${badRequest.stringMaxLength}")
     private String badRequestStringMaxLength;
 
+    @Value("${badRequest.dateTimeCompare}")
+    private String badRequestDateTimeCompare;
+
     @PersistenceContext
     private EntityManager entityManager;
 
 
 
     @Autowired
-    public RoomController(RoomRepository roomRepository, RoomHasGearUnitRepository roomHasGearUnitRepository, GearUnitRepository gearUnitRepository, BuildingRepository buildingRepository) {
+    public RoomController(RoomRepository roomRepository, RoomHasGearUnitRepository roomHasGearUnitRepository, GearUnitRepository gearUnitRepository, BuildingRepository buildingRepository, MeetingRepository meetingRepository, CompanyRepository companyRepository) {
         super(roomRepository);
         this.roomRepository = roomRepository;
         this.roomHasGearUnitRepository = roomHasGearUnitRepository;
         this.gearUnitRepository = gearUnitRepository;
         this.buildingRepository = buildingRepository;
+        this.meetingRepository = meetingRepository;
+        this.companyRepository = companyRepository;
     }
 
     @Override
@@ -217,4 +226,32 @@ public class RoomController extends GenericController<Room, Integer> {
         throw new BadRequestException(badRequestStringMaxLength.replace("{tekst}", "naziva").replace("{broj}", String.valueOf(100)));
     }
 
+    //metoda koja vraca postotak zauzetosti neke sale u datom periodu u odnosu na ukupno radno vrijeme u tom periodu
+    @RequestMapping(value = "getOccupancy/{roomId}/{dateFrom}/{dateTo}", method = RequestMethod.GET)
+    public @ResponseBody
+    double getPercentageOfRoomOccupancy(@PathVariable Integer roomId, @PathVariable java.sql.Date dateFrom, @PathVariable java.sql.Date dateTo) throws BadRequestException, ForbiddenException {
+        Room room = roomRepository.getRoomById(roomId);
+        if(Validator.dateCompare(dateFrom, dateTo) == 1)
+            throw new BadRequestException(badRequestDateTimeCompare);
+
+        List<Integer> idsOfMeetingsInThisPeriod = meetingRepository.getIdsOfMeetingsBetween(new Timestamp(dateFrom.getTime()), new Timestamp(dateTo.getTime()), roomId);
+        List<Meeting> meetingsInThisPeriod = new ArrayList<>();
+        for(Integer meetingId : idsOfMeetingsInThisPeriod){
+            Meeting meeting = meetingRepository.findById(meetingId).orElse(null);
+            if(meeting != null)
+                meetingsInThisPeriod.add(meeting);
+        }
+        if(room != null){
+            Company company = companyRepository.getById(room.getCompanyId());
+            long companyWorkTime = companyRepository.getCompanyWorkTimeAsMillis(company, dateFrom, dateTo);
+
+            long meetingsDuration = 0;
+
+            for(Meeting meeting : meetingsInThisPeriod){
+                meetingsDuration += (meeting.getEndTime().getTime() - meeting.getStartTime().getTime());
+            }
+            return (double)(meetingsDuration*100)/companyWorkTime;
+        }else
+            throw new BadRequestException(badRequestNoRoom);
+    }
 }

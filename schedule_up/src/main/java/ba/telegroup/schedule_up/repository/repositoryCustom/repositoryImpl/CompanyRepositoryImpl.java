@@ -5,11 +5,15 @@ import ba.telegroup.schedule_up.model.User;
 import ba.telegroup.schedule_up.model.modelCustom.CompanyUser;
 import ba.telegroup.schedule_up.repository.UserRepository;
 import ba.telegroup.schedule_up.repository.repositoryCustom.CompanyRepositoryCustom;
+import ba.telegroup.schedule_up.util.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
+import java.sql.Date;
 import java.sql.Time;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.List;
 
 public class CompanyRepositoryImpl implements CompanyRepositoryCustom {
@@ -57,5 +61,23 @@ public class CompanyRepositoryImpl implements CompanyRepositoryCustom {
             ex.printStackTrace();
             return null;
         }
+    }
+
+    @Override
+    public long getCompanyWorkTimeAsMillis(Company company, Date dateFrom, Date dateTo){
+        if(company != null){
+            long dailyWorkTime = company.getTimeTo().getTime() - company.getTimeFrom().getTime();
+
+            LocalDate localDateFrom = dateFrom.toLocalDate();
+            LocalDate localDateTo = dateTo.toLocalDate();
+
+            int counterOfWorkingDays = 0;
+            for(LocalDate date = localDateFrom; localDateTo.isAfter(date); date = date.plusDays(1) ){
+                if(!date.getDayOfWeek().equals(DayOfWeek.SATURDAY) && !date.getDayOfWeek().equals(DayOfWeek.SUNDAY))
+                    counterOfWorkingDays++;
+            }
+            return counterOfWorkingDays*dailyWorkTime;
+        } else
+            return 0;
     }
 }

@@ -59,7 +59,7 @@ public class Room {
     }
 
     @Basic
-    @Column(name = "pin", nullable = false)
+    @Column(name = "pin", nullable = true)
     public byte[] getPin() {
         return pin;
     }
