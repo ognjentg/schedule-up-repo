@@ -91,6 +91,15 @@ public class MeetingController extends GenericController<Meeting, Integer> {
         this.userGroupRepository = userGroupRepository;
     }
 
+    @ModelAttribute("finishMeetingsIfExpiredEndTime")
+    public void finishMeetingsIfExpiredEndTime(){
+        List<Meeting> meetings = meetingRepository.getAllNotFinished();
+        Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+        meetings.stream().filter(meeting -> meeting.getEndTime().before(currentTime)).forEach(meeting -> {
+            meeting.setStatus(finished);
+            meetingRepository.saveAndFlush(meeting);
+        });
+    }
 
     @Override
     public @ResponseBody
