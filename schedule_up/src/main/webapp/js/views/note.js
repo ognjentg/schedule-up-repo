@@ -153,9 +153,7 @@ var noteView = {
                             noteView.showChangeNoteDialog($$("noteDT").getItem(context.id.row));
                             break;
                         case "2":
-                            var delBox = (webix.copy(commonViews.brisanjePotvrda("sale"," salu "+$$("roomDT").getItem(context.id.row).name)));
-
-                            var delBox = (webix.copy(commonViews.brisanjePotvrda("oglasa", "oglas"+$$("noteDT").getItem(context.id.row).name)));
+                            var delBox = (webix.copy(commonViews.brisanjePotvrda("oglasa", "oglas "+$$("noteDT").getItem(context.id.row).name)));
                             var newItem = $$("noteDT").getItem(context.id.row);
                             delBox.callback = function (result) {
                                 if (result == 1) {
