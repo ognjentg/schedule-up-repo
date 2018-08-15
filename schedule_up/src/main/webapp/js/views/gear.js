@@ -108,7 +108,7 @@ var gearView = {
         var panelCopy = webix.copy(this.panel);
 
         $$("main").addView(webix.copy(panelCopy));
-        connection.attachAjaxEvents("gearDT", "gear-unit", true, true, editValidationRules);
+        connection.attachAjaxEvents("gearDT", "gear-unit", true, false, editValidationRules);
         $$("gearDT").detachEvent("onBeforeDelete");
 
         webix.ui({

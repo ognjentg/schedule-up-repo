@@ -153,7 +153,7 @@ var noteView = {
                             noteView.showChangeNoteDialog($$("noteDT").getItem(context.id.row));
                             break;
                         case "2":
-                            var delBox = (webix.copy(commonViews.brisanjePotvrda("oglasa", "oglas "+$$("noteDT").getItem(context.id.row).name)));
+                            var delBox = (webix.copy(commonViews.brisanjePotvrda("oglasa", "oglas")));
                             var newItem = $$("noteDT").getItem(context.id.row);
                             delBox.callback = function (result) {
                                 if (result == 1) {
@@ -224,6 +224,7 @@ var noteView = {
                     required: true
                 },{
                     view: "datepicker",
+                    editable:true,
                     value: new Date(Date.now() + 1296000000),
                     timepicker: true,
                     id: "expiredTime",
@@ -346,6 +347,7 @@ var noteView = {
                     required: true
                 },{
                     view: "datepicker",
+                    editable:true,
                     timepicker: true,
                     id: "expiredTime",
                     name: "expiredTime",

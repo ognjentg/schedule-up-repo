@@ -73,6 +73,7 @@ var meetingDetailsView = {
                                         },
                                         {
                                             view: "datepicker",
+                                            editable:true,
                                             format: "%d.%m.%Y. %H:%i",
                                             timepicker: true,
                                             id: "startTime",
@@ -83,6 +84,7 @@ var meetingDetailsView = {
                                         },
                                         {
                                             view: "datepicker",
+                                            editable:true,
                                             format: "%d.%m.%Y. %H:%i",
                                             timepicker: true,
                                             id: "endTime",
