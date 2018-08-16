@@ -360,7 +360,13 @@ public class MeetingController extends GenericController<Meeting, Integer> {
     MeetingDocumentParticipant updateFullMeeting(@PathVariable Integer id,@RequestBody MeetingDocumentParticipant meeting) throws BadRequestException, ForbiddenException {
         update(id,meeting.getMeeting());
         meeting.getParticipants().forEach(participant -> participant.setMeetingId(id));
+        List<String> beforeEmails = meetingRepository.getEmailsForMeeting(meeting.getMeeting().getId());
         meeting.setParticipants(participantRepository.saveAll(meeting.getParticipants()));
+        participantRepository.flush();
+        List<String> afterEmails = meetingRepository.getEmailsForMeeting(meeting.getMeeting().getId());
+        afterEmails.removeAll(beforeEmails);
+        for(String s : afterEmails)
+            Notification.notify(s.trim(), "New meeting");
         List<Document> documents = meeting.getDocuments();
         List<Document> currentDocuments = documentRepository.getAllByMeetingId(id);
         for (Iterator<Document> it = currentDocuments.iterator(); it.hasNext(); ) {

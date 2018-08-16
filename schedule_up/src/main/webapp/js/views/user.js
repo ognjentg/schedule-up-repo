@@ -212,7 +212,7 @@ userView = {
                                             util.messages.showMessage("Uspjesno deaktiviranje");
                                         }
                                     }, function (text, data, xhr) {
-                                        util.messages.showErrorMessage("Neuspjesno deaktiviranje");
+                                        util.messages.showErrorMessage(text);
                                     });
                                 }
                             };

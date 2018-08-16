@@ -280,8 +280,8 @@ var buildingView = {
                                                 $$("buildingDT").remove(context.id.row);
                                             } else
                                                 util.messages.showErrorMessage("Neuspješno uklanjanje zgrade.");
-                                        }, function () {
-                                            util.messages.showErrorMessage("Neuspješno uklanjanje zgrade.");
+                                        }, function (text, data, xhr) {
+                                            util.messages.showErrorMessage(text);
                                         }, null);
                                 }
                             };
@@ -420,8 +420,8 @@ var buildingView = {
                                 $$("buildingDT").updateItem(newItem.id, newItem);
                             } else
                                 util.messages.showErrorMessage("Podaci nisu izmijenjeni.");
-                        }, function () {
-                            util.messages.showErrorMessage("Podaci nisu izmijenjeni.");
+                        }, function (text, data, xhr) {
+                            util.messages.showErrorMessage(text);
                         }, newItem);
 
                     util.dismissDialog('changeBuildingDialog');
@@ -768,8 +768,8 @@ var buildingView = {
                                 $$("buildingDT").updateItem(newItem.id, newItem);
                             } else
                                 util.messages.showErrorMessage("Podaci nisu izmijenjeni.");
-                        }, function () {
-                            util.messages.showErrorMessage("Podaci nisu izmijenjeni.");
+                        }, function (text, data, xhr) {
+                            util.messages.showErrorMessage(text);
                         }, newItem);
                     util.dismissDialog('changeBuildingDialog');
                 }

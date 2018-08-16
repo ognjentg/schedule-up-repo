@@ -165,8 +165,8 @@ var noteView = {
                                                 $$("noteDT").remove(context.id.row);
                                             } else
                                                 util.messages.showErrorMessage("Neuspješno uklanjanje oglasa.");
-                                        }, function () {
-                                            util.messages.showErrorMessage("Neuspješno uklanjanje oglasa.");
+                                        }, function (text, data, xhr) {
+                                            util.messages.showErrorMessage(text);
                                         }, null);
 
                                 }
@@ -439,8 +439,8 @@ var noteView = {
                         $$("noteDT").updateItem(newItem.id, newItem);
                     } else
                         util.messages.showErrorMessage("Neuspješna izmjena oglasa.");
-                }, function () {
-                    util.messages.showErrorMessage("Neuspješna izmjena oglasa.");
+                }, function (text, data, xhr) {
+                    util.messages.showErrorMessage(text);
                 }, newItem);
 
             util.dismissDialog('changeNoteDialog');

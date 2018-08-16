@@ -100,8 +100,8 @@ var userGroupView = {
                                     }
                                     connection.sendAjax("POST", "user-group-has-user",
                                         function (text, data, xhr) {
-                                        }, function () {
-                                            util.messages.showErrorMessage("Podaci nisu dodati.");
+                                        }, function (text, data, xhr) {
+                                            util.messages.showErrorMessage(text);
                                         }, newUserGroupHasUser);
                                 }
                             }
@@ -144,8 +144,8 @@ var userGroupView = {
                                         function (text, data, xhr) {
                                             if (!text)
                                                 util.messages.showErrorMessage("Neuspješno brisanje.");
-                                        }, function () {
-                                            util.messages.showErrorMessage("Neuspješno brisanje.");
+                                        }, function (text, data, xhr) {
+                                            util.messages.showErrorMessage(text);
                                         }, null);
                                 }
                             }
@@ -193,7 +193,7 @@ var userGroupView = {
                                             util.messages.showMessage("Uspješno uklanjanje korisničke grupe");
                                         }
                                     }, function (text, data, xhr) {
-                                        util.messages.showErrorMessage("Neuspješno uklanjanje korisničke grupe");
+                                        util.messages.showErrorMessage(text);
                                     }, null);
                                 }
                             };

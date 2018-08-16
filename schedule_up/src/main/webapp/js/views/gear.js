@@ -146,8 +146,8 @@ var gearView = {
                                                 $$("gearDT").remove(context.id.row);
                                             } else
                                                 util.messages.showErrorMessage("Neuspješno uklanjanje opreme.");
-                                        }, function () {
-                                            util.messages.showErrorMessage("Neuspješno uklanjanje opreme.");
+                                        }, function (text, data, xhr) {
+                                            util.messages.showErrorMessage(text);
                                         }, null);
                                 }
                             };

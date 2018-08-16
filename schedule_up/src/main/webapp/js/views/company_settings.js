@@ -60,7 +60,7 @@ var companySettingsView = {
                                                         companyData.timeFrom = oldTimeFrom;
                                                     }
                                                 }, function (text, data, xhr) {
-                                                    util.messages.showErrorMessage("Greška pri izmjeni.");
+                                                    util.messages.showErrorMessage(text);
                                                     companyData.timeFrom = oldTimeFrom;
                                                 }, companyData)
                                         } else {
@@ -111,8 +111,7 @@ var companySettingsView = {
 
                                                 }
                                             }, function (text, data, xhr) {
-
-                                                util.messages.showErrorMessage("Greška pri izmjeni.");
+                                                util.messages.showErrorMessage(text);
                                                 companyData.timeTo = oldTimeTo;
                                             }, companyData)
                                     }else{
@@ -187,8 +186,8 @@ var companySettingsView = {
                                                     util.messages.showErrorMessage("Greška pri izmjeni.");
                                                 }
                                             }, function (text, data, xhr) {
+                                                util.messages.showErrorMessage(text);
                                                 companySettingsView.settings.reminderTime = oldValue;
-                                                util.messages.showErrorMessage("Greška pri izmjeni.");
 
                                             }
                                             , companySettingsView.settings);
@@ -249,8 +248,8 @@ var companySettingsView = {
                                                     util.messages.showErrorMessage("Greška pri izmjeni.");
                                                 }
                                             }, function (text, data, xhr) {
+                                                util.messages.showErrorMessage(text);
                                                 companySettingsView.settings.cancelTime = oldValue;
-                                                util.messages.showErrorMessage("Greška pri izmjeni.");
 
                                             }, companySettingsView.settings);
                                     }
@@ -468,7 +467,7 @@ var companySettingsView = {
                                             util.messages.showMessage("Uspjesno uklanjanje");
                                         }
                                     }, function (text, data, xhr) {
-                                        util.messages.showErrorMessage("Neuspjesno uklanjanje");
+                                        util.messages.showErrorMessage(text);
                                     }, item);
                                 }
                             };
@@ -553,8 +552,8 @@ var companySettingsView = {
                     $$("cancelTime").setValue(cancelTime);
                 } else
                     util.messages.showErrorMessage("Greška pri učitavanju.");
-            }, function () {
-                util.messages.showErrorMessage("Greška pri učitavanju.");
+            }, function (text, data, xhr) {
+                util.messages.showErrorMessage(text);
             }, null);
 
         $$("timeTo").setValue(companyData.timeTo);

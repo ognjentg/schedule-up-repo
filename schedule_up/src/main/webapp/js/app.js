@@ -375,7 +375,7 @@ var tokenConfirm = function () {
             }
         },
         error: function (text, data, xhr) {
-            util.messages.showErrorMessage("Neispravan ili istekao token!");
+            util.messages.showErrorMessage(text);
         }
     });
 

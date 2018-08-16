@@ -306,8 +306,8 @@ var roomView = {
                                                 $$("roomDT").remove(context.id.row);
                                             } else
                                                 util.messages.showErrorMessage("Neuspješno brisanje.");
-                                        }, function () {
-                                            util.messages.showErrorMessage("Neuspješno brisanje.");
+                                        }, function (text, data, xhr) {
+                                            util.messages.showErrorMessage(text);
                                         }, null);
 
                                 }
@@ -667,8 +667,8 @@ var roomView = {
                         $$("roomDT").updateItem(newRoom.id, newRoom);
                     } else
                         util.messages.showErrorMessage("Podaci nisu izmijenjeni.");
-                }, function () {
-                    util.messages.showErrorMessage("Podaci nisu izmijenjeni.");
+                }, function (text, data, xhr) {
+                    util.messages.showErrorMessage(text);
                 }, newRoom);
 
             util.dismissDialog('changeRoomDialog');
@@ -764,7 +764,7 @@ var roomView = {
                         util.messages.showErrorMessage("Greška pri učitavanju opreme.");
                     }
                 }, function (text, data, xhr) {
-                    util.messages.showErrorMessage("Greška pri učitavanju opreme.");
+                    util.messages.showErrorMessage(text);
 
                 }
                 , null);
@@ -880,7 +880,7 @@ var roomView = {
                         util.messages.showErrorMessage("Greška pri dodavanju opreme u salu.");
                     }
                 }, function (text, data, xhr) {
-                    util.messages.showErrorMessage("Greška pri dodavanju opreme u salu.");
+                    util.messages.showErrorMessage(text);
 
                 }
                 , gearIds);
@@ -923,8 +923,8 @@ var roomView = {
                                                     $$("gearList").remove(context.id);
                                                 } else
                                                     util.messages.showErrorMessage("Neuspješno brisanje.");
-                                            }, function () {
-                                                util.messages.showErrorMessage("Neuspješno brisanje.");
+                                            }, function (text, data, xhr) {
+                                                util.messages.showErrorMessage(text);
                                             }, null);
 
                                     }

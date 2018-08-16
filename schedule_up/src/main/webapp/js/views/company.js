@@ -140,7 +140,7 @@ var companyView = {
                                             util.messages.showMessage("Uspjesno uklanjanje");
                                         }
                                     }, function (text, data, xhr) {
-                                        util.messages.showErrorMessage("Neuspjesno uklanjanje");
+                                        util.messages.showErrorMessage(text);
                                     }, item);
                                 }
                             };
@@ -696,8 +696,8 @@ var companyView = {
                         $$("companyDT").updateItem(newCompany.id, newCompany);
                     } else
                         util.messages.showErrorMessage("Neuspješna izmjena.");
-                }, function () {
-                    util.messages.showErrorMessage("Neuspješna izmjena.");
+                }, function (text, data, xhr) {
+                    util.messages.showErrorMessage(text);
                 }, newCompany);
 
             util.dismissDialog('changeCompanyDialog');

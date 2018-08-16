@@ -186,8 +186,8 @@ var registrationView = {
 
                     } else
                         util.messages.showErrorMessage("Neuspješna registracija.");
-                }, function () {
-                    util.messages.showErrorMessage("Neuspješna registracija.");
+                }, function (text, data, xhr) {
+                    util.messages.showErrorMessage(text);
                 }, newItem);
 
         }

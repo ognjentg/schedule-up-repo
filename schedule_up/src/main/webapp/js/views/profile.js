@@ -170,8 +170,8 @@ var profileView={
                         else $$("userInfo").setHTML("<p style='display: table-cell;line-height: 13px;vertical-align:text-top;font-size: 14px;}'>"+userData.firstName+" "+userData.lastName+"<br> korisnik</p>");
                     } else
                         util.messages.showErrorMessage("Podaci nisu izmijenjeni.");
-                }, function () {
-                    util.messages.showErrorMessage("Podaci nisu izmijenjeni.");
+                }, function (text, data, xhr) {
+                    util.messages.showErrorMessage(text);
                 }, helpUser);
         }
     },
@@ -287,8 +287,8 @@ var profileView={
                         util.messages.showMessage("Uspješna izmjena lozinke.");
                     } else
                         util.messages.showErrorMessage("Neuspješna izmjena lozinke.");
-                }, function () {
-                    util.messages.showErrorMessage("Neuspješna izmjena lozinke.");
+                }, function (text, data, xhr) {
+                    util.messages.showErrorMessage(text);
                 }, passwordInformation);
 
         }

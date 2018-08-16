@@ -139,7 +139,7 @@ var meetingView = {
                                                         util.messages.showMessage("Sastanak uspješno zatvoren");
                                                     }
                                                 }).fail(function (err) {
-                                                    util.messages.showErrorMessage(err.responseText());
+                                                    util.messages.showErrorMessage(err.responseText);
                                                 })
                                             }
                                         };
@@ -315,8 +315,8 @@ var meetingView = {
                         }).post("document/list/", JSON.stringify(reports)).then(function (result) {
                             util.messages.showMessage("Izvještaj je uspješno dodat.");
                             util.dismissDialog("addReportDialog");
-                        }).fail(function (err) {
-                            util.messages.showErrorMessage("Dodavanje izvještaja nije uspjelo!");
+                        }).fail(function (error) {
+                            util.messages.showErrorMessage(error.responseText);
                             util.dismissDialog("addReportDialog");
                         });
                     }
