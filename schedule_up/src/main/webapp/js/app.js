@@ -158,10 +158,10 @@ var init = function () {
                                     companyData.deleted = 0;
                                     showApp();
                                     if(userData.roleId===2)
-                                    $$("userInfo").setHTML("<p style='display: table-cell;line-height: 13px;vertical-align:text-top;font-size: 14px;}'>"+userData.firstName+" "+userData.lastName+"<br> administrator</p>");
+                                    $$("userInfo").setHTML("<p style='display: table-cell; line-height: 13px; vertical-align: text-top; horizontal-align:right;font-size: 14px; margin-left: auto;margin-right: 0;}'>"+userData.firstName+" "+userData.lastName+"<br> administrator</p>");
                                     else if(userData.roleId===3)
-                                        $$("userInfo").setHTML("<p style='display: table-cell;line-height: 11px;vertical-align:text-top;font-size: 14px;}'>"+userData.firstName+" "+userData.lastName+"<br> napredni korisnik</p>");
-                                else $$("userInfo").setHTML("<p style='display: table-cell;line-height: 13px;vertical-align:text-top;font-size: 14px;}'>"+userData.firstName+" "+userData.lastName+"<br> korisnik</p>");
+                                        $$("userInfo").setHTML("<p style='display: table-cell; line-height: 13px; vertical-align: text-top; horizontal-align:right;font-size: 14px; margin-left: auto;margin-right: 0;}'>"+userData.firstName+" "+userData.lastName+"<br> napredni korisnik</p>");
+                                else $$("userInfo").setHTML("<p style='display: table-cell; line-height: 13px; vertical-align: text-top; horizontal-align:right;font-size: 14px; margin-left: auto;margin-right: 0;}'>"+userData.firstName+" "+userData.lastName+"<br> korisnik</p>");
 
                                 } else {
                                     userData = null;
@@ -176,7 +176,7 @@ var init = function () {
                         });
                     } else {
                         showApp();
-                        $$("userInfo").setHTML("<p style='display: table-cell;line-height: 13px;height:75px;vertical-align: middle;font-size: 14px;}'>"+userData.firstName+" "+userData.lastName+"<br> super admin</p>");
+                        $$("userInfo").setHTML("<p style='display: table-cell; line-height: 13px; vertical-align: text-top; horizontal-align:right;font-size: 14px; margin-left: auto;margin-right: 0;}'>"+userData.firstName+" "+userData.lastName+"<br> super admin</p>");
                     }
 
                 }
@@ -324,7 +324,6 @@ var registrationLayout={
                         {
                             id: "token",
                             name: "token",
-                            //  align:"center",
                             view: "text",
                             label: "Token",
                             invalidMessage: "Token je obavezan!",
@@ -339,6 +338,7 @@ var registrationLayout={
                                 value: "Potvrdi",
                                 type: "form",
                                 click: "tokenConfirm",
+                                hotkey: "enter",
                                 width: 150
                             },{}]
                         }]},{}]}]
@@ -395,7 +395,7 @@ var login = function () {
                         userData = user;
                         companyData = null;
                         showApp();
-                        $$("userInfo").setHTML("<p style='display: table-cell;line-height: 13px;height:75px;vertical-align: middle;font-size: 14px;}'>"+userData.firstName+" "+userData.lastName+"<br> super admin</p>");
+                        $$("userInfo").setHTML("<p style='display: table-cell; line-height: 13px; vertical-align: text-top; horizontal-align:right;font-size: 14px; margin-left: auto;margin-right: 0;}'>"+userData.firstName+" "+userData.lastName+"<br> super admin</p>");
 
                     } else {
                         webix.ajax().get("company/" + user.companyId, {
@@ -407,10 +407,10 @@ var login = function () {
                                     companyData.deleted = 0;
                                     showApp();
                                     if(userData.roleId===2)
-                                        $$("userInfo").setHTML("<p style='display: table-cell;line-height: 13px;vertical-align:text-top;font-size: 14px;}'>"+userData.firstName+" "+userData.lastName+"<br> administrator</p>");
+                                        $$("userInfo").setHTML("<p style='display: table-cell; line-height: 13px; vertical-align: text-top; horizontal-align:right;font-size: 14px; margin-left: auto;margin-right: 0;}'>"+userData.firstName+" "+userData.lastName+"<br> administrator</p>");
                                     else if(userData.roleId===3)
-                                        $$("userInfo").setHTML("<p style='display: table-cell;line-height: 13px;vertical-align:text-top;font-size: 14px;}'>"+userData.firstName+" "+userData.lastName+"<br> napredni korisnik</p>");
-                                    else $$("userInfo").setHTML("<p style='display: table-cell;line-height: 13px;vertical-align:text-top;font-size: 14px;}'>"+userData.firstName+" "+userData.lastName+"<br> korisnik</p>");
+                                        $$("userInfo").setHTML("<p style='display: table-cell; line-height: 13px; vertical-align: text-top; horizontal-align:right;font-size: 14px; margin-left: auto;margin-right: 0;}'>"+userData.firstName+" "+userData.lastName+"<br> napredni korisnik</p>");
+                                    else $$("userInfo").setHTML("<p style='display: table-cell; line-height: 13px; vertical-align: text-top; horizontal-align:right;font-size: 14px; margin-left: auto;margin-right: 0;}'>"+userData.firstName+" "+userData.lastName+"<br> korisnik</p>");
 
                                 } else {
                                     util.messages.showErrorMessage("Prijavljivanje nije uspjelo!");
@@ -466,39 +466,24 @@ var mainLayout = {
                         view: "label",
                         css: "appNameLabel",
                         label: "Schedule Up"
-                    },/*{   id: "profileBtn",
-                        view: "button",
-                        type: "iconButton",
-                        label: "Profil",
-                        click: "clickProfile",
-                        icon: "user",
-                        autowidth: true
-                    }, {
-                        id: "logoutBtn",
-                        view: "button",
-                        type: "iconButton",
-                        label: "Odjavite se",
-                        click: "logout",
-                        icon: "sign-out",
-                        autowidth: true
-                    }*/
+                    },
                     {},{},{
                             id: "userInfo",
                             view: "label",
-                            // height:100,
                             align: "right",
                         labelPosition:"top",
-
-                            // css: "userLabel-font-size",
-                            label: ""},
+                        css:"custom_menu_alignment_style",
+                            label: ""
+                    },
                     {view:"menu",
+                        id:"userMenu",
                         align:"right",
                         width:50,
-                        //height:30,
+                        css:"custom_menu_list_item",
                         data:[
                             {id:"1",value:"",icon:"cog",config:{  width:200  }, submenu:[
 
-                                    {value:"O aplikaciji", icon:"info",autowidth:true}, {value:"Izmjena profila", icon:"user",autowidth:true},{value:"Izmjena lozinke",icon:"key",width:400},{value:"Odjavite se", icon:"sign-out",width:400}
+                                     {value:"Izmjena profila", icon:"user",autowidth:true},{value:"Izmjena lozinke",icon:"key",width:400},{value:"Odjavite se", icon:"sign-out",width:400}
 
                                 ]}
                         ],
@@ -643,6 +628,8 @@ var showApp = function () {
     else if(userForRegistration!=null){
         registrationView.selectPanel();
         $$("mainMenu").select("registration");
+        $$("userMenu").hide();
+        $$("userInfo").hide();
     }
 };
 
