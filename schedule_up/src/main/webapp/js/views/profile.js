@@ -63,8 +63,8 @@ var profileView={
                             name: "username",
                             readonly:true,
                             label: "Korisničko ime:",
-                            labelWidth:118,
                             labelAlign:'left',
+                            labelWidth:118,
                             invalidMessage: "Unesite korisničko ime!",
                             //required: true
                         },{
@@ -81,7 +81,8 @@ var profileView={
                                 readonly:false,
 
                                 invalidMessage: "Unesite ime!",
-                                labelAlign:'right',
+                                labelAlign:'left',
+                                labelWidth:118,
                                 required: true
                             },
                             {view: "text",
@@ -93,7 +94,8 @@ var profileView={
                                 readonly:false,
                                 editaction:"dblclick",
                                 invalidMessage: "Unesite prezime!",
-                                labelAlign:'right',
+                                labelAlign:'left',
+                                labelWidth:118,
                                 required: true
                             },
                             {
@@ -105,7 +107,9 @@ var profileView={
                                 label: "E-mail:",
                                 readonly:true,
                                 invalidMessage: "Unesite prezime!",
-                                labelAlign:'right',
+                                labelAlign:'left',
+                                labelWidth:118
+
                                 // required: true
                             },{
                                 cols:[
@@ -248,8 +252,32 @@ var profileView={
                         return true;
                     },
                     "newPassword1":function (value) {
+                        var re1 = /[0-9]/;
+                        var re2 = /[a-z]/;
+                        var re3 = /[A-Z]/;
+                        var re4=/[@#$%^&+=]/;
                         if (!value)
                             return false;
+                        if(value.length<8) {
+                            $$('changePasswordForm').elements.newPassword1.config.invalidMessage = 'Lozinka mora da ima više od 8 karaktera!';
+                            return false;
+                        }
+                        if(!re1.test(value)){
+                            $$('changePasswordForm').elements.newPassword1.config.invalidMessage = 'Lozinka mora da sadrži bar jedan broj!';
+                            return false;
+                        }
+                        if(!re2.test(value)){
+                            $$('changePasswordForm').elements.newPassword1.config.invalidMessage = 'Lozinka mora da sadrži bar jedno malo slovo!';
+                            return false;
+                        }
+                        if(!re3.test(value)){
+                            $$('changePasswordForm').elements.newPassword1.config.invalidMessage = 'Lozinka mora da sadrži bar jedno veliko slovo!';
+                            return false;
+                        }
+                        if(!re4.test(value)){
+                            $$('changePasswordForm').elements.newPassword1.config.invalidMessage = 'Lozinka mora da sadrži specijalni karakter: (@ # $ % ^ & + =) !';
+                            return false;
+                        }
 
                         return true;
                     },
@@ -290,6 +318,8 @@ var profileView={
                 }, function (text, data, xhr) {
                     util.messages.showErrorMessage(text);
                 }, passwordInformation);
+            util.dismissDialog('changePasswordDialog');
+
 
         }
     }
