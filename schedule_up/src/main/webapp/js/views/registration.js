@@ -21,7 +21,8 @@ var registrationView = {
             height:y,
             id: "registrationForm",
             elementsConfig: {
-                bottomPadding: 20
+                bottomPadding: 20,
+                css:"custom_invalid_message_registration"
             },
             elements: [{
                 view: "text",
@@ -30,9 +31,9 @@ var registrationView = {
                 id: "username",
                 name: "username",
                 label: "Korisničko ime:",
-                labelWidth:118,
                 labelAlign:'left',
-                invalidMessage: "Unesite korisničko ime!",
+                labelWidth:118,
+                invalidMessage: "Prazan unos!",
                 required: true
             },{
                 view: "text",
@@ -46,8 +47,9 @@ var registrationView = {
                 width:400,
                 align:"center",
                 label: "Šifra:",
-                labelAlign:'right',
-                invalidMessage: "Unesite šifru!",
+                labelAlign:'left',
+                labelWidth:118,
+                invalidMessage: "Prazan unos!",
                 required: true
             },
 
@@ -57,8 +59,9 @@ var registrationView = {
                     width:400,
                     align:"center",
                     label: "Ime:",
-                    invalidMessage: "Unesite ime!",
-                    labelAlign:'right',
+                    labelAlign:'left',
+                    labelWidth:118,
+                    invalidMessage: "Prazan unos!",
                     required: true
                 },
                 {view: "text",
@@ -67,8 +70,9 @@ var registrationView = {
                     width:400,
                     align:"center",
                     label: "Prezime:",
-                    invalidMessage: "Unesite prezime!",
-                    labelAlign:'right',
+                    labelAlign:'left',
+                    labelWidth:118,
+                    invalidMessage: "Prazan unos!",
                     required: true
                 },
                 {

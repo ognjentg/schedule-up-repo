@@ -328,7 +328,6 @@ public class UserController extends GenericController<User, Integer> {
                                     user.setFirstName(newUser.getFirstName());
                                     user.setLastName(newUser.getLastName());
                                     user.setPhoto(newUser.getPhoto());
-                                    user.setPin(Util.hashPassword(newUser.getPin()));
                                     user.setActive((byte) 1);
 
                                     if(repo.saveAndFlush(user) != null){

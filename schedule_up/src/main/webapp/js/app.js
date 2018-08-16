@@ -360,7 +360,6 @@ var tokenConfirm = function () {
                             companyData = company;
                             companyData.deleted = 0;
                             showApp();
-                            $$("logoutBtn").hide();
                         } else {
                             userForRegistration=null;
                             showLogin();
