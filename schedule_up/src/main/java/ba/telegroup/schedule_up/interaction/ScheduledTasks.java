@@ -52,7 +52,7 @@ public class ScheduledTasks {
                 List<Participant> participants = participantRepository.getAllByMeetingIdAndDeletedIs(meeting.getId(), (byte)0);
                 participants.stream().forEach(participant -> {
                     try {
-                        Notification.notify(participant.getEmail(), "Imate sastanak \""
+                        new Notification().notify(participant.getEmail(), "Imate sastanak \""
                                 + meeting.getTopic() +": "+meeting.getDescription()+"\", " + dateFormat.format(meeting.getStartTime()));
                     } catch (BadRequestException e) {
                     }
