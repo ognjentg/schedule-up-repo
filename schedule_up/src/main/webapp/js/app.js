@@ -44,6 +44,9 @@ var menuActions = function (id) {
         case "userGroup":
             userGroupView.selectPanel();
             break;
+        case "report":
+            reportView.selectPanel();
+            break;
     }
 };
 
@@ -98,6 +101,11 @@ var menuAdmin = [
         id: "userGroup",
         value: "Korisničke grupe",
         icon: "users"
+    },
+    {
+        id:"report",
+        value:"Izvještaj",
+        icon:"percent"
     }
 ];
 

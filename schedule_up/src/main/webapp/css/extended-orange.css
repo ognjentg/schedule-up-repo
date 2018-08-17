@@ -157,3 +157,9 @@
     color: #fff;
     font-size: 15px;
 }
+.custom_date_picker_report .webix_el_box {
+    display: none !important;
+}
+.custom_date_picker_report .webix_cal_icon_clear  {
+    display: ruby !important;
+}
