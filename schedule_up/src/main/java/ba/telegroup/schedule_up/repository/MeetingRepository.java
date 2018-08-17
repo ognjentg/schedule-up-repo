@@ -28,6 +28,9 @@ public interface MeetingRepository extends JpaRepository<Meeting,Integer>{
     List<String> getEmailsForMeeting(Integer meetingId);
     @Query(value = "(SELECT * FROM meeting WHERE status = 0);", nativeQuery =  true)
     List<Meeting> getAllScheduled();
+    @Query(value = "SELECT r.id, r.topic, r.start_time,r.end_time,r.participants_number,r.status,r.description, r.cancelation_reason, " +
+            "r.room_id,r.user_id,r.company_id FROM meeting r  WHERE r.status=?2 and r.room_id=?1",nativeQuery = true)
+    List<Meeting> getAllByRoomIdAndStatus(Integer roomId,Byte status);
 
 
 }

@@ -1,11 +1,13 @@
 package ba.telegroup.schedule_up.interaction;
 
 import ba.telegroup.schedule_up.common.exceptions.BadRequestException;
+import org.springframework.scheduling.annotation.Async;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 import java.util.Properties;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
@@ -30,8 +32,8 @@ public class Notification {
         return properties;
     }
 
-    public static void notify(String recipientMail, String messageText) throws BadRequestException {
-
+    @Async
+    public void notify(String recipientMail, String messageText) throws BadRequestException {
         Properties properties = getTLSSetProperty();
 
         Session session = Session.getDefaultInstance(properties, new Authenticator() {
@@ -44,6 +46,36 @@ public class Notification {
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(SENDER_MAIL, "TeleGroup ScheduleUp"));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientMail));
+            message.setSubject("Notification");
+            message.setText(messageText);
+
+            Transport.send(message);
+
+        } catch (MessagingException | UnsupportedEncodingException e) {
+            throw new BadRequestException("Recipient mail not found.");
+        }
+    }
+
+    @Async
+    public void notifyAll(List<String> recipientMail, String messageText) throws BadRequestException {
+        Properties properties = getTLSSetProperty();
+
+
+        Session session = Session.getDefaultInstance(properties, new Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(SENDER_MAIL, PASSWORD);
+            }
+        });
+
+        try {
+            InternetAddress[] recipientAddresses=new InternetAddress[recipientMail.size()];
+            int counter=0;
+            for(String mail:recipientMail){
+                recipientAddresses[counter++]=new InternetAddress(mail);
+            }
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(SENDER_MAIL, "TeleGroup ScheduleUp"));
+            message.setRecipients(Message.RecipientType.TO, recipientAddresses);
             message.setSubject("Notification");
             message.setText(messageText);
 

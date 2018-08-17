@@ -3,6 +3,7 @@ package ba.telegroup.schedule_up.controller;
 import ba.telegroup.schedule_up.common.exceptions.BadRequestException;
 import ba.telegroup.schedule_up.common.exceptions.ForbiddenException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
+import ba.telegroup.schedule_up.interaction.Notification;
 import ba.telegroup.schedule_up.model.*;
 import ba.telegroup.schedule_up.model.modelCustom.RoomBuilding;
 import ba.telegroup.schedule_up.model.modelCustom.RoomBuildingOccupancy;
@@ -31,12 +32,22 @@ import java.util.List;
 @Scope("request")
 public class RoomController extends GenericController<Room, Integer> {
 
+    @Autowired
+    private MeetingController meetingController;
+
     private final RoomRepository roomRepository;
     private final RoomHasGearUnitRepository roomHasGearUnitRepository;
     private final GearUnitRepository gearUnitRepository;
     private final BuildingRepository buildingRepository;
     private final MeetingRepository meetingRepository;
     private final CompanyRepository companyRepository;
+    private final Notification notification;
+
+    @Value("${meetingStatus.canceled}")
+    private Byte canceled;
+
+    @Value("${meetingStatus.scheduled}")
+    private Byte scheduled;
 
     @Value("${badRequest.alreadyTaken}")
     private String badRequestAlreadyTaken;
@@ -82,14 +93,22 @@ public class RoomController extends GenericController<Room, Integer> {
         this.buildingRepository = buildingRepository;
         this.meetingRepository = meetingRepository;
         this.companyRepository = companyRepository;
+        notification=new Notification();
     }
 
     @Override
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.DELETE)
     public @ResponseBody
-    String delete(@PathVariable Integer id) throws BadRequestException {
+    String delete(@PathVariable Integer id) throws BadRequestException, ForbiddenException {
         Room room = roomRepository.findById(id).orElse(null);
         if (room != null) {
+            List<Meeting> meetings=meetingRepository.getAllByRoomIdAndStatus(room.getId(),scheduled);
+            for(Meeting meeting:meetings){
+                List<String> emails = meetingRepository.getEmailsForMeeting(meeting.getId());
+                notification.notifyAll(emails,"Meeting canceled");
+                meeting.setStatus(canceled);
+                meetingController.update(meeting.getId(),meeting);
+            }
             room.setDeleted((byte) 1);
             roomRepository.saveAndFlush(room);
             logDeleteAction(room);

@@ -1,9 +1,12 @@
 package ba.telegroup.schedule_up.controller;
 
 import ba.telegroup.schedule_up.common.exceptions.BadRequestException;
+import ba.telegroup.schedule_up.common.exceptions.ForbiddenException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.model.Building;
+import ba.telegroup.schedule_up.model.Room;
 import ba.telegroup.schedule_up.repository.BuildingRepository;
+import ba.telegroup.schedule_up.repository.RoomRepository;
 import ba.telegroup.schedule_up.util.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +22,10 @@ import java.util.List;
 @Controller
 @Scope("request")
 public class BuildingController extends GenericController<Building, Integer> {
+    @Autowired
+    private RoomController roomController;
 
+    private final RoomRepository roomRepository;
     private final BuildingRepository buildingRepository;
 
     @Value("${badRequest.insert}")
@@ -35,9 +41,10 @@ public class BuildingController extends GenericController<Building, Integer> {
     private String badRequestStringMaxLength;
 
     @Autowired
-    public BuildingController(BuildingRepository repo) {
+    public BuildingController(BuildingRepository repo,RoomRepository roomRepository) {
         super(repo);
         buildingRepository = repo;
+        this.roomRepository=roomRepository;
     }
 
     @Override
@@ -106,9 +113,13 @@ public class BuildingController extends GenericController<Building, Integer> {
     @Override
     @RequestMapping(value = {"/{id}"}, method = RequestMethod.DELETE)
     public @ResponseBody
-    String delete(@PathVariable Integer id) throws BadRequestException {
+    String delete(@PathVariable Integer id) throws BadRequestException, ForbiddenException {
         Building building = buildingRepository.findById(id).orElse(null);
         if (building != null) {
+            List<Room> rooms=roomRepository.getRoomsByBuildingId(building.getId());
+            for(Room room:rooms){
+                roomController.delete(room.getId());
+            }
             building.setDeleted((byte) 1);
             repo.saveAndFlush(building);
             logDeleteAction(building);

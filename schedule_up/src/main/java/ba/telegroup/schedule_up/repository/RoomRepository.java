@@ -11,4 +11,5 @@ public interface RoomRepository extends JpaRepository<Room, Integer>, RoomReposi
 
     Room getRoomById(Integer id);
     List<Room> getByCompanyId(Integer companyId);
+    List<Room> getRoomsByBuildingId(Integer buildingId);
 }

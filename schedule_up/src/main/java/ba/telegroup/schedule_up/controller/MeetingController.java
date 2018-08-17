@@ -29,6 +29,7 @@ public class MeetingController extends GenericController<Meeting, Integer> {
     private final DocumentRepository documentRepository;
     private final UserRepository userRepository;
     private final UserGroupRepository userGroupRepository;
+    private final Notification notification;
     @Value("${admin.id}")
     private Integer admin;
     @Value("${superAdmin.id}")
@@ -89,6 +90,7 @@ public class MeetingController extends GenericController<Meeting, Integer> {
         this.documentRepository = documentRepository;
         this.userRepository = userRepository;
         this.userGroupRepository = userGroupRepository;
+        notification=new Notification();
     }
 
     @ModelAttribute("finishMeetingsIfExpiredEndTime")
@@ -160,8 +162,10 @@ public class MeetingController extends GenericController<Meeting, Integer> {
 
                 // notify participants
                 List<String> emails = meetingRepository.getEmailsForMeeting(id);
-                for(String s : emails)
-                    Notification.notify(s.trim(), "Meeting canceled");
+                notification.notifyAll(emails,"Meeting canceled");
+               /* for(String s : emails)
+                    notification.notify(s.trim(), "Meeting canceled");
+                    */
 
                 return updateStatus(meeting, canceled);
                 //}
@@ -348,9 +352,10 @@ public class MeetingController extends GenericController<Meeting, Integer> {
 
         // notify participants
         List<String> emails = meetingRepository.getEmailsForMeeting(meeting.getMeeting().getId());
-        for(String s : emails)
-            Notification.notify(s.trim(), "New meeting");
-
+        notification.notifyAll(emails, "New meeting");
+      /*  for(String s : emails) {
+            notification.notify(s.trim(), "New meeting");
+        }*/
         return meeting;
 
     }
@@ -365,8 +370,9 @@ public class MeetingController extends GenericController<Meeting, Integer> {
         participantRepository.flush();
         List<String> afterEmails = meetingRepository.getEmailsForMeeting(meeting.getMeeting().getId());
         afterEmails.removeAll(beforeEmails);
-        for(String s : afterEmails)
-            Notification.notify(s.trim(), "New meeting");
+        notification.notifyAll(afterEmails, "New meeting");
+       /* for(String s : afterEmails)
+            notification.notify(s.trim(), "New meeting");*/
         List<Document> documents = meeting.getDocuments();
         List<Document> currentDocuments = documentRepository.getAllByMeetingId(id);
         for (Iterator<Document> it = currentDocuments.iterator(); it.hasNext(); ) {
