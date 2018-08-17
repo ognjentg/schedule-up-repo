@@ -660,7 +660,6 @@ var buildingView = {
             };
             lat=json['results'][0]['geometry']['location']['lat'];
             lng=json['results'][0]['geometry']['location']['lng'];
-            entered=true;
             tabledata[0]=mapaObjekat;
             webix.ui(webix.copy(buildingView.showMapDialog)).show();
             $$("map").attachEvent("onAfterDrop", function(id, item){
@@ -776,15 +775,14 @@ var buildingView = {
             }
         }
     },
-    save: function () {
-        var form = $$("addBuildingForm");
-        if (form.validate()) {
-
-            // form.elements.validBuildingName.setValue(1);
-
+        save: function () {
+            var form = $$("addBuildingForm");
             if (form.validate()) {
-                if((lat==null && lng==null) || entered){
-                    entered=true;
+
+                // form.elements.validBuildingName.setValue(1);
+
+                if (form.validate()) {
+
                     var adresa=$$("adresa").getValue();
                     var res = adresa.replace(/ /g, "+");
                     var drzava=$$("combo").getValue().split(" : ")[0];
@@ -799,41 +797,33 @@ var buildingView = {
                         }
                         throw new Error('Neuspješno dobavljanje tačne lokacije.');
                     }).then(function(json) {
-                        lat=json['results'][0]['geometry']['location']['lat'];
-                        lng=json['results'][0]['geometry']['location']['lng'];
-                        var newItem = {
-                            name: $$("addBuildingForm").getValues().name,
-                            description: $$("addBuildingForm").getValues().description,
-                            address: $$("addBuildingForm").getValues().adresa,
-                            latitude:lat,
-                            longitude:lng,
-                            companyId: companyData.id
+                        var validate = json['results'][0]['geometry']['location_type'];
+                        if (validate == 'APPROXIMATE') {
+                            util.messages.showErrorMessage("Neispravna adresa!")
+                        }else{
+                            lat = json['results'][0]['geometry']['location']['lat'];
+                            lng = json['results'][0]['geometry']['location']['lng'];
+                            var newItem = {
+                                name: $$("addBuildingForm").getValues().name,
+                                description: $$("addBuildingForm").getValues().description,
+                                address: $$("addBuildingForm").getValues().adresa,
+                                latitude: lat,
+                                longitude: lng,
+                                companyId: companyData.id
 
-                        };
-                        $$("buildingDT").add(newItem);
-                        util.messages.showMessage("Uspješno dodavanje nove zgrade.");
-                        util.dismissDialog('addBuildingDialog');
+                            };
+                            $$("buildingDT").add(newItem);
+                            util.messages.showMessage("Uspješno dodavanje nove zgrade.");
+                            util.dismissDialog('addBuildingDialog');
+                        }
                     }).catch(function(error) {
                         util.messages.showErrorMessage("Neuspješno dobavljanje tačne lokacije.")
 
                     });
 
-                }else{
-                    var newItem = {
-                        name: $$("addBuildingForm").getValues().name,
-                        description: $$("addBuildingForm").getValues().description,
-                        address: $$("addBuildingForm").getValues().adresa,
-                        latitude:lat,
-                        longitude:lng,
-                        companyId: companyData.id
-
-                    };
-                    $$("buildingDT").add(newItem);
-                    util.messages.showMessage("Uspješno dodavanje nove zgrade.");
-                    util.dismissDialog('addBuildingDialog');}
+                }
             }
-        }
-    },
+        },
     preloadDependencies: function () {
 
         var url="https://restcountries.eu/rest/v2/all";
