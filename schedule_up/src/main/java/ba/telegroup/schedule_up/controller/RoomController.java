@@ -5,8 +5,10 @@ import ba.telegroup.schedule_up.common.exceptions.ForbiddenException;
 import ba.telegroup.schedule_up.controller.genericController.GenericController;
 import ba.telegroup.schedule_up.model.*;
 import ba.telegroup.schedule_up.model.modelCustom.RoomBuilding;
+import ba.telegroup.schedule_up.model.modelCustom.RoomBuildingOccupancy;
 import ba.telegroup.schedule_up.repository.*;
 import ba.telegroup.schedule_up.repository.repositoryCustom.GearUnitRepositoryCustom;
+import ba.telegroup.schedule_up.session.UserBean;
 import ba.telegroup.schedule_up.util.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,6 +49,9 @@ public class RoomController extends GenericController<Room, Integer> {
 
     @Value("${badRequest.noRoom}")
     private String badRequestNoRoom;
+
+    @Value("${badRequest.noRooms}")
+    private String badRequestNoRooms;
 
     @Value("${badRequest.noBuilding}")
     private String badRequestNoBuilding;
@@ -253,5 +258,21 @@ public class RoomController extends GenericController<Room, Integer> {
             return (double)(meetingsDuration*100)/companyWorkTime;
         }else
             throw new BadRequestException(badRequestNoRoom);
+    }
+
+    @RequestMapping(value = "getListOccupancy/{dateFrom}/{dateTo}", method = RequestMethod.GET)
+    public @ResponseBody
+    List<RoomBuildingOccupancy> getPercentageOfRoomsOccupancy(@PathVariable java.sql.Date dateFrom, @PathVariable java.sql.Date dateTo) throws BadRequestException, ForbiddenException {
+        List<RoomBuildingOccupancy> rooms = roomRepository.getAllExtendedOccupancyByCompanyId(userBean.getUser().getCompanyId());
+        if(rooms != null && !rooms.isEmpty()){
+            for(RoomBuildingOccupancy roomBuildingOccupancy : rooms){
+                roomBuildingOccupancy.setOccupancy(getPercentageOfRoomOccupancy(roomBuildingOccupancy.getId(), dateFrom, dateTo));
+            }
+
+            return rooms;
+        }
+        else{
+            throw new BadRequestException(badRequestNoRooms);
+        }
     }
 }

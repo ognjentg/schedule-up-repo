@@ -8,5 +8,5 @@ import java.util.List;
 public interface RoomRepositoryCustom {
 
     List getAllExtendedByCompanyId(Integer id);
-
+    List getAllExtendedOccupancyByCompanyId(Integer companyId);
 }

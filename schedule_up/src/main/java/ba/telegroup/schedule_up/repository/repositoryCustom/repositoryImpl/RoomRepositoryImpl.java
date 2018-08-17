@@ -11,6 +11,7 @@ import java.util.List;
 public class RoomRepositoryImpl implements RoomRepositoryCustom {
 
     private static final String SQL_GET_ALL_EXTENDED_BY_COMPANY_NAME_WHERE_DELETED_IS_FALSE = "SELECT r.id, r.name, r.floor,r.capacity,r.pin,r.description,r.building_id, r.company_id, b.name, b.longitude, b.latitude FROM room r JOIN building b ON r.building_id=b.id WHERE r.deleted=0 AND b.company_id=?";
+    private static final String SQL_GET_ALL_EXTENDED_OCCUPANCY_BY_COMPANY_ID = "SELECT r.id, r.name, r.floor, r.capacity, r.description, b.name as building_name FROM room r JOIN building b ON b.id=r.building_id WHERE r.deleted=0 AND r.company_id=?";
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -20,5 +21,8 @@ public class RoomRepositoryImpl implements RoomRepositoryCustom {
         return entityManager.createNativeQuery(SQL_GET_ALL_EXTENDED_BY_COMPANY_NAME_WHERE_DELETED_IS_FALSE, "RoomBuildingMapping").setParameter(1, id).getResultList();
     }
 
-
+    @Override
+    public List getAllExtendedOccupancyByCompanyId(Integer companyId) {
+        return entityManager.createNativeQuery(SQL_GET_ALL_EXTENDED_OCCUPANCY_BY_COMPANY_ID, "RoomBuildingOccupancyMapping").setParameter(1, companyId).getResultList();
+    }
 }

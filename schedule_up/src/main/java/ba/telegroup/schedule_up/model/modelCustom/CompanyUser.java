@@ -56,6 +56,4 @@ public class CompanyUser extends Company implements Serializable {
     public Byte getDeleted() {
         return super.getDeleted();
     }
-
-
 }
