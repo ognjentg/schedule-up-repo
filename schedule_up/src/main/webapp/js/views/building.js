@@ -336,7 +336,7 @@ var buildingView = {
             if(country_short==""){country_short="",console.log("grad prazan2")};
             if(country_long==""){country_long="",console.log("grad prazan3")};
             console.log(country_long+" : "+country_short);
-             state=country_long+" : "+country_short;
+             state=country_long.trim()+" : "+country_short.trim();
              $$("combo").setValue(state);
 
         }).catch(function(error) {
@@ -353,82 +353,9 @@ var buildingView = {
         form.elements.name.setValue(building.name);
         form.elements.description.setValue(building.description);
         form.elements.adresa.setValue(building.address);
-
-        var url = "https://restcountries.eu/rest/v2/all";
-        fetch(url).then(function (result) {
-            return result.json();
-        }).then(function (json) {
-            for (var i = 0; i < json.length; i++) {
-                var countryName = json[i].name;
-                var countryCode = json[i].alpha2Code;
-                countries[i] = (countryName + " : " + countryCode);
-            }
-            setTimeout(function () {
-                $$("changeBuildingDialog").show();
-                webix.UIManager.setFocus("name");
-            }, 0);
-        });
-
-    }},
-
-    saveChangedBuilding: function () {
-        if ($$("changeBuildingForm").validate()) {
-
-            if (form.validate()) {
-                if (lat == null && lng == null) {
-                    var adresa = $$("adresa").getValue();
-                    var res = adresa.replace(/ /g, "+");
-                    var drzava = $$("combo").getValue().split(" : ")[0];
-                    drzava = drzava.replace(/ /g, "+");
-                    var grad = $$("grad").getValue();
-                    grad = grad.replace(/ /g, "+");
-                    var query = res + "+" + grad + "+" + drzava;
-                    var url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + query + "&key=AIzaSyBExEHqJmRKJoRhWOT6Ok3fLR5QMGIZ_eg&language=hr";
-                    fetch(url).then(function (result) {
-                        return result.json();
-                    }).then(function (json) {
-                        lat = json['results'][0]['geometry']['location']['lat'];
-                        lng = json['results'][0]['geometry']['location']['lng'];
-                        var newItem = {
-                            name: $$("addBuildingForm").getValues().name,
-                            description: $$("addBuildingForm").getValues().description,
-                            address: $$("addBuildingForm").getValues().adresa,
-                            latitude: lat,
-                            longitude: lng,
-                            companyId: companyData.id
-
-                        };
-                        $$("buildingDT").add(newItem);
-                        util.dismissDialog('addBuildingDialog');
-                    });
-
-                } else {
-                    var newItem = {
-                        name: $$("addBuildingForm").getValues().name,
-                        description: $$("addBuildingForm").getValues().description,
-                        address: $$("addBuildingForm").getValues().adresa,
-                        latitude: lat,
-                        longitude: lng,
-                        companyId: companyData.id
-
-                    };
-
-                    connection.sendAjax("PUT", "building/" + newItem.id,
-                        function (text, data, xhr) {
-                            if (text) {
-                                util.messages.showMessage("Podaci su uspješno izmijenjeni.");
-                                $$("buildingDT").updateItem(newItem.id, newItem);
-                            } else
-                                util.messages.showErrorMessage("Podaci nisu izmijenjeni.");
-                        }, function (text, data, xhr) {
-                            util.messages.showErrorMessage(text);
-                        }, newItem);
-
-                    util.dismissDialog('changeBuildingDialog');
-                }
-            }
-        }
-    }
+            $$("changeBuildingDialog").show();
+            webix.UIManager.setFocus("name");
+    }}
     ,
     addDialog: {
         view: "popup",
@@ -619,7 +546,7 @@ var buildingView = {
                 $$("adresa").setValue(adresa);
 
             }
-            $$("combo").setValue(country_long + " : " + country_short);
+            $$("combo").setValue(country_long.trim() + " : " + country_short.trim());
             $$("grad").setValue(city);
             
 
@@ -713,12 +640,8 @@ var buildingView = {
     },
     saveChanges: function () {
         var form = $$("changeBuildingForm");
-        if (form.validate()) {
-
-            // form.elements.validBuildingName.setValue(1);
-
             if (form.validate()) {
-                if (lat == null && lng == null) {
+
                     var adresa = $$("adresa").getValue();
                     var res = adresa.replace(/ /g, "+");
                     var drzava = $$("combo").getValue().split(" : ")[0];
@@ -727,9 +650,16 @@ var buildingView = {
                     grad = grad.replace(/ /g, "+");
                     var query = res + "+" + grad + "+" + drzava;
                     var url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + query + "&key=AIzaSyBExEHqJmRKJoRhWOT6Ok3fLR5QMGIZ_eg&language=hr";
-                    fetch(url).then(function (result) {
+                fetch(url).then(function(result) {
+                    if(result.ok) {
                         return result.json();
-                    }).then(function (json) {
+                    }
+                    throw new Error('Neuspješno dobavljanje tačne lokacije.');
+                }).then(function(json) {
+                    var validate = json['results'][0]['geometry']['location_type'];
+                    if (validate == 'APPROXIMATE') {
+                        util.messages.showErrorMessage("Neispravna adresa!")
+                    }else{
                         lat = json['results'][0]['geometry']['location']['lat'];
                         lng = json['results'][0]['geometry']['location']['lng'];
                         var newItem = {
@@ -743,37 +673,22 @@ var buildingView = {
                             deleted: 0
 
                         };
+                        connection.sendAjax("PUT", "building/" + newItem.id,
+                            function (text, data, xhr) {
+                                if (text) {
+                                    util.messages.showMessage("Podaci su uspješno izmijenjeni.");
+                                    $$("buildingDT").updateItem(newItem.id, newItem);
+                                } else
+                                    util.messages.showErrorMessage("Podaci nisu izmijenjeni.");
+                            }, function (text, data, xhr) {
+                                util.messages.showErrorMessage(text);
+                            }, newItem);
+                        util.dismissDialog('changeBuildingDialog');
 
 
-                    });
-
-                } else {
-                    var newItem = {
-                        id: $$("changeBuildingForm").getValues().id,
-                        name: $$("changeBuildingForm").getValues().name,
-                        description: $$("changeBuildingForm").getValues().description,
-                        address: $$("changeBuildingForm").getValues().adresa,
-                        latitude: lat,
-                        longitude: lng,
-                        companyId: companyData.id,
-                        deleted: 0
-
-                    };
-                    console.log(newItem);
-                    connection.sendAjax("PUT", "building/" + newItem.id,
-                        function (text, data, xhr) {
-                            if (text) {
-                                util.messages.showMessage("Podaci su uspješno izmijenjeni.");
-                                $$("buildingDT").updateItem(newItem.id, newItem);
-                            } else
-                                util.messages.showErrorMessage("Podaci nisu izmijenjeni.");
-                        }, function (text, data, xhr) {
-                            util.messages.showErrorMessage(text);
-                        }, newItem);
-                    util.dismissDialog('changeBuildingDialog');
+                    }});
                 }
-            }
-        }
+
     },
         save: function () {
             var form = $$("addBuildingForm");
