@@ -15,6 +15,15 @@ var loggerView = {
                 view:"daterangepicker",
                 name:"dateRangePicker",
                 label:"Od-Do:",
+                suggest:{
+                    view:"daterangesuggest",
+                    body:{
+                        calendarCount:1,
+                        icons:true,
+                        css:"custom_date_picker_report",
+
+                    }
+                },
                 on:{
                     onChange: function (dates) {
                         if (dates.start != null && dates.end != null){
@@ -64,12 +73,10 @@ var loggerView = {
                         }
                         switch (id){
                             case 1:
-                                util.messages.showMessage("i guess something one");
                                 $$("loggerDT").filterByAll();
                                 break;
                             case 2:
                                 customFilterForDate(1);
-                                util.messages.showMessage("i guess something 2");
                                 break;
                             case 3:
                                 customFilterForDate(7);
