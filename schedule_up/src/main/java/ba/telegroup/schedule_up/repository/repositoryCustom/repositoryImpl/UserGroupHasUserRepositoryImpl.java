@@ -13,7 +13,7 @@ import java.util.List;
 
 public class UserGroupHasUserRepositoryImpl implements UserGroupHasUserRepositoryCustom {
 
-    private static final String SQL_GET_ALL_USER_BY_GROUP_ID = "SELECT u.id, u.email, u.username, u.password, u.pin, u.first_name, u.last_name, u.photo, u.active, u.deleted, u.token, u.token_time, u.company_id, u.role_id FROM user u JOIN user_group_has_user g ON g.user_id = u.id WHERE g.user_group_id = ? and u.deleted = 0";
+    private static final String SQL_GET_ALL_USER_BY_GROUP_ID = "SELECT u.id, u.email, u.username, u.password, u.pin, u.first_name, u.last_name, u.photo, u.active, u.deleted, u.token, u.token_time, u.company_id, u.role_id FROM user u JOIN user_group_has_user g ON g.user_id = u.id WHERE g.user_group_id = ? and u.deleted = 0 AND (u.active=1 OR (u.active=0 AND u.token IS NOT NULL AND NOW() < ADDTIME(u.token_time, '00:10:00')))";
 
     @PersistenceContext
     private EntityManager entityManager;
