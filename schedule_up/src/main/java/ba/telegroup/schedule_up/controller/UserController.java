@@ -180,7 +180,6 @@ public class UserController extends GenericController<User, Integer> {
             user.setPin(null);
             userBean.setUser(user);
             userBean.setLoggedIn(true);
-
             return userBean.getUser();
         }
     }
