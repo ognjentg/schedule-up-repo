@@ -8,36 +8,26 @@ var userGroupView = {
             css: "panelToolbar",
             cols: [{
                 view: "label",
-                width: 400,
+                width: 200,
                 template: "<span class='fa fa-users'></span> Korisničke grupe"
+            },{},{
+                id: "addUserGroupBtn",
+                view: "button",
+                type: "iconButton",
+                label: "Dodajte grupu",
+                icon: "plus-circle",
+                click: 'userGroupView.showAddDialog',
+                autowidth: true
             }]
         }, {
-            height: 40
-        },  {
             cols: [
-                {},
+
                 {
                 rows: [
                     {
-                        view:"toolbar",
-                        css:"panelToolbar",
-                        width:300,
-
-                        cols:[{
-                        view: "label",
-                        label: "Grupe",
-
-                    },
-                    {},
-                    {
-                        id: "addUserGroupBtn",
-                        view: "button",
-                        type: "iconButton",
-                        label: "Dodajte grupu",
-                        icon: "plus-circle",
-                        click: 'userGroupView.showAddDialog',
-                        autowidth: true
-                    }]
+                        view: "template",
+                        template: "Grupe",
+                        type: "header"
                     },
 
                     {
@@ -71,7 +61,7 @@ var userGroupView = {
                 }
 
                 ]
-            }, {}, {
+            }, {
                 rows: [
 
                     {
@@ -79,7 +69,7 @@ var userGroupView = {
                     template: "Članovi",
                     type: "header"
                 }, {
-                    width:300,
+                    autowidth:true,
                     view: "list",
                     multiselect: true,
                     id: "inUsersList",
@@ -119,13 +109,13 @@ var userGroupView = {
                 }
 
                 ]
-            }, {}, {
+            }, {
                 rows: [{
                     view: "template",
                     template: "Ostali korisnici",
                     type: "header"
                 }, {
-                    width:300,
+                    autowidth:true,
 
                     view: "list",
                     multiselect: true,
@@ -163,8 +153,8 @@ var userGroupView = {
                         }
                     }
                 }]
-            },{}]
-        },{height:40}]
+            }]
+        }]
     },
 
     selectPanel: function () {

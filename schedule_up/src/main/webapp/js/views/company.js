@@ -358,7 +358,6 @@ var companyView = {
                             $$('addCompanyForm').elements.email.config.invalidMessage = 'E-mail nije u validnom formatu.';
                             return false;
                         }
-
                         return true;
                     },
                     "timeTo":function (value) {
@@ -704,4 +703,6 @@ var companyView = {
         }
 
     }
+
+    
 };

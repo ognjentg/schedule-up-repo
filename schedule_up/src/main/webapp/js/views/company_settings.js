@@ -8,325 +8,340 @@ var companySettingsView = {
     panel: {
         id: "settingsPanel",
         adjust: true,
-        cols: [
+        rows:[
+            { height:50},
             {
-                rows: [
-                    {
-                        view: "toolbar",
-                        padding: 8,
-                        css: "panelToolbar rounded-top",
-                        cols: [
+                cols: [
+                    {}, {
+                        rows: [
+
                             {
-                                view: "label",
-                                template: "<span class='fa fa-cog'></span> Opšta podešavanja"
-                            }
-                        ]
-                    },
-                    {
-                        view: "form",
-                        id: "customizeForm",
-                        adjust: true,
-                        elementsConfig: {
-                            bottomPadding: 5,
-
-                        },
-                        elements: [
-                            {
-                                id: "timeFrom",
-                                name: "timeFrom",
-                                view: "datepicker",
-                                editable:true,
-                                labelWidth: 290,
-                                stringResult: true,
-                                width: 400,
-                                label: "Početak radnog vremena:",
-                                timepicker: true,
-                                type: "time",
-                                format: "%H:%i",
-                                on: {
-                                    onChange: function (item, oldv) {
-                                        if (companySettingsView.firstLoadStart++ == 0) {
-                                            return;
-                                        }
-                                        var oldTimeFrom = companyData.timeFrom;
-                                        var endTime = companyData.timeTo;
-                                        if (endTime > $$("customizeForm").getValues().timeFrom) {
-                                            companyData.timeFrom = $$("customizeForm").getValues().timeFrom + ":00";
-                                            connection.sendAjax("PUT", "company/" + companyData.id,
-                                                function (text, data, xhr) {
-                                                    if (text && text == "Success") {
-                                                    } else {
-                                                        util.messages.showErrorMessage("Greška pri izmjeni.");
-                                                        companyData.timeFrom = oldTimeFrom;
-                                                    }
-                                                }, function (text, data, xhr) {
-                                                    util.messages.showErrorMessage(text);
-                                                    companyData.timeFrom = oldTimeFrom;
-                                                }, companyData)
-                                        } else {
-                                            util.messages.showErrorMessage("Vrijeme početka ne može biti poslije kraja radnog vremena.");
-                                            companyData.timeFrom = oldTimeFrom;
-                                            $$("timeFrom").setValue(oldTimeFrom);
-                                             $$("customizeForm").refresh();
-                                            return false;
-                                        }
-                                    }
-                                },
-                                suggest: {
-                                    type: "calendar",
-                                    body: {
-                                        type: "time",
-                                        calendarTime: "%H:%i"
-                                    }
-                                }
-                            },
-                            {
-                                id: "timeTo",
-                                width: 400,
-                                labelWidth: 290,
-                                name: "timeTo",
-                                view: "datepicker",
-                                editable:true,
-                                stringResult: true,
-                                label: "Kraj radnog vremena:",
-                                timepicker: true,
-                                type: "time",
-                                format: "%H:%i",
-                                on: {
-                                    onChange: function (item,novi) {
-
-                                        if (companySettingsView.firstLoadEnd++ == 0) {
-                                            return;
-                                        }
-                                        var oldTimeTo = companyData.timeTo;
-                                        companyData.timeTo = $$("customizeForm").getValues().timeTo + ":00";
-                                        var startTime = companyData.timeFrom;
-                                        if (startTime < $$("customizeForm").getValues().timeTo) {
-                                        connection.sendAjax("PUT", "company/" + companyData.id,
-                                            function (text, data, xhr) {
-                                                if (text && text == "Success") {
-                                                } else {
-                                                    util.messages.showErrorMessage("Greška pri izmjeni.");
-                                                    companyData.timeTo = oldTimeTo;
-
-                                                }
-                                            }, function (text, data, xhr) {
-                                                util.messages.showErrorMessage(text);
-                                                companyData.timeTo = oldTimeTo;
-                                            }, companyData)
-                                    }else{
-                                            util.messages.showErrorMessage("Vrijeme početka ne može biti poslije kraja radnog vremena.");
-                                            companyData.timeTo = oldTimeTo;;
-                                            $$("timeTo").setValue( oldTimeTo);
-                                            $$("customizeForm").refresh();
-                                    }}
-                                },
-                                suggest: {
-                                    type: "calendar",
-                                    body: {
-                                        type: "time",
-                                        calendarTime: "%H:%i"
-                                    }
-                                }
-                            },
-                            {
-                                id: "reminderTime",
-                                view: "combo",
-                                labelWidth: 290,
-                                width: 400,
-                                value: "One",
-                                options: ["0 minuta", "5 minuta", "15 minuta", "30 minuta", "1 sat", "12 sati", "1 dan"],
-                                label: "Podsjetnik:",
-                                on: {
-                                    onChange: function (item, oldv) {
-
-                                        if (companySettingsView.firstLoadReminder++ == 0) {
-                                            return;
-                                        }
-
-                                        var newReminderTime = $$("reminderTime").getValue();
-                                        switch (newReminderTime) {
-                                            case "0 minuta": {
-                                                newReminderTime = "00:00:00";
-                                                break;
-                                            }
-                                            case "5 minuta": {
-                                                newReminderTime = "00:05:00";
-                                                break;
-                                            }
-                                            case "15 minuta": {
-                                                newReminderTime = "00:15:00";
-                                                break;
-                                            }
-                                            case "30 minuta": {
-                                                newReminderTime = "00:30:00";
-                                                break;
-                                            }
-                                            case "1 sat": {
-                                                newReminderTime = "01:00:00";
-                                                break;
-                                            }
-                                            case "12 sati": {
-                                                newReminderTime = "12:00:00";
-                                                break;
-                                            }
-                                            case "1 dan": {
-                                                newReminderTime = "23:59:59";
-                                                break;
-                                            }
-                                        }
-
-                                        var oldValue = companySettingsView.settings.reminderTime;
-                                        companySettingsView.settings.reminderTime = newReminderTime;
-                                        connection.sendAjax("PUT", "settings/" + companySettingsView.settings.id,
-                                            function (text, data, xhr) {
-                                                if (text && text == "Success") {
-                                                } else {
-                                                    companySettingsView.settings.reminderTime = oldValue;
-                                                    util.messages.showErrorMessage("Greška pri izmjeni.");
-                                                }
-                                            }, function (text, data, xhr) {
-                                                util.messages.showErrorMessage(text);
-                                                companySettingsView.settings.reminderTime = oldValue;
-
-                                            }
-                                            , companySettingsView.settings);
-                                    }
-                                }
-                            },
-                            {
-                                view: "combo",
-                                id: "cancelTime",
-                                labelWidth: 290,
-                                label: "Minimalno vrijeme za otkazivanje sastanka:",
-                                width: 400,
-                                options: ["15 minuta", "30 minuta", "1 sat", "12 sati", "1 dan"],
-                                on: {
-                                    onChange: function (item, oldv) {
-
-                                        if (companySettingsView.firstLoadCancel++ == 0) {
-                                            return;
-                                        }
-                                        var newCancelTime = $$("cancelTime").getValue();
-                                        switch (newCancelTime) {
-                                            case "0 minuta": {
-                                                newCancelTime = "00:00:00";
-                                                break;
-                                            }
-                                            case "5 minuta": {
-                                                newCancelTime = "00:05:00";
-                                                break;
-                                            }
-                                            case "15 minuta": {
-                                                newCancelTime = "00:15:00";
-                                                break;
-                                            }
-                                            case "30 minuta": {
-                                                newCancelTime = "00:30:00";
-                                                break;
-                                            }
-                                            case "1 sat": {
-                                                newCancelTime = "01:00:00";
-                                                break;
-                                            }
-                                            case "12 sati": {
-                                                newCancelTime = "12:00:00";
-                                                break;
-                                            }
-                                            case "1 dan": {
-                                                newCancelTime = "23:59:59";
-                                                break;
-                                            }
-                                        }
-                                        var oldValue = companySettingsView.settings.cancelTime;
-                                        companySettingsView.settings.cancelTime = newCancelTime;
-                                        connection.sendAjax("PUT", "settings/" + companySettingsView.settings.id,
-                                            function (text, data, xhr) {
-                                                if (text && text == "Success") {
-                                                } else {
-                                                    companySettingsView.settings.cancelTime = oldValue;
-                                                    util.messages.showErrorMessage("Greška pri izmjeni.");
-                                                }
-                                            }, function (text, data, xhr) {
-                                                util.messages.showErrorMessage(text);
-                                                companySettingsView.settings.cancelTime = oldValue;
-
-                                            }, companySettingsView.settings);
-                                    }
-                                }
-                            }
-                        ]
-                    }, {
-                        view: "toolbar",
-                        padding: 8,
-                        css: "panelToolbar",
-                        cols: [{
-                            view: "label",
-                            template: "<span class='fa fa-calendar'></span> Neradni dani"
-                        }, {
-                            id: "addDayBtn",
-                            view: "button",
-                            type: "iconButton",
-                            label: "Dodajte neradni dan",
-                            click: "companySettingsView.showAddDialog",
-                            icon: "plus-circle",
-                            autowidth: true
-                        }]
-                    }, {
-                        view: "datatable",
-                        css: "webixDatatable",
-                        width: 400,
-                        multiselect: false,
-                        id: "holidayDT",
-                        resizeColumn: true,
-                        resizeRow: true,
-                        onContext: {},
-                        columns: [{
-
-                            id: "name",
-
-                            editable: false,
-                            fillspace: true,
-                            editor: "text",
-                            sort: "string",
-                            header: [
-                                "Naziv", {
-                                    content: "textFilter"
-                                }
-                            ]
-                        }, {
-                            id: "companyId",
-                            hidden: true
-                        }, {
-                            id: "company_id",
-                            hidden: true
-                        },
-                            {
-                                id: "date",
-                                fillspace: true,
-                                editable: false,
-                                editor: "text",
-                                sort: "text",
-                                header: [
-                                    "Datum", {
-                                        content: "textFilter"
+                                view: "toolbar",
+                                padding: 8,
+                                css: "panelToolbar",
+                                cols: [
+                                    {
+                                        view: "label",
+                                        template: "<span class='fa fa-cog'></span> Opšta podešavanja"
                                     }
                                 ]
-                            }
-                        ],
-                        select: "row",
-                        navigation: true,
-                        editable: false,
-                        url: "holiday",
-                        on: {
+                            },
+                            {
+                                view: "form",
+                                id: "customizeForm",
+                                height:350,
+                                adjust: true,
+                                elementsConfig: {
+                                    bottomPadding: 5,
 
-                            onAfterContextMenu: function (item) {
-                                this.select(item.row);
+                                },
+                                elements: [
+                                    {
+                                        id: "timeFrom",
+                                        name: "timeFrom",
+                                        view: "datepicker",
+                                        editable: true,
+                                        labelWidth: 290,
+                                        stringResult: true,
+                                        width: 400,
+                                        label: "Početak radnog vremena:",
+                                        timepicker: true,
+                                        type: "time",
+                                        format: "%H:%i",
+                                        on: {
+                                            onChange: function (item, oldv) {
+                                                if (companySettingsView.firstLoadStart++ == 0) {
+                                                    return;
+                                                }
+                                                var oldTimeFrom = companyData.timeFrom;
+                                                var endTime = companyData.timeTo;
+                                                if (endTime > $$("customizeForm").getValues().timeFrom) {
+                                                    companyData.timeFrom = $$("customizeForm").getValues().timeFrom + ":00";
+                                                    connection.sendAjax("PUT", "company/" + companyData.id,
+                                                        function (text, data, xhr) {
+                                                            if (text && text == "Success") {
+                                                            } else {
+                                                                util.messages.showErrorMessage("Greška pri izmjeni.");
+                                                                companyData.timeFrom = oldTimeFrom;
+                                                            }
+                                                        }, function (text, data, xhr) {
+                                                            util.messages.showErrorMessage(text);
+                                                            companyData.timeFrom = oldTimeFrom;
+                                                        }, companyData)
+                                                } else {
+                                                    util.messages.showErrorMessage("Vrijeme početka ne može biti poslije kraja radnog vremena.");
+                                                    companyData.timeFrom = oldTimeFrom;
+                                                    $$("timeFrom").setValue(oldTimeFrom);
+                                                    $$("customizeForm").refresh();
+                                                    return false;
+                                                }
+                                            }
+                                        },
+                                        suggest: {
+                                            type: "calendar",
+                                            body: {
+                                                type: "time",
+                                                calendarTime: "%H:%i"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        id: "timeTo",
+                                        width: 400,
+                                        labelWidth: 290,
+                                        name: "timeTo",
+                                        view: "datepicker",
+                                        editable: true,
+                                        stringResult: true,
+                                        label: "Kraj radnog vremena:",
+                                        timepicker: true,
+                                        type: "time",
+                                        format: "%H:%i",
+                                        on: {
+                                            onChange: function (item, novi) {
+
+                                                if (companySettingsView.firstLoadEnd++ == 0) {
+                                                    return;
+                                                }
+                                                var oldTimeTo = companyData.timeTo;
+                                                companyData.timeTo = $$("customizeForm").getValues().timeTo + ":00";
+                                                var startTime = companyData.timeFrom;
+                                                if (startTime < $$("customizeForm").getValues().timeTo) {
+                                                    connection.sendAjax("PUT", "company/" + companyData.id,
+                                                        function (text, data, xhr) {
+                                                            if (text && text == "Success") {
+                                                            } else {
+                                                                util.messages.showErrorMessage("Greška pri izmjeni.");
+                                                                companyData.timeTo = oldTimeTo;
+
+                                                            }
+                                                        }, function (text, data, xhr) {
+                                                            util.messages.showErrorMessage(text);
+                                                            companyData.timeTo = oldTimeTo;
+                                                        }, companyData)
+                                                } else {
+                                                    util.messages.showErrorMessage("Vrijeme početka ne može biti poslije kraja radnog vremena.");
+                                                    companyData.timeTo = oldTimeTo;
+                                                    ;
+                                                    $$("timeTo").setValue(oldTimeTo);
+                                                    $$("customizeForm").refresh();
+                                                }
+                                            }
+                                        },
+                                        suggest: {
+                                            type: "calendar",
+                                            body: {
+                                                type: "time",
+                                                calendarTime: "%H:%i"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        id: "reminderTime",
+                                        view: "combo",
+                                        labelWidth: 290,
+                                        width: 400,
+                                        value: "One",
+                                        options: ["0 minuta", "5 minuta", "15 minuta", "30 minuta", "1 sat", "12 sati", "1 dan"],
+                                        label: "Podsjetnik:",
+                                        on: {
+                                            onChange: function (item, oldv) {
+
+                                                if (companySettingsView.firstLoadReminder++ == 0) {
+                                                    return;
+                                                }
+
+                                                var newReminderTime = $$("reminderTime").getValue();
+                                                switch (newReminderTime) {
+                                                    case "0 minuta": {
+                                                        newReminderTime = "00:00:00";
+                                                        break;
+                                                    }
+                                                    case "5 minuta": {
+                                                        newReminderTime = "00:05:00";
+                                                        break;
+                                                    }
+                                                    case "15 minuta": {
+                                                        newReminderTime = "00:15:00";
+                                                        break;
+                                                    }
+                                                    case "30 minuta": {
+                                                        newReminderTime = "00:30:00";
+                                                        break;
+                                                    }
+                                                    case "1 sat": {
+                                                        newReminderTime = "01:00:00";
+                                                        break;
+                                                    }
+                                                    case "12 sati": {
+                                                        newReminderTime = "12:00:00";
+                                                        break;
+                                                    }
+                                                    case "1 dan": {
+                                                        newReminderTime = "23:59:59";
+                                                        break;
+                                                    }
+                                                }
+
+                                                var oldValue = companySettingsView.settings.reminderTime;
+                                                companySettingsView.settings.reminderTime = newReminderTime;
+                                                connection.sendAjax("PUT", "settings/" + companySettingsView.settings.id,
+                                                    function (text, data, xhr) {
+                                                        if (text && text == "Success") {
+                                                        } else {
+                                                            companySettingsView.settings.reminderTime = oldValue;
+                                                            util.messages.showErrorMessage("Greška pri izmjeni.");
+                                                        }
+                                                    }, function (text, data, xhr) {
+                                                        util.messages.showErrorMessage(text);
+                                                        companySettingsView.settings.reminderTime = oldValue;
+
+                                                    }
+                                                    , companySettingsView.settings);
+                                            }
+                                        }
+                                    },
+                                    {
+                                        view: "combo",
+                                        id: "cancelTime",
+                                        labelWidth: 290,
+                                        label: "Minimalno vrijeme za otkazivanje sastanka:",
+                                        width: 400,
+                                        options: ["15 minuta", "30 minuta", "1 sat", "12 sati", "1 dan"],
+                                        on: {
+                                            onChange: function (item, oldv) {
+
+                                                if (companySettingsView.firstLoadCancel++ == 0) {
+                                                    return;
+                                                }
+                                                var newCancelTime = $$("cancelTime").getValue();
+                                                switch (newCancelTime) {
+                                                    case "0 minuta": {
+                                                        newCancelTime = "00:00:00";
+                                                        break;
+                                                    }
+                                                    case "5 minuta": {
+                                                        newCancelTime = "00:05:00";
+                                                        break;
+                                                    }
+                                                    case "15 minuta": {
+                                                        newCancelTime = "00:15:00";
+                                                        break;
+                                                    }
+                                                    case "30 minuta": {
+                                                        newCancelTime = "00:30:00";
+                                                        break;
+                                                    }
+                                                    case "1 sat": {
+                                                        newCancelTime = "01:00:00";
+                                                        break;
+                                                    }
+                                                    case "12 sati": {
+                                                        newCancelTime = "12:00:00";
+                                                        break;
+                                                    }
+                                                    case "1 dan": {
+                                                        newCancelTime = "23:59:59";
+                                                        break;
+                                                    }
+                                                }
+                                                var oldValue = companySettingsView.settings.cancelTime;
+                                                companySettingsView.settings.cancelTime = newCancelTime;
+                                                connection.sendAjax("PUT", "settings/" + companySettingsView.settings.id,
+                                                    function (text, data, xhr) {
+                                                        if (text && text == "Success") {
+                                                        } else {
+                                                            companySettingsView.settings.cancelTime = oldValue;
+                                                            util.messages.showErrorMessage("Greška pri izmjeni.");
+                                                        }
+                                                    }, function (text, data, xhr) {
+                                                        util.messages.showErrorMessage(text);
+                                                        companySettingsView.settings.cancelTime = oldValue;
+
+                                                    }, companySettingsView.settings);
+                                            }
+                                        }
+                                    }
+                                ]
+                            },
+                        ]
+                    }, {
+                        rows: [
+                            {
+                                view: "toolbar",
+                                padding: 8,
+                                css: "panelToolbar",
+                                cols: [{
+                                    view: "label",
+                                    template: "<span class='fa fa-calendar'></span> Neradni dani"
+                                }, {
+                                    id: "addDayBtn",
+                                    view: "button",
+                                    type: "iconButton",
+                                    label: "Dodajte neradni dan",
+                                    click: "companySettingsView.showAddDialog",
+                                    icon: "plus-circle",
+                                    autowidth: true
+                                }]
+                            },
+                            {
+                                view: "datatable",
+                                css: "webixDatatable",
+                                width: 400,
+                                height:350,
+                                multiselect: false,
+                                id: "holidayDT",
+                                resizeColumn: true,
+                                resizeRow: true,
+                                onContext: {},
+                                columns: [{
+
+                                    id: "name",
+
+                                    editable: false,
+                                    fillspace: true,
+                                    editor: "text",
+                                    sort: "string",
+                                    header: [
+                                        "Naziv", {
+                                            content: "textFilter"
+                                        }
+                                    ]
+                                }, {
+                                    id: "companyId",
+                                    hidden: true
+                                }, {
+                                    id: "company_id",
+                                    hidden: true
+                                },
+                                    {
+                                        id: "date",
+                                        fillspace: true,
+                                        editable: false,
+                                        editor: "text",
+                                        sort: "text",
+                                        header: [
+                                            "Datum", {
+                                                content: "textFilter"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                select: "row",
+                                navigation: true,
+                                editable: false,
+                                url: "holiday",
+                                on: {
+
+                                    onAfterContextMenu: function (item) {
+                                        this.select(item.row);
+                                    }
+                                }
                             }
-                        }
-                    }]
-            }
-        ]
+                        ]
+                    }, {}
+                ]
+            },{}]
     },
     addDialog: {
         view: "popup",
