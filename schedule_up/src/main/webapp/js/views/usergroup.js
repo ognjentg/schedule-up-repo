@@ -29,7 +29,21 @@ var userGroupView = {
                         template: "Grupe",
                         type: "header"
                     },
-
+                    {
+                        height: 50,
+                        view:"toolbar",
+                        rows:[ {
+                            view:"text",
+                            id:"userGroupFilter",
+                            on: {
+                                onTimedKeyPress: function () {
+                                    var value = this.getValue().toLowerCase();
+                                    $$("userGroupList").filter("#name#", value);
+                                }
+                            }
+                        }
+                        ]
+                    },
                     {
                     view: "list",
                     multiselect: false,
@@ -69,6 +83,27 @@ var userGroupView = {
                     template: "Članovi",
                     type: "header"
                 }, {
+                        height: 50,
+                        view:"toolbar",
+                        rows:[ {
+                            view:"text",
+                            id:"inUsersFilter",
+                            on: {
+                                onTimedKeyPress: function () {
+                                    var value = this.getValue().toLowerCase();
+                                    $$("inUsersList").filter(function(obj){
+                                        //filter by multiple properties
+                                        var filter = [obj.firstName, obj.lastName,
+                                            obj.email].join("|");
+                                        filter = filter.toString().toLowerCase();
+                                        return (filter.indexOf(value) != -1);
+                                    });
+
+                                }
+                            }
+                        }
+                        ]
+                    }, {
                     autowidth:true,
                     view: "list",
                     multiselect: true,
@@ -114,6 +149,27 @@ var userGroupView = {
                     view: "template",
                     template: "Ostali korisnici",
                     type: "header"
+                }, {
+                    height: 50,
+                    view:"toolbar",
+                    rows:[ {
+                        view:"text",
+                        id:"outUsersFilter",
+                        on: {
+                            onTimedKeyPress: function () {
+                                var value = this.getValue().toLowerCase();
+                                $$("outUsersList").filter(function(obj){
+                                    //filter by multiple properties
+                                    var filter = [obj.firstName, obj.lastName,
+                                        obj.email].join("|");
+                                    filter = filter.toString().toLowerCase();
+                                    return (filter.indexOf(value) != -1);
+                                });
+
+                            }
+                        }
+                    }
+                    ]
                 }, {
                     autowidth:true,
 
