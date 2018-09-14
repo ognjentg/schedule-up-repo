@@ -16,6 +16,50 @@
     background: #f1f1f1;
 }*/
 
+
+
+
+.loginBar {
+    background: linear-gradient(90deg, #F58220 50%, #F5BB7A 60%, #F5E2B8 100%);
+}
+
+.loginLogo {
+    border: none;
+    text-align: center;
+}
+
+.logoInside {
+    background: linear-gradient(#FFF, #F8F8F8);
+    text-align: center;
+    padding-top: 6px;
+    cursor: pointer;
+}
+
+.loginForm {
+    position: relative;
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.loginPanel .webix_view {
+    overflow: visible !important;
+}
+
+.loginName{
+    display: inline-block;
+    vertical-align: top;
+    border-width: 0px;
+    margin-top: 0px;
+    margin-left: -1px;
+    padding-top: 25px;
+    width: 500px;
+    height: 102px;
+    font-size: 25px;
+    font-weight: bold;
+}
+
+
+
 .noteName {
     font-size: 26px !important;
     padding-left: 20px !important;

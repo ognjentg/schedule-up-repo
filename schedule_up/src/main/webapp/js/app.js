@@ -200,100 +200,88 @@ var init = function () {
 
 var loginLayout = {
     id: "login",
-    width: "auto",
-    height: "auto",
-    rows: [
-        {
-            cols: [
-                {},
-                {
-                    height: 60,
+    css: "loginPanel",
+    rows: [{
+        view: "template",
+        height: 25,
+        css: "loginBar"
+    }, {}, {
+        cols: [{}, {
+            view: "template",
+            height: 100,
+            width: 150,
+            css: "loginLogo",
+            template: '<img src="img/schedule_up_logo.png" style="margin-left:-160px"/>'
+        }, {
+            id: "logoName",
+            name: "logoName",
+            view: "label",
+            css: "loginName",
+            label: "SCHEDULE UP",
+            template: '<span style="margin-left: -100px"></span>SCHEDULE UP'
+        }]
+    }, {
+        cols: [{}, {
+            view: "form",
+            id: "loginForm",
+            css: "loginForm",
+            width: 500,
+            elements: [{
+                id: "username",
+                name: "username",
+                view: "text",
+                label: "Korisničko ime:",
+                invalidMessage: "Korisničke ime je obavezno!",
+                required: true,
+                labelWidth: 150
+            }, {
+                id: "password",
+                name: "password",
+                view: "text",
+                type: "password",
+                label: "Lozinka:",
+                invalidMessage: "Lozinka je obavezna!",
+                required: true,
+                labelWidth: 150
+            }, {
+                id: "companyName",
+                name: "companyName",
+                view: "text",
+                label: "Kompanija:",
+                labelWidth: 150
+            }, {
+                cols: [{
+                    id: "registerBtn",
+                    view: "button",
+                    value: "Registrujte se",
+                    type: "form",
+                    click: "register",
+                    width: 150
+                }, {}, {
+                    id: "loginBtn",
+                    view: "button",
+                    value: "Prijavite se",
+                    type: "form",
+                    click: "login",
+                    align: "right",
+                    hotkey: "enter",
+                    width: 150
+                }]
+            }, {
+                cols: [{}, {
+                    width: 150,
+                    align: "right",
                     view: "label",
-                    label: "Schedule Up",
-                    css: "appNameLabel"
+                    label: "<a href='javascript:showForgottenPasswordPopup();'>Zaboravili ste lozinku?</a>"
                 }
-            ]
-
-        },
-        {
-            cols: [
-                {},
-                {
-                    view: "form",
-                    id: "loginForm",
-                    width: 400,
-                    elementsConfig: {
-                        labelWidth: 140,
-                        bottomPadding: 18
-                    },
-                    elements: [
-                        {
-                            id: "username",
-                            name: "username",
-                            view: "text",
-                            label: "Korisničko ime:",
-                            invalidMessage: "Korisničke ime je obavezno!",
-                            required: true
-                        },
-                        {
-                            id: "password",
-                            name: "password",
-                            view: "text",
-                            type: "password",
-                            label: "Lozinka:",
-                            invalidMessage: "Lozinka je obavezna!",
-                            required: true
-                        },
-                        {
-                            id: "companyName",
-                            name: "companyName",
-                            view: "text",
-                            label: "Kompanija:"
-                        }, {
-                            margin: 5,
-                            cols: [
-                                {
-                                    id: "registerBtn",
-                                    view: "button",
-                                    value: "Registrujte se",
-                                    type: "form",
-                                    click: "register",
-                                    width: 150
-                                },
-                                {},
-                                {
-                                    id: "loginBtn",
-                                    view: "button",
-                                    value: "Prijavite se",
-                                    type: "form",
-                                    click: "login",
-                                    align:"right",
-                                    hotkey: "enter",
-                                    width: 150
-                                }
-                                ]
-                        },
-                        {
-                            margin: 5,
-                            cols:[
-                                {},
-                                {
-                                    width: 150,
-                                    align:"right",
-                                    view:"label",
-                                    label:"<a href='javascript:showForgottenPasswordPopup();'>Zaboravili ste lozinku?</a>"
-                                }
-
-                            ]
-                        }
-                    ]
-                }
-                ,
-                {}
-            ]
-        }
+                ]
+            }]
+        }, {},
+        ]
+    }, {}, {}
     ]
 };
+
 var register = function () {
     var register = webix.copy(registrationLayout);
     webix.ui(register, panel);
